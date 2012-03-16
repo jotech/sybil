@@ -1,0 +1,893 @@
+\documentclass[a4paper,headings=small]{scrartcl}
+\usepackage[english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{textcomp,lmodern}
+\typearea[current]{last}
+\usepackage{fixltx2e,mparhack,mathdots}
+
+
+\usepackage{xspace}
+\usepackage{paralist}
+\usepackage{footmisc}
+\usepackage{natbib}
+\usepackage{hyperref}
+
+\usepackage{microtype}
+
+\newcommand{\Comp}[1]{\texttt{#1}}
+
+\addtolength{\skip\footins}{0.5\baselineskip}
+\usepackage{fnpos}
+
+
+\hypersetup{
+    pdftitle = {SyBiL -- Systems Biology Library},
+    pdfauthor = {Gabriel Gelius-Dietrich},
+    pdfsubject = {constrained based analysis in R},
+    pdfkeywords = {Optimization, FBA, MOMA},
+    pdfborder = {0 0 0},
+    pdfhighlight = {/N}
+}
+
+
+\newcommand{\pkg}[1]{\emph{#1}}
+\newcommand{\pkgname}{\pkg{SyBiL}\xspace}
+\newcommand{\prgname}[1]{\textsc{#1}}
+
+%\newcommand{\cplex}{IBM\textregistered{} %
+%                    ILOG\textregistered{} CPLEX\textregistered{}%
+%}
+\newcommand{\cplex}{IBM ILOG CPLEX}
+
+\title{SyBiL -- Systems Biology Library}
+%\VignetteIndexEntry{SyBiL -- Systems Biology Library}
+%\VignettePackage{SyBiL}
+\author{Gabriel Gelius-Dietrich}
+
+
+% ---------------------------------------------------------------------------- %
+% entire document
+% ---------------------------------------------------------------------------- %
+
+\begin{document}
+
+
+\maketitle
+\enlargethispage{1.5\baselineskip}
+
+\tableofcontents
+
+% ---------------------------------------------------------------------------- %
+
+\section{Introduction}
+
+The R-package \pkgname{} is a Systems Biology Library for R, implementing
+algorithms for constraint based analysis of metabolic networks.
+%The software is available from the \pkgname{}
+%homepage\footnote{\url{http://www.cs.uni-duesseldorf.de/AG/BI/Software/SyBiL/}\label{sfoot}}.
+
+\pkgname{} makes use of the sparse matrix implementation in the R-package
+\pkg{Matrix} available from
+CRAN\footnote{\url{http://www.r-project.org/}\label{cranfoot}}, or, from
+R version 2.14.0 on, is already included in your R installation.
+
+
+% ---------------------------------------------------------------------------- %
+
+\section{Installation}
+
+The package \pkgname{} itself depends on an existing installation of the
+package \pkg{Matrix}.  In order to run optimizations, at least one of the
+following additional R-packages and the corresponding libraries are required:
+\pkg{glpkAPI}, \pkg{cplexAPI}, \pkg{clpAPI} or \pkg{lpSolveAPI}.
+These packages are also available from CRAN\footref{cranfoot}.
+
+
+% ---------------------------------------------------------------------------- %
+
+\section{Input files}
+\label{inputformats}
+
+Input files for \pkgname are text files containing a description of the
+metabolic model to analyse.  These descriptions are basically lists of
+reactions.
+Two fundamentally different types of text files are supported:
+\begin{inparaenum}[i)]
+\item in tabular form, or
+\item in an XML based format (SBML).
+\end{inparaenum}
+
+
+% ---------------------------------------------------------------------------- %
+
+\subsection{Tabular form} \label{tabmod}
+
+Models in tabular form can be read using the function \Comp{readTSVmod} and
+written using the function \Comp{modelorg2tsv}.
+Each metabolic model description consits of three tables:
+\begin{enumerate}
+\item A model description, containing a model name, the compartments of the
+      model and so on (section~\ref{moddesc}).
+\item A list of all metabolites (section~\ref{metlist}).
+\item A list of all reactions (section~\ref{reactlist}).
+\end{enumerate}
+A model must contain at least a list of all reactions.  All other tables are
+optional.  The tables contain columns storing the required data.  Some of these
+columns are optional, but if a certain table exists, there must be a minimal set
+of columns.  The column names (the first line in each file) are used as keywords
+and cannot be changed.
+
+
+% ---------------------------------------------------------------------------- %
+
+\subsubsection{Field and entry delimiter}
+
+There are two important variables in connection with text based tables:  The
+fields (columns) of the tables are separated by a variable
+\Comp{fielddelim}.  If a single entry of a field contains a list of entries,
+they are separated by a variable \Comp{entrydelim}.  The default values are
+given in the table below.
+\begin{center}
+\begin{tabular}{ll}
+\Comp{fielddelim} & \Comp{\textbackslash t}   \\
+\Comp{entrydelim} & \Comp{,\textvisiblespace} \\
+\end{tabular}
+\end{center}
+The default behavior is, that the columns of each table are separated by a
+single \Comp{tab} character. If a column entry helds more than one entry, they
+are separated by a comma folowed by a single
+whitespace \Comp{\textvisiblespace} (not a tab!).
+
+
+% ---------------------------------------------------------------------------- %
+
+\subsubsection{Model description} \label{moddesc}
+Every column in this table can have at most one entry, meaning each entry will
+be a single character string.  If a model description file is used, there should
+be at least the two columns \Comp{name} and \Comp{id}.  If they are
+missing---or if no model description file is used---they will be set to the file
+name of the reaction list, which must be there.
+\begin{description}
+
+\item[name]
+A single character string giving the model name.  If this field is empty, the
+filename of the reaction list is used.
+
+\item[id]
+A single character string giving the model id.  If this field is empty, the
+filename of the reaction list is used.
+
+\item[description]
+A single character string giving a model description (optional).
+
+\item[compartment]
+A single character string containing the compartment names.  The names must be
+separated by \Comp{fielddelim} (optional).
+
+\item[abbreviation]
+A single character string containing the compartment abbreviations.  The
+abbreviations must be in square brackets and separated by \Comp{fielddelim} as
+mentioned above (optional).
+
+\item[Nmetabolites]
+A single integer giving the number of metabolites in the model (optional).
+
+\item[Nreactions]
+A single integer giving the number of reactions in the model (optional).
+
+\item[Ngenes]
+A single integer giving the number of independent genes in the model (optional).
+
+\item[Nnnz]
+A single integer giving the number of non-zero elements in the stoichiometric
+matrix of the model (optional).
+
+\end{description}
+The file \Comp{Ec\_core\_desc.tsv} (in \Comp{extdata/}) contains an exemplarily
+table for the core energy metabolism of \emph{E.~coli}
+\citep{Palsson:2006fk,Orth:2010fk}.
+
+
+% ---------------------------------------------------------------------------- %
+
+\subsubsection{Metabolite list} \label{metlist}
+
+This table is used in order to match metabolite id's given in the list of
+reactions to long metabolite names.  This table is optional, but if it is used,
+the columns \Comp{abbreviation} and \Comp{name} should not be empty.
+\begin{description}
+
+\item[abbreviation]
+A list of single character strings containing the metabolite abbreviations.
+
+\item[name]
+A list of single character strings containing the metabolite names.
+
+\item[compartment]
+A list of character strings containing the metabolite compartment names. Each
+entry can contain more than one compartment name, separated by \Comp{fielddelim}
+(optional, currently unused).
+
+\end{description}
+The file \Comp{Ec\_core\_met.tsv} (in \Comp{extdata/}) contains an exemplarily
+table for the core energy metabolism of \emph{E.~coli}
+\citep{Palsson:2006fk,Orth:2010fk}.
+
+
+% ---------------------------------------------------------------------------- %
+
+\subsubsection{Reaction list} \label{reactlist}
+
+This table contains the reaction equations used in the metabolic network.
+\begin{description}
+
+\item[abbreviation]
+A list of single character strings containing the reaction abbreviations
+(optional, if empty, a warning will be produced).  Entries in the field
+abbreviation are used as reaction id's, so they must be unique.  If they are
+missing, they will be set to \Comp{vi}, $i \in \{1, \dots, n\}\ \forall i$ with
+$n$ beeing the total number of reactions).
+
+\item[name]
+A list of single character strings containing the reaction names (optional, if
+empty, the reaction id's (abbreviations) are used as reaction names.
+
+\item[equation]
+A list of single character strings containing the reaction equation. See
+section~\ref{writeEQ} for a description of reaction equation strings.
+
+\item[reversible]
+A list of single character strings making a particular reaction reversible or
+not. If the entry is \Comp{Reversible} or \Comp{TRUE}, the reaction is
+considered as reversible, otherwise not. If this column is not used, the arrow
+symbol of the reaction string is used (optional).
+
+\item[compartment]
+A list of character strings containing the compartment names in which the
+current reaction takes place. Each entry can contain more than one name,
+separated by \Comp{fielddelim} (optional, currently unused).
+
+\item[lowbnd]
+A list of numeric values containing the lower bounds of the reaction rates.
+If not set, zero is used for an irreversible reaction and the value of
+\Comp{def\_bnd * -1} for a reversible reaction. See documentation of the
+function \Comp{readTSVmod} for the argument \Comp{def\_bnd} (optional).
+
+\item[uppbnd]
+A list of numeric values containing the upper bounds of the reaction rates.
+If not set, the value of \Comp{def\_bnd} is used. See documentation of the
+function \Comp{readTSVmod} for the argument \Comp{def\_bnd} (optional).
+
+\item[obj\_coef]
+A list of numeric values containing objective values for each reaction
+(optional, if missing, zero is used).
+
+\item[rule]
+A list of single character strings containing the gene to reaction associations
+(optional).
+
+\item[subsystem]
+A list of character strings containing the reaction subsystems. Each reaction
+can belong to more than one subsystem. The entries are separated by
+\Comp{fielddelim} (optional).
+
+\end{description}
+The file \Comp{Ec\_core\_react.tsv} (in \Comp{extdata/}) contains an exemplarily
+table for the core energy metabolism of \emph{E.~coli}
+\citep{Palsson:2006fk,Orth:2010fk}.
+
+
+% ---------------------------------------------------------------------------- %
+
+\subsubsection{How to write a reaction equation string} \label{writeEQ}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=.75\textwidth]{net-crop}
+\caption{Simple example network.  A) showing a closed network, B) an open
+         network.  Capital letters are used as metabolite is's, lower case
+         letters are used as compartment id's: b: boundary metabolite,
+         c:~cytosol and e: external metabolite.  Internal reactions are named
+         $v_{1:7}$, transport reactions $b_{1:3}$. Reactions $v_3$ and $v_4$ are
+         reversible, all others are irreversible.}
+\label{netex}
+\end{figure}
+
+Any reaction string can be written without whitespaces. They are not required
+but showed here, in order to make the string more human readable.
+
+\paragraph{Compartment Flag} Each reaction string can start with a compartment
+flag in square brackets followed by a colon. The compartment flag here gives the
+location of all metabolites appearing in the reaction.
+\begin{verbatim}
+[c] :
+\end{verbatim}
+The compartment flag can consist of more than one letter and---if used---must be
+an element of the field \Comp{abbreviation} in the model description. The letter
+\Comp{b} is reserved for boundary metabolites, which can be transported inside
+the system (those metabolites are only used in closed systems and will be
+removed during file parsing).
+
+If the reaction string does not start with a compartment flag, the flag can be
+appended to each metabolite name (e.\,g. for transport reactions):
+\begin{verbatim}
+h2o[e] <==> h2o[c]
+\end{verbatim}
+If no compartment flag is found, it is set to \Comp{[unknown]}.
+
+\paragraph{Reaction Arrow}
+All reactions must be written in the direction educt to product, so that all
+metabolites left of the reaction arrow are considered as educts, all metabolites
+on the right of the reaction arrow are products.
+
+The reaction arrow itself consits of one or more \Comp{=} or \Comp{-} symbols.
+The last symbol must be a \Comp{>}. If a reaction arrow starts with \Comp{<}, it
+is taken as reversible, if the field \Comp{reversible} in the reaction list is
+empty.  Each reaction must contain exactly one reaction arrow.
+
+\paragraph{Stoichiometric Coefficients}
+Stoichiometric coefficients must be in round brackets in front of the
+corresponding metabolite:
+\begin{verbatim}
+(2) h[c] + (0.5) o2[c] + q8h2[c] --> h2o[c] + (2) h[e] + q8[c]
+\end{verbatim}
+Putting the stoichiometric coefficient in brackets makes it possible for the
+metabolite id to start with a number.
+
+\paragraph{Examples}
+
+A minimal reaction list without compartment flags for figure~\ref{netex}A
+(open network):
+\begin{verbatim}
+equation
+A  --> B
+B <==> D
+D <==> E
+B  --> C
+   --> A
+C  -->
+E  -->
+\end{verbatim}
+The same as above including compartment flags and external metabolites and all
+transport reactions for figure~\ref{netex}B (closed network):
+\begin{verbatim}
+equation
+[c]: A  --> B
+[c]: B <==> D
+[c]: D <==> E
+[c]: B  --> C
+A[e] --> A[c]
+C[c] --> C[e]
+E[c] --> E[e]
+A[b] --> A[e]
+C[e] --> C[b]
+E[e] --> E[b]
+\end{verbatim}
+The same as above including reaction id's for figure~\ref{netex} (fields are
+separated by tabulators):
+\begin{verbatim}
+abbreviation    equation
+v2    [c]: A  --> B
+v3    [c]: B <==> D
+v4    [c]: D <==> E
+v6    [c]: B  --> C
+v1    A[e] --> A[c]
+v7    C[c] --> C[e]
+v5    E[c] --> E[e]
+b1    A[b] --> A[e]
+b3    C[e] --> C[b]
+b2    E[e] --> E[b]
+\end{verbatim}
+
+% ---------------------------------------------------------------------------- %
+
+\subsection{XML}
+
+In order to read SBML written model files, the package \pkg{sybilSBML} is
+required (which is also available from available from CRAN\footref{cranfoot}).
+
+
+% ---------------------------------------------------------------------------- %
+
+\section{Usage}
+
+Load \pkgname:
+<<>>=
+library(sybil)
+@
+Get a list of all functions provided with \pkgname:
+<<eval=FALSE>>=
+library(help = "sybil")
+@
+In the following, it is assumed, that package \pkg{glpkAPI} is installed
+additionally to \pkgname, thus GLPK is used as optimization software.
+
+
+\subsection{Reading a model in tabular form}
+
+\pkgname can read metabolic network models written in tabular form as descibed
+in section~\ref{tabmod}. A reconstruction of the central metabolism of
+\emph{E. coli} \citep{Orth:2010fk,Palsson:2006fk} is included as an example
+dataset. The example dataset consists of three files:
+\begin{enumerate}
+\item \Comp{Ec\_core\_desc.tsv} containing the model description,
+\item \Comp{Ec\_core\_met.tsv} containing the metabolite list and
+\item \Comp{Ec\_core\_react.tsv} containing the reaction list.
+\end{enumerate}
+These files are located in the directory \Comp{extdata/} in the package
+\pkgname und can be read in by using the comand \Comp{readTSVmod}:
+<<>>=
+mpath <- system.file(package = "sybil", "extdata")
+model <- readTSVmod(prefix = "Ec_core", fpath = mpath, quote = "\"")
+model
+@
+If the fields in the input files for \Comp{readTSVmod} are quoted, use the
+argument quote (see also documentation of \Comp{read.table}).
+Models (instances of class \Comp{modelorg}, see section~\ref{classmod}) can be
+converted to files in tabular form with the command \Comp{modelorg2tsv}:
+<<eval=FALSE>>=
+modelorg2tsv(model, prefix = "Ec_core")
+@
+Load the example dataset included in \pkgname.
+<<>>=
+data(Ec_core)
+@
+The example model is a `ready to use' model, it contains a biomass objective
+function and an uptake of glucose \citep{Orth:2010fk,Palsson:2006fk}. It is the
+same model as used in the text files before.
+
+
+\subsection{Flux-balance analysis}
+
+Perform flux-balance analysis (FBA).
+<<>>=
+simpleFBA(Ec_core, fld = TRUE)
+@
+The function \Comp{simpleFBA} performs flux-balance analysis
+\citep{Edwards:2002kx,Orth:2010vn}. It returns a list containing the return
+value of the optimization process (\Comp{"ok"}), the solution status
+(\Comp{"stat"}), the value of the objective function after optimization
+(\Comp{"obj"}), the resulting flux distribution---the phenotype of the metabolic
+network---(\Comp{"fluxes"}; argument \Comp{fld} has to be \Comp{TRUE})---and
+results of pre- and postprocessing commands if indicated (\Comp{"preP"} and
+\Comp{\$postP}).
+
+Perform FBA, return an object of class \Comp{optsol\_simpleFBA}
+(extends class \Comp{optsol}, see section~\ref{classopt}).
+<<>>=
+(opt <- simpleFBA(Ec_core, retOptSol = TRUE))
+@
+The variable \Comp{opt} contains an object of class \Comp{optsol\_simpleFBA},
+a data structure storing all results of the optimization and providing methods
+to access the data.  Retrieve the value of the objective function after
+optimization.
+<<>>=
+lp_obj(opt)
+@
+Translate the return and status codes of the optimization software into human
+readable strings.
+<<>>=
+checkOptSol(opt)
+@
+Retrieve reduced costs after optimization.
+<<>>=
+simpleFBA(Ec_core, poCmd = list("getRedCosts"))
+@
+
+
+\subsection{Knock-out mutants}
+
+In order to compute the metabolic phenotype of \emph{in silico} knock-out
+mutants, the function \Comp{oneGeneDel} can be used.
+<<>>=
+opt <- oneGeneDel(Ec_core)
+checkOptSol(opt)
+@
+The function \Comp{oneGeneDel} gets an argument \Comp{geneList}, a character
+vector containing the gene id's to knock out.  If \Comp{geneList} is missing,
+all genes are taken into account.  The example model contains 137 independent
+genes. The first optimization is for the wild type---no gene is knocked
+out---followed by one optimization for each gene.
+
+
+The result in \Comp{opt} is an object of class \Comp{optsol\_geneDel},
+extending class \Comp{optsol\_simpleFBA}.  Class \Comp{optsol\_geneDel}
+contains a \Comp{hist}-method, plotting the vaules of the objective function.
+<<fig=TRUE>>=
+hist(opt, col = "lightgray", breaks = 20)
+@
+
+\noindent
+The default algorithm used is FBA \citep{Edwards:2002kx,Orth:2010vn}, with the
+assumption, that the phenotype of the mutant metabolic network is independent of
+the wild-type phenotype. An alternative is a linearized version of the MOMA
+algorithm described in \citet{Segre:2002fk} minimizing the hammiltonian distance
+of the wild-type phenotype and the mutant phenotype.
+<<fig=TRUE>>=
+opt <- oneGeneDel(Ec_core, alg = "linearMOMA")
+checkOptSol(opt)
+hist(opt, col = "lightgray", breaks = 20)
+@
+
+\noindent
+In order to perform all possible double-knock-out mutants, or $n$-knock-out
+mutants, the function \Comp{geneDeletion} can be used. Perform single gene
+deletions (in principle the same as before with \Comp{oneGeneDel}).
+<<>>=
+opt <- geneDeletion(Ec_core)
+@
+Compute all double-knock-out mutants and all triple-knock-out mutants
+<<eval=FALSE>>=
+opt2 <- geneDeletion(Ec_core, combinations = 2)
+opt3 <- geneDeletion(Ec_core, combinations = 3)
+@
+which will result in 9317 optimizations for double-knock-outs and
+419\,221~Optimizations for triple-knock-outs using the metabolic model of the
+core energy metabolism of \emph{E.\,coli}. This model contains 137 genes.
+
+
+\subsubsection{Flux variablility analysis}
+
+The function \Comp{fluxVar} performs a flux variability analysis with a given
+model \citep{Mahadevan:2003fk}. The minimum and maximum flux values for each
+reaction in the model are calculated, which still support a given optimal
+functional state $Z_{\mathrm{opt}}$. The example below is based upon the
+metabolic model of the human red blood cell
+by \citet{Palsson:2006fk} and \citet{Price:2004fk}.
+<<>>=
+rbc <- readTSVmod(reactList = "rbc.tsv", fpath = mpath, quote = "\"")
+@
+Perform flux variablilty analysis.
+<<fig=TRUE>>=
+opt <- fluxVar(rbc, verboseMode = 1)
+plot(opt, dottedline = FALSE)
+@
+
+\subsubsection{Robustness analysis}
+
+The function \Comp{robAna} performs a robustness analysis with a given model.
+The flux of a control reaction will be varied stepwise between the maximum and
+minimum value the flux of the control reaction can reach \citep{Palsson:2006fk}. 
+The example below shows a flux variability ananlyis based upon the metabolic
+model of the core energy metabolism of \emph{E.\,coli} using the exchange flux
+of Oxygen as control reaction.
+<<fig=TRUE>>=
+opt <- robAna(Ec_core, "Ex_o2", verboseMode = 1)
+plot(opt)
+@
+
+
+\subsubsection{Parallel computing}
+
+\pkgname{} provides basic support for the R-package \pkg{parallel}
+(\pkg{multicore} for R version prior 2.14.0) in the function \Comp{multidel}.
+The following example shows the computation of all possible triple-knock-out
+mutants using the model of the core energy metabolism of \emph{E.\,coli}.
+The set of genes included in the analysis will be reduced to genes, which are not
+lethal. A gene $i$ is considered as ``lethal'', if in a single-gene-knockout
+the deletion of gene $i$ results in a maximum groth ratio of zero.
+<<>>=
+opt <- oneGeneDel(Ec_core)
+grRatio <- lp_obj(opt)[-1]/lp_obj(opt)[1]
+nletid  <- which(! abs(grRatio) < SYBIL_SETTINGS("TOLERANCE"))
+@
+
+\noindent
+At first, all single-gene-knock-outs are computed. The variable \Comp{nletid}
+contains pointers to the gene id's of genes, who's deletion results in a maximum
+groth ratio not lower than \pkgname's default tolerance value; it contains the
+non-lethal genes.
+The first value of an optimization like \Comp{oneGeneDel} is always the wild
+type value, without any modification of the network. So \Comp{lp\_obj(opt)[1]}
+gives the value of the objective function after optimization of the entire
+metabolic model.
+<<eval=FALSE>>=
+gmat <- combn(nletid, 3)
+@
+The variable \Comp{gmat} now contains a matrix with three rows, each column is
+one combination of three values in \Comp{nletid}; one set of genes to knock-out
+in one step.
+<<eval=FALSE>>=
+opt <- multiDel(Ec_core, nProc = 4, todo = "geneDeletion", del1 = gmat)
+@
+The function \Comp{multiDel} performs a \Comp{geneDeletion} with the model
+\Comp{Ec\_core} on four CPU's (argument \Comp{nProc}) on a shared memory
+machine. Argument \Comp{del1} is the matrix containing the sets of genes to
+delete. This matrix will be split up in smaller submatrices all having about the
+same number of columns and three rows. The submatrices are passed to
+\Comp{geneDeletion} and are processed on separate cores in parallel. The
+resulting variable \Comp{opt} now contains a list of four objects of class
+\Comp{optsol\_genedel}.
+<<eval=FALSE>>=
+mapply(checkOptSol, opt)
+@
+
+\subsection{Optimization software}
+
+For optimizations,
+GLPK\footnote{Andrew Makhorin: GNU Linear Programming Kit, version~4.42 or
+higher
+
+\url{http://www.gnu.org/software/glpk/glpk.html}},
+\cplex\footnote{\cplex{} version 12.2 (or higher) from the IBM Academic
+Ini\-tia\-tive
+
+\url{https://www.ibm.com/developerworks/university/academicinitiative/}},
+COIN-OR Clp\footnote{COIN-OR linear programming version 1.12.0 or higher
+\url{https://projects.coin-or.org/Clp}}
+or lp\_solve\footnote{lp\_solve via R-package \pkg{lpSolveAPI} version 5.5.2.0-5
+or higer
+
+\url{http://lpsolve.sourceforge.net/5.5/index.htm}}
+can be used.  All functions performing optimizations, get the arguments
+\Comp{solver} and \Comp{method}.  The first setting the desired solver and the
+latter setting the desired optimization algorithm.
+Possible values for the argument \Comp{solver} are:
+\begin{itemize}
+\item \Comp{"glpk"}, which is the default,
+\item \Comp{"cplex"},
+\item \Comp{"clp"} or
+\item \Comp{"lpSolveAPI"}.
+\end{itemize}
+Perform FBA, using GLPK as solver and ``simplex exact'' as algorithm.
+<<eval=FALSE>>=
+simpleFBA(Ec_core, method = "exact")
+@
+Perform FBA, using \cplex{} as solver and ``dualopt'' as algorithm.
+<<eval=FALSE>>=
+simpleFBA(Ec_core, solver = "cplex", method = "dualopt")
+@
+The R-packages \pkg{glpkAPI}, \pkg{clpAPI} and \pkg{cplexAPI}
+provide access to the C-API of the corresponding optimization software.
+They are also available from CRAN\footref{cranfoot}.
+
+\subsection{Setting parameters to the optimization software}
+
+All functions performing optimizations can handle the argument
+\Comp{solverParm} getting a data frame containing parameters used by the
+optimization software.
+
+\subsubsection{GLPK}
+
+For available parameters used by GLPK, see the GLPK and the \pkg{glpkAPI}
+documentation.
+<<eval=FALSE>>=
+opt <- oneGeneDel(Ec_core,
+                  solverParm = data.frame(TM_LIM = 1000,
+                                          PRESOLVE = GLP_ON))
+@
+The above command performs a one gene deletion experiment, sets the time
+limit for each optimization to one second and does presolving in each
+optimization.
+
+\subsubsection{\cplex}
+
+For available parameters used by \cplex{}, see the \cplex{} and the
+\pkg{cplexAPI} documentation.
+<<eval=FALSE>>=
+opt <- simpleFBA(Ec_core,
+                 solverParm = data.frame(CPX_PARAM_SCRIND = CPX_ON,
+                                         CPX_PARAM_EPRHS = 1E-09),
+                 solver = "cplex")
+@
+The above command performs FBA, sets the messages to screen switch to ``on''
+and sets the feasibility tolerance to $10^{-9}$.
+
+\subsubsection{clp}
+
+At the time of writing, it is not possible to set any parameters when using
+COIN-OR Clp.
+
+\subsubsection{lpSolveAPI}
+
+See the \pkg{lpSolveAPI} documentation for parameters for \Comp{lp\_solve}.
+<<eval=FALSE>>=
+opt <- simpleFBA(Ec_core,
+                 solverParm = data.frame(verbose = "full",
+                                         timeout = 10),
+                 solver = "lpSolveAPI")
+@
+The above command performs FBA, sets the verbose mode to ``full''
+and sets the timeout to ten seconds.
+
+
+\subsection{Setting parameters in SyBiL}
+
+Settings to \pkgname{} can be set using the function \Comp{SYBIL\_SETTINGS}.
+Set parameter solver to \cplex for every optimization.
+<<eval=FALSE>>=
+SYBIL_SETTINGS("SOLVER", "cplex")
+@
+Now, \cplex is used as default solver e.\,g. in \Comp{simpleFBA}.
+
+
+% ---------------------------------------------------------------------------- %
+
+\section{Central data structures}
+
+\subsection{Class modelorg} \label{classmod}
+
+The class \Comp{modelorg} is the core datastructure to represent a metabolic 
+network, in particular the stoichiometric matrix $S$. 
+An example (E.\,coli core flux by \citep{Palsson:2006fk}) is shipped within 
+\pkgname and can be loaded this way:
+<<>>=
+data(Ec_core)
+Ec_core
+@
+The generic method \Comp{show} displays a short summary of the network. See
+<<eval=FALSE>>=
+help("modelorg")
+@
+for the list of available methods.  All slots of an object of class
+\Comp{modelorg} are accessible via setter and getter methods having the same
+name as the slot. For example, slot \Comp{react\_num} contains the number of
+reactions in the model (equals the number of columns in $S$). Access the
+number of reactions in the \emph{E.\,coli} model.
+<<>>=
+react_num(Ec_core)
+@
+Get all reaction is's:
+<<>>=
+id <- react_id(Ec_core)
+@
+Change a reaction id:
+<<>>=
+react_id(Ec_core)[13] <- "biomass"
+@
+Plot an image of the stoichiometric matrix $S$:
+<<fig=TRUE>>=
+image(S(Ec_core))
+@
+
+\noindent
+Matrices in objects of class \Comp{modelorg} are stored in formats provided by
+the \pkg{Matrix}-package.
+
+Objects of class \Comp{modelorg} can easily be created. Sources are common file
+formats like tab delimited files from the
+BiGG-Database \citep{Schellenberger:2010fk}\footnote{\url{http://bigg.ucsd.edu}}
+or SBML-Files (with package \pkg{sybilSBML}). See section \ref{inputformats} on
+page \pageref{inputformats} about supported file formats and their description.
+
+
+\subsection{Class optsol} \label{classopt}
+
+The derived classes of \Comp{optsol} (optimization solution) are used to store 
+information and results from various optimisation problems and their biological 
+relation. See
+<<eval=FALSE>>=
+help("optsol")
+@
+for the list of available methods to access data.
+A simple demonstration would be:
+<<>>=
+data(Ec_core)
+os <- simpleFBA(Ec_core, retOptSol = TRUE)
+os
+class(os)
+@
+Retrieve objective value.
+<<>>=
+lp_obj(os)
+@
+
+\subsection{Class optObj} \label{classoo}
+
+The class \Comp{optObj} is SyBiL's internal representation of a linear 
+programming problem. Objects of this class harbor four slots: a pointer to the
+C-structure of the problem, the name of the solver, the name of the optimization
+method used by the solver and a single character string, describing the
+problemtype (e.\,g. \Comp{lp} [linear programming]).
+
+\pkgname provides several functions to alter the linear programming model. Each 
+function takes care of the special needs of every supported solver for you.
+The following example should illustrate the purpose of class \Comp{optObj}.
+Consider a linear programming problem, here written in lp file format:
+\begin{verbatim}
+Maximize
+  obj: + x_1 + x_2
+Subject To
+  r_1: + 0.5 x_1 + x_2 <= 4.5
+  r_2: + 2   x_1 + x_2 <= 9
+Bounds
+  0 <= x_1 <= 1000
+  0 <= x_2 <= 1000
+\end{verbatim}
+In order to solve this lp problem with \pkgname{}, an onject of class
+\Comp{optObj} has to be created. The constructor function has the same name as
+the class it builds.
+<<>>=
+lp <- optObj(solver = "glpk", method = "exact")
+lp
+@
+The first argument is the used solver software, in this case it is GLPK. The
+second optional argument gives the method, how the solver software has to solve
+the problem. Here, it is the simplex exact algorithm of GLPK. Every other
+method working on objects of class \Comp{optObj} use the information on slot
+\Comp{solver} in order to select the correct API function fitting to the solver
+software.
+
+Initialize the new problem object. Each solver software needs to create
+specific data structures to hold the problem and solution data.
+<<>>=
+lp <- initProb(lp)
+lp
+@
+Slot \Comp{oobj} holds a pointer to the problem object of GLPK. Now, we need to
+allocate space for the problem data and load the data into the problem object.
+<<>>=
+addRowsCols(lp, nrows = 2, ncols = 2)
+loadMatrix(lp, ne = 4,
+           ia = c(1, 2, 1, 2),
+           ja = c(1, 1, 2, 2),
+           ra = c(0.5, 2, 1, 1))
+@
+The first command adds two rows and two columns to the problem object. The
+second command loads the problem data in sparse format (see also documentation
+of class \Comp{dgTMatrix} in package \pkg{Matrix}).
+
+Set the objective function and add variable bounds.
+<<>>=
+changeColsBndsObjCoefs(lp, j = c(1,2),
+                       lb = rep(0, 2),
+                       ub = rep(1000, 2),
+                       obj_coef = c(1, 1))
+@
+Set the right hand side.
+<<>>=
+changeRowsBnds(lp, i = c(1,2), lb = rep(0, 2), ub = c(4.5, 9))
+@
+Set the direction of optimization
+<<>>=
+setObjDir(lp, "max")
+lp
+@
+All data are now set in the problem object, so it can be solved.
+<<>>=
+status <- solveLp(lp)
+status
+@
+Translate the status code in a text string.
+<<>>=
+getMeanReturn(code = status, solver = solver(lp))
+@
+Check the solution status.
+<<>>=
+status <- getSolStat(lp)
+getMeanStatus(code = status, solver = solver(lp))
+@
+Retrieve the value of the objective function and the values of the variables
+after optimization.
+<<>>=
+getObjVal(lp)
+getFluxDist(lp)
+@
+Get the reduced costs.
+<<>>=
+getRedCosts(lp)
+@
+Another way to solve an optimization problem and retrieve the solution would be
+to use the function \Comp{simpleFBA}.
+<<>>=
+simpleFBA(lp, fld = TRUE)
+@
+Delete problem object and free all memory allocated by the solver software.
+<<>>=
+delProb(lp)
+lp
+@
+
+%% maybe next chapter: how to extend sybil, example fluxVar or robAna
+
+% ---------------------------------------------------------------------------- %
+
+\newpage
+
+\nocite{Becker:2007uq,Schellenberger:2011fk}
+
+\bibliographystyle{abbrvnat}
+\bibliography{sybil}
+
+\end{document}
