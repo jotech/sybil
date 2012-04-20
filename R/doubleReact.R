@@ -123,7 +123,7 @@ doubleReact <- function(model, checkRev = TRUE) {
           # walk through Stmp
           for (k in 1:(numr-1)) {
 
-              .progressDots(10, k, (numr-1))
+              sybil:::.progressDots(10, k, (numr-1))
             
               # a vector containing the column indices of S of reactions
               # that are identical to reaction k in Stmp

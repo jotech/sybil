@@ -50,16 +50,16 @@ checkDefaultMethod <- function(solver, method) {
 
     # -------------------------------------------------------------- #
 
-    ctrl_param     <- .SYBILenv$solverCtrlParam[[val_solver]][[val_method]]
+    ctrl_parm <- .SYBILenv$solverCtrlParm[[val_solver]][[val_method]]
 
-    if (is.null(ctrl_param)) {
-        ctrl_param <- as.data.frame(NA)
+    if (is.null(ctrl_parm)) {
+        ctrl_parm <- as.data.frame(NA)
     }
 
     return(list(
-                sol       = val_solver,
-                met       = val_method,
-                param     = ctrl_param
+                sol  = val_solver,
+                met  = val_method,
+                parm = ctrl_parm
            )
     )
 

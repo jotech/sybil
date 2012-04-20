@@ -72,9 +72,10 @@ modelorg2tsv <- function(model, prefix, suffix, extMetFlag = "b",
     #--------------------------------------------------------------------------#
 
     # create reaction strings
-    rstr <- .createReactionString(model,
-                                  makeClosedNetwork,
-                                  entrydelim, extMetFlag)
+    rstr <- sybil:::.createReactionString(model,
+                                          makeClosedNetwork,
+                                          entrydelim,
+                                          extMetFlag)
 
     if (isTRUE(onlyReactionList)) {
         write.table(x = data.frame(equation = rstr$equat),

@@ -36,7 +36,7 @@
 \value{
   \item{sol}{Validated solver name.}
   \item{met}{Validated method name.}
-  \item{param}{Default prarmeter set for the validated method.}
+  \item{parm}{Default prarmeter set for the validated method.}
 }
 
 \author{

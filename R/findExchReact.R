@@ -65,10 +65,9 @@ findExchReact <- function(model) {
   }
 
   if (is(model, "modelorg")) {
-      react <- list(
-                    exchange = reactId(ex, react_id(model)[ex]),
-                    uptake   = ex[up]
-                    )
+      react <- list(exchange   = reactId(ex, react_id(model)[ex]),
+                    uptake     = ex[up],
+                    metabolite = which(Matrix::rowSums(abs(S(model)[, ex])) == 1))
   }
   else {
       react <- oneEntry[exchangeReact]

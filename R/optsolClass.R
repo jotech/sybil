@@ -43,7 +43,7 @@ setClass("optsol",
         obj_function = "character",        # the objective function
         fluxdist     = "fluxDistribution"  # the flux distribution
     ),
-    validity = .validoptsol
+    validity = sybil:::.validoptsol
 )
 
 

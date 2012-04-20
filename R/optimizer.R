@@ -42,15 +42,12 @@ optimizer <- function(model, optsol, lb, ub,
                       copyModel = FALSE,
                       prCmd = NA, poCmd = NA,
                       prDIR = NA, poDIR = NA,
-                      verboseMode = 3,
-                      loglevel = -1,
-                      logfile = NA,
-                      logfileEnc = NA,
+                      verboseMode = 2,
                       ...) {
 
 
     #--------------------------------------------------------------------------#
-    # logging
+    # verboseMode
 
     on.exit(expr = {
         if (exists("logObj")) {
@@ -59,16 +56,9 @@ optimizer <- function(model, optsol, lb, ub,
     } )
 
     # start logging
-    logObj <- sybilLog(filename = logfile,
-                       loglevel = loglevel,
-                       verblevel = verboseMode,
-                       logfileEnc = logfileEnc)
-
-    logHead(logObj)
-    logCall(logObj, nog = 2)
-    logComment(logObj, "input/output")
-    logComment(logObj, paste("\tmodel id:", mod_id(model), sep = "\t"))
-    logComment(logObj, paste("\tclass:", is(optsol)[1], sep = "\t\t"))
+    logObj <- sybilLog(filename = "",
+                       loglevel = -1,
+                       verblevel = verboseMode)
 
 
     #--------------------------------------------------------------------------#
@@ -92,7 +82,7 @@ optimizer <- function(model, optsol, lb, ub,
     if ((isTRUE(rebuildModel)) && (alg == "linearMOMA_COBRA")) {
         msg <- paste("flag 'rebuildModel' is not implemented for COBRA version",
                      "of linearMOMA switching to 'linearMOMA'")
-        logWarning(logObj, msg)
+        warning(msg)
         alg <- "linearMOMA"
     }
 
@@ -189,12 +179,6 @@ optimizer <- function(model, optsol, lb, ub,
 #                          ...
 #                         )
 
-    logComment(logObj, "verifyed arguments are")
-    logComment(logObj, paste("\talgorithm:", algorithm(optsol), sep = "\t"))
-    logComment(logObj, paste("\tsolver:", solver(optsol), sep = "\t\t"))
-    logComment(logObj, paste("\tmethod:", method(optsol)[1], sep = "\t\t"))
-    
-
     # tmp vectors for solutions
     lmfld <- TRUE
     nObj  <- num_of_prob(optsol)
@@ -202,10 +186,10 @@ optimizer <- function(model, optsol, lb, ub,
     ok    <- integer(nObj)
     stat  <- integer(nObj)
     if ((isTRUE(fld)) || (isTRUE(lMOMAflag))) {
-        flux <- Matrix(0, nrow = nc, ncol = nObj)
+        flux <- Matrix::Matrix(0, nrow = nc, ncol = nObj)
     }
     else {
-        flux <- Matrix(0, nrow = 1, ncol = 1)
+        flux <- Matrix::Matrix(0, nrow = 1, ncol = 1)
     }
     if (is(optsol, "optsol_genedel")) {
         heff  <- logical(nObj)
@@ -220,7 +204,7 @@ optimizer <- function(model, optsol, lb, ub,
     if (all(!is.na(prCmd))) {
         do_pr  <- TRUE
         prPcmd <- NULL
-        runPrP <- .doInRound(prDIR, nObj)
+        runPrP <- sybil:::.doInRound(prDIR, nObj)
         prPpa  <- vector(mode = "list", length = length(runPrP))
         runPrPl[runPrP] <- TRUE
     }
@@ -230,7 +214,7 @@ optimizer <- function(model, optsol, lb, ub,
     if (all(!is.na(poCmd))) {
         do_po  <- TRUE
         poPcmd <- NULL
-        runPoP <- .doInRound(poDIR, nObj)
+        runPoP <- sybil:::.doInRound(poDIR, nObj)
         poPpa  <- vector(mode = "list", length = length(runPoP))
         runPoPl[runPoP] <- TRUE
     }
@@ -264,8 +248,6 @@ optimizer <- function(model, optsol, lb, ub,
         #lp_stat(optsol)[1] <- NA
         ok[1] <- NA
         stat[1] <- NA
-
-        logComment(logObj, "got wild type solution (wtFluxes)")
 
     }
     else {
@@ -342,7 +324,7 @@ optimizer <- function(model, optsol, lb, ub,
             did_po     <- FALSE
         }
 
-        logOptimization(logObj, sol$ok, sol$stat, sol$obj, NA)
+        logOptimization(logObj, sol$ok, sol$stat, sol$obj, NA, 1)
 
     }
 
@@ -357,14 +339,14 @@ optimizer <- function(model, optsol, lb, ub,
     chlb(optsol) <- c(NA, lb)
     chub(optsol) <- c(NA, ub)
 
-    logStep(logObj) <- paste("calculating",
-                             num_of_prob(optsol),
-                             "optimizations")
-    if (verboseMode > 2) {
-        cat("\n")
-        progr <- .progressBar()
+    message("calculating ", num_of_prob(optsol), " optimizations ... ", appendLF = FALSE)
+    if (verboseMode > 1) { cat("\n") }
+    if (verboseMode == 2) {
+        progr <- sybil:::.progressBar()
+        #progr <- txtProgressBar(min = 2, max = nObj, initial = 2, style = 3)
     }
 
+    logComment(logObj, "compute mutant strains")
     logOptimizationTH(logObj)
 
     if (isTRUE(MOMAflag)) {
@@ -418,7 +400,10 @@ optimizer <- function(model, optsol, lb, ub,
 
     for (i in 2:nObj) {
 
-        if (verboseMode > 2) { progr <- .progressBar(i, nObj, progr) }
+        if (verboseMode == 2) {
+            progr <- sybil:::.progressBar(i, nObj, progr)
+            #setTxtProgressBar(progr, i)
+        }
 
         if (is(optsol, "optsol_genedel")) {
             # get the reactions for gene i
@@ -449,7 +434,7 @@ optimizer <- function(model, optsol, lb, ub,
                     flux[,i] <- flux[,1]
                 }
 
-                logOptimizationNE(logObj, tmp_del)
+                logOptimizationNE(logObj, tmp_del, i)
                 
                 if (isTRUE(runPrPl[i])) {
                     runPrPcn <- runPrPcn+1
@@ -604,12 +589,13 @@ optimizer <- function(model, optsol, lb, ub,
         if (isTRUE(MOMAflag)) {
             tmp_del <- tmp_del - nc
         }
-        logOptimization(logObj, sol$ok, sol$stat, obj[i], tmp_del)
+        logOptimization(logObj, sol$ok, sol$stat, obj[i], tmp_del, i)
 
         remove(sol)
+        #close(progr)
     }
 
-    logStep(logObj) <- NA
+    message("OK")
 
 
 #------------------------------------------------------------------------------#
@@ -660,8 +646,8 @@ optimizer <- function(model, optsol, lb, ub,
         num_new  <- length(do_again)
         lp_obj(optsol)[do_again] <- as.numeric(0)
 
-        logStep(logObj) <- paste("setting", num_new, "objective values to zero")
-        logHead(logObj)
+        message("setting ", num_new, " objective values to zero")
+
         for (i in seq(along = do_again)) {
             logOptimization(logObj, lp_ok(optsol)[do_again[i]],
                             lp_stat(optsol)[do_again[i]], 0,

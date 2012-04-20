@@ -73,7 +73,7 @@ modelorg2text <- function(model, prefix, suffix, extMetFlag = "b",
     # reactions list
     #--------------------------------------------------------------------------#
 
-    rstr <- .createReactionString(model, makeClosedNetwork)
+    rstr <- sybil:::.createReactionString(model, makeClosedNetwork)
 
     # rule    abbreviation    equation    lowbnd    uppbnd    obj_coef
     
@@ -82,7 +82,7 @@ modelorg2text <- function(model, prefix, suffix, extMetFlag = "b",
     
     gpr_list <- strsplit(gprFRule, "", fixed = TRUE)
     
-    check_bp <- mapply(.check_brackets, gpr_list, SIMPLIFY = TRUE)
+    check_bp <- mapply(sybil:::.check_brackets, gpr_list, SIMPLIFY = TRUE)
    
     if ( sum(check_bp) != length(check_bp) ) {
        warning(paste("Wrong gpr rules detected, setting to \"\". ",
@@ -92,7 +92,7 @@ modelorg2text <- function(model, prefix, suffix, extMetFlag = "b",
        gpr_list[!check_bp] <- ""
     }
     
-    gpr_bp  <- mapply(.bracket_pairs, gpr_list, SIMPLIFY = FALSE)
+    gpr_bp  <- mapply(sybil:::.bracket_pairs, gpr_list, SIMPLIFY = FALSE)
     
     gpr_str <- mapply(prepareRuleStrings,
                       gprFRule, gpr_bp, c(1:react_num(model)),

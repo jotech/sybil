@@ -63,7 +63,7 @@ setClass("modelorg",
          subSys       = "Matrix"
 
     ),
-    validity = .validmodelorg
+    validity = sybil:::.validmodelorg
 )
 
 

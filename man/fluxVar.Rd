@@ -15,7 +15,7 @@
           lpdir = SYBIL_SETTINGS("OPT_DIRECTION"),
           solver = SYBIL_SETTINGS("SOLVER"),
           method = SYBIL_SETTINGS("METHOD"),
-          solverParm = SYBIL_SETTINGS("SOLVER_CTRL_PARAM"),
+          solverParm = SYBIL_SETTINGS("SOLVER_CTRL_PARM"),
           fld = FALSE, verboseMode = 2, ...)
 }
 
@@ -54,7 +54,7 @@
   }
   \item{solverParm}{
     A data frame containing parameters for the specified solver.\cr
-    Default: SYBIL_SETTINGS("SOLVER_CTRL_PARAM").
+    Default: SYBIL_SETTINGS("SOLVER_CTRL_PARM").
   }
   \item{fld}{
     Boolean.  Save the resulting flux distribution.\cr
@@ -80,14 +80,14 @@
   problems are solved
   \deqn{%
       \begin{array}{rll}%
-          \max            & v_i                                         \\[1ex]
+          \max \textrm{ or } \min & v_i                                 \\[1ex]
           \mathrm{s.\,t.} & Z = Z_{\mathrm{opt}}                        \\[1ex]
                           & \mbox{\boldmath$Sv$\unboldmath} = 0         \\[1ex]
                           & \alpha_i \leq v_i \leq \beta_i
                             & \quad \forall i \in \{1, \ldots, n\}      \\[1ex]
       \end{array}%
   }{
-      max  v[i]
+      max or min v[i]
       s.t. Z = Z[opt]
            Sv = 0
            a_i <= v_i <= b_i  for i = 1, ..., n

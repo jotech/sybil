@@ -37,7 +37,7 @@ robAna <- function(model,
                    lpdir = SYBIL_SETTINGS("OPT_DIRECTION"),
                    solver = SYBIL_SETTINGS("SOLVER"),
                    method = SYBIL_SETTINGS("METHOD"),
-                   solverParm = SYBIL_SETTINGS("SOLVER_CTRL_PARAM"),
+                   solverParm = SYBIL_SETTINGS("SOLVER_CTRL_PARM"),
                    fld = FALSE, verboseMode = 2, ...) {
 
     if (!is(model, "modelorg")) {
@@ -117,7 +117,7 @@ robAna <- function(model,
 
     for (i in 1:numP){
 
-        if (verboseMode == 2) { .progressDots(5, i, numP) }
+        if (verboseMode == 2) { sybil:::.progressDots(5, i, numP) }
 
         optsol <- simpleFBA(lpmod,
                             react = ctrlr,

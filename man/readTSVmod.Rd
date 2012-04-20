@@ -26,10 +26,6 @@
              remMet = FALSE,
              constrMet = FALSE,
              tol = SYBIL_SETTINGS("TOLERANCE"),
-             verboseMode = 2,
-             loglevel = -1,
-             logfile = NA,
-             logfileEnc = NA,
              fpath = SYBIL_SETTINGS("PATH_TO_MODEL"),
              def_bnd = SYBIL_SETTINGS("MAXIMUM"),
              quoteChar = "",
@@ -81,12 +77,15 @@
     abbreviations contain comments in square brackets. If set to \code{TRUE},
     these comments will be removed. If set to \code{FALSE}, whitespaces included
     in comments in metabolite abbreviations will be removed. Comments in
-    reaction abbreviations stay unchanged.\cr
+    reaction abbreviations stay unchanged. A reaction id with comment is, for
+    example, the string: \code{pfk [comment]}, with \code{[comment]} being the
+    comment. There must be at least one whitespace between id and comment,
+    otherwise it will be considered as compartment flag.\cr
     Default: \code{TRUE}.
   }
   \item{oneSubSystem}{
     A boolean value. Ignore parameter \code{entrydelim} for the field
-    \sQuote{subsystem}, if every reaction belongs to exactly one sys system.\cr
+    \sQuote{subsystem}, if every reaction belongs to exactly one sub system.\cr
     Default: \code{TRUE}.
   }
   \item{mergeMet}{
@@ -143,29 +142,6 @@
     unequal to zero, see details below.\cr
     Default: \code{SYBIL_SETTINGS("TOLERANCE")}.
   }
-  \item{verboseMode}{
-    Single integer value, see \code{\link{sybilLog}} for possible values.\cr
-    Default: \code{2}.
-  }
-  \item{loglevel}{
-    Single integer value, see \code{\link{sybilLog}} for possible values.\cr
-    Default: \code{-1}.
-  }
-  \item{logfile}{
-    A single character string giving the filename of the logfile.
-    The value of \code{logfile} gets prefixed with \code{fpath}. If
-    \code{logfile} is set to \code{NA} and \code{loglevel} is \code{> -1},
-    a default filename is used (see \code{\link{sybilLog}} for details).\cr
-    Default: \code{NA}.
-  }
-  \item{logfileEnc}{
-    A single character string giving the encoding for the logfile. If set to
-    \code{NA}, the default encoding is used: \code{getOption("encoding")}.
-    If \code{logfileEnc} is set to something different, the option
-    \code{useFancyQuotes} is turned
-    off: \code{options(useFancyQuotes = FALSE)}.\cr
-    Default: \code{NA}.
-  }
   \item{fpath}{
     A single character string giving the path to a certain directory containing
     the model files.\cr
@@ -220,10 +196,12 @@
       anything else \tab \code{"dsv"} \cr
   }
 
-  The argument \code{...} is passed to \code{\link{read.table}}.  It could be
-  necessary, to turn off quoting \code{quote = ""}, if e.g. metabolite names
-  contain quoting characters \code{"'"} like in
-  \code{3',5'-bisphosphate nucleotidase}.
+  The argument \code{...} is passed to \code{\link{read.table}}.
+  
+  In some cases, it could be necessary, to turn off quoting
+  \code{quoteChar = ""} (default), if e.g. metabolite names contain quoting
+  characters \code{"'"} like in \code{3',5'-bisphosphate nucleotidase}. If all
+  fields are in quotes, use \code{quoteChar = "\""} for example.
 
   The input files are read using the function \code{\link{read.table}}.  The
   argument \code{header} is set to \code{TRUE} and the argument \code{sep} is
@@ -269,13 +247,14 @@
   }
   If a model description file is provided, it is supposed to contain at least
   the entries \code{"name"} and \code{"id"}.  Otherwise, the filename of the
-  reactions list will be used.
+  reactions list will be used (the filename extension and the string
+  \code{_react} at the end of the filename will be removed).
 
   The compartments in which a reaction takes place is determined by the
   compartment flags of the participating metabolites.
 
   All fields in the output files of \code{\link{modelorg2tsv}} are in double
-  quotes. In order to read them, set argument \code{quote} to \code{"\""}.
+  quotes. In order to read them, set argument \code{quoteChar} to \code{"\""}.
 
   Please read the package vignette for detailed information about input formats
   and examples.
@@ -301,7 +280,7 @@
   the model if \code{remUnusedMetReact} is set to \code{TRUE}.
 
   The binary version of the stoichiometric matrix \eqn{S} is scanned for
-  metabolites, which are used only once in S. If there are some, at least
+  metabolites, which are used only once in S. If there are some, at least a
   warning will be given. If either \code{constrMet} or \code{remMet} is set to
   \code{TRUE}, the binary version of \eqn{S} is scanned for paths of singleton
   metabolites. If \code{constrMet} is set to \code{TRUE}, reactions containing
@@ -310,9 +289,9 @@
   will be removed from the network.
 
   In order to find path of singleton metabolites a binary version of the
-  stiochiometric matrix \eqn{S} is used. Sums of rows gives the vektor of
+  stoichiometric matrix \eqn{S} is used. Sums of rows gives the vector of
   metabolite usage, each element is the number of reactions a metabolite
-  parcipitates.  A single metabolite (singleton) is a metabolite with a row sum
+  participates.  A single metabolite (singleton) is a metabolite with a row sum
   of zero. All columns in \eqn{S} (reactions) containing singleton metabolites
   will be set to zero. And again, singleton metabolites will be searched until
   none are found.
@@ -351,8 +330,42 @@
 }
 
 \seealso{
-  \code{\link{read.table}}, \code{\link{modelorg2tsv}},
-  \code{\link{modelorg}}, \code{\link{sybilLog}}.
+  \code{\link{read.table}}, \code{\link{modelorg2tsv}}, \code{\link{modelorg}}
 }
 
-\keyword{ file }
+\examples{
+  ## read example dataset
+  mp  <- system.file(package = "sybil", "extdata")
+  mod <- readTSVmod(prefix = "Ec_core", fpath = mp, quoteChar = "\"")
+
+  ## redirect warnings to a log file
+  sink(file = "warn.log")
+  mod <- readTSVmod(prefix = "Ec_core", fpath = mp, quoteChar = "\"")
+  warnings()
+  sink()
+  unlink("warn.log")  
+
+  ## print no warnings
+  suppressWarnings(
+    mod <- readTSVmod(prefix = "Ec_core", fpath = mp, quoteChar = "\""))
+
+  ## print no messages
+  suppressMessages(
+    mod <- readTSVmod(prefix = "Ec_core", fpath = mp, quoteChar = "\""))
+
+\dontrun{
+  ## set number of warnings to keep
+  options(nwarnings = 1000)
+  
+  ## redirect every output to a file
+  zz <- file("log.Rout", open = "wt")
+  sink(zz)
+  sink(zz, type = "message")
+  mod <- readTSVmod(prefix = "Ec_core", fpath = mp, quoteChar = "\"")
+  warnings()
+  sink(type = "message")
+  sink()
+  close(zz)  
+}
+}
+\keyword{ IO }

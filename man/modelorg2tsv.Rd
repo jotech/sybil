@@ -1,6 +1,8 @@
 \name{modelorg2tsv}
 \alias{modelorg2tsv}
 
+\encoding{utf8}
+
 \title{
   Write an Instance of Class modelorg to File
 }
@@ -136,8 +138,8 @@
   Please read the package vignette for detailed information about file formats
   and examples.
 
-  All fields in the output files are in double quotes. In order to read them
-  with \code{link{readTSVmod}}, set argument \code{quote} to \code{"\""}.
+  All fields in the output files are in double quotes. In order to read them in
+  with \code{\link{readTSVmod}}, set argument \code{quoteChar} to \code{"\""}.
 }
 
 \value{
@@ -156,4 +158,4 @@
   \code{\link{read.table}}, \code{\link{modelorg2tsv}}, \code{\link{modelorg}}.
 }
 
-\keyword{ file }
+\keyword{ IO }

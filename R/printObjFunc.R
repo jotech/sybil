@@ -32,36 +32,23 @@
 
 printObjFunc <- function(model) {
 
-  if (!is(model, "modelorg")) {
-      stop("needs an object of class modelorg!")
-  }
+    if (!is(model, "modelorg")) {
+        stop("needs an object of class modelorg!")
+    }
 
-  c <- which(obj_coef(model) != 0)
+    cInd <- which(obj_coef(model) != 0)
   
-  # check if there is an objective function
-  if (length(c) == 0) {
-      return("no objective function")
-  }
+    # check if there is an objective function
+    if (length(cInd) == 0) {
+        of <- "no objective function"
+    }
+    else {
+        of <- paste(paste(obj_coef(model)[cInd],
+                          react_id(model)[cInd],
+                          sep = " * "), collapse = " + ")
+    }
 
-  if (length(c) == 1) {
-      if (obj_coef(model)[c] != 1) {
-          return(paste(obj_coef(model)[c], react_id(model)[c], sep = " * "))
-      }
-      else {
-          return(react_id(model)[c])
-      }
-  
-  }
-  else {
-      coef <- as.character(obj_coef(model)[c])
-      coef <- sub("^1$", "+", coef)
-      coef <- sub("^(\\d+)$", "+\\1", coef, perl = TRUE)
-      coef[1] <- sub("^\\+", "", coef[1])
-
-      return(paste(coef, react_id(model)[c], collapse = " "))
-  }
-  
-  return("no objective function")
+    return(of)  
   
 }
 

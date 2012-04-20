@@ -70,8 +70,8 @@ mod2irrev <- function(model, exex = FALSE) {
   met_name(modelIr)     <- met_name(model)
   met_comp(modelIr)     <- met_comp(model)
   
-  ## in my opinion should not be diff:
-  met_single(modelIr)	<- met_single(model)
+  met_single(modelIr)   <- met_single(model)
+  met_de(modelIr)       <- met_de(model)
   
   rhs(modelIr)          <- rhs(model)
 
@@ -95,7 +95,10 @@ mod2irrev <- function(model, exex = FALSE) {
   #irrev2rev             <- integer(irrev_react_num)
 
   Sr <- S(model)
-  Si <- Matrix(0, nrow = met_num(model), ncol = irrev_react_num, sparse = TRUE)
+  Si <- Matrix::Matrix(0,
+                       nrow = met_num(model),
+                       ncol = irrev_react_num,
+                       sparse = TRUE)
   #print(dim(Si))
 
 #------------------------------------------------------------------------------#
@@ -107,17 +110,16 @@ mod2irrev <- function(model, exex = FALSE) {
   counti <- 0
 
   message("building the new model ...")
-  progr <- .progressBar() # initialize the progressbar
+  progr <- sybil:::.progressBar() # initialize the progressbar
 
   for (i in 1 : react_num(model)) {
 
-      progr <- .progressBar(i, react_num(model), progr)
+      progr <- sybil:::.progressBar(i, react_num(model), progr)
 
       counti <- counti + 1
 
       react_rev(modelIr)[counti] <- react_rev(model)[i]
-      #irrev2rev(modelIr)[counti] <- i
-      irrev2rev(modelIr)[counti]         <- i
+      irrev2rev(modelIr)[counti] <- i
 
       # Reaction in negative direction in the rev model
       if ((uppbnd(model)[i] <= 0) && (lowbnd(model)[i] < 0)) {
@@ -142,6 +144,7 @@ mod2irrev <- function(model, exex = FALSE) {
           react_id(modelIr)[counti]   <- paste(react_id(model)[i], "_r", sep = "")
           react_rev(modelIr)[counti]  <- FALSE
           react_single(modelIr)[counti] <- react_single(model)[i]
+          react_de(modelIr)[counti]     <- react_de(model)[i]
 
           # set reaction in rev model to irreversible
           react_rev(model)[i]       <- FALSE
@@ -172,6 +175,7 @@ mod2irrev <- function(model, exex = FALSE) {
           react_id(modelIr)[counti]   <- react_id(model)[i]
           #react_rev(modelIr)[counti]  <- FALSE
           react_single(modelIr)[counti] <- react_single(model)[i]
+          react_de(modelIr)[counti]     <- react_de(model)[i]
       }
 
       # current reaction is reversible
@@ -194,9 +198,11 @@ mod2irrev <- function(model, exex = FALSE) {
           react_id(modelIr)[counti-1] <- paste(react_id(model)[i], "_f", sep = "")
           react_id(modelIr)[counti]   <- paste(react_id(model)[i], "_b", sep = "")
 
-		  # react_single
-		  react_single(modelIr)[counti] <- react_single(model)[i]
-		  react_single(modelIr)[counti-1] <- react_single(model)[i]
+          # react_single/react_de
+          react_single(modelIr)[counti]   <- react_single(model)[i]
+          react_single(modelIr)[counti-1] <- react_single(model)[i]
+          react_de(modelIr)[counti]       <- react_de(model)[i]
+          react_de(modelIr)[counti-1]     <- react_de(model)[i]
 
           # stoichiometric coefficients
           Si[,counti]               <- (Sr[,i] * -1)

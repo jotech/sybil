@@ -36,14 +36,14 @@
     # settings in SyBiL
 
     .SYBILenv$settings <- list(
-        SOLVER            = "glpk",
-        METHOD            = "simplex",
-        TOLERANCE         = 1E-6,
-        MAXIMUM           = 1000,
-        ALGORITHM         = "FBA",
-        OPT_DIRECTION     = "max",
-        PATH_TO_MODEL     = ".",
-        SOLVER_CTRL_PARAM = as.data.frame(NA)
+        SOLVER           = "glpk",
+        METHOD           = "simplex",
+        TOLERANCE        = 1E-6,
+        MAXIMUM          = 1000,
+        ALGORITHM        = "FBA",
+        OPT_DIRECTION    = "max",
+        PATH_TO_MODEL    = ".",
+        SOLVER_CTRL_PARM = as.data.frame(NA)
     )
 
 
@@ -67,7 +67,7 @@
 
     .SYBILenv$solvers <- c("glpk", "clp", "lpSolveAPI", "cplex")
 
-    .SYBILenv$solverCtrlParam <- list(
+    .SYBILenv$solverCtrlParm <- list(
         glpk = list(
                     simplex  = as.data.frame(NA),
                     interior = as.data.frame(NA),

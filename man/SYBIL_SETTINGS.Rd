@@ -7,7 +7,7 @@
 \alias{ALGORITHM}
 \alias{OPT_DIRECTION}
 \alias{PATH_TO_MODEL}
-\alias{SOLVER_CTRL_PARAM}
+\alias{SOLVER_CTRL_PARM}
 
 \encoding{utf8}
 
@@ -20,11 +20,11 @@
 }
 
 \usage{
-  SYBIL_SETTINGS(param, value)
+  SYBIL_SETTINGS(parm, value)
 }
 
 \arguments{
-  \item{param}{
+  \item{parm}{
     A character string giving the name of the parameter to set.
   }
   \item{value}{
@@ -35,8 +35,8 @@
 \details{
   Typical usages are
   \preformatted{
-    SYBIL_SETTINGS(param, value)
-    SYBIL_SETTINGS(param)
+    SYBIL_SETTINGS(parm, value)
+    SYBIL_SETTINGS(parm)
     SYBIL_SETTINGS()
   }
   Possible parameters are:
@@ -108,7 +108,7 @@
       Path to a directory to read or write files.\cr
       Default: \code{"."}.
     }
-    \item{\code{"SOLVER_CTRL_PARAM"}}{
+    \item{\code{"SOLVER_CTRL_PARM"}}{
       A \code{data.frame} giving parameters to the optimizer software
       (e.g. GLPK).\cr
       Default: \code{as.data.frame(NA)}.

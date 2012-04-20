@@ -18,7 +18,7 @@
          lpdir = SYBIL_SETTINGS("OPT_DIRECTION"),
          solver = SYBIL_SETTINGS("SOLVER"),
          method = SYBIL_SETTINGS("METHOD"),
-         solverParm = SYBIL_SETTINGS("SOLVER_CTRL_PARAM"),
+         solverParm = SYBIL_SETTINGS("SOLVER_CTRL_PARM"),
          fld = FALSE, verboseMode = 2, ...)
 }
 
@@ -51,7 +51,7 @@
   }
   \item{solverParm}{
     A data frame containing parameters for the specified solver.\cr
-    Default: SYBIL_SETTINGS("SOLVER_CTRL_PARAM").
+    Default: SYBIL_SETTINGS("SOLVER_CTRL_PARM").
   }
   \item{fld}{
     Boolean.  Save the resulting flux distribution.\cr

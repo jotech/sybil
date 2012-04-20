@@ -91,7 +91,10 @@
             return("Wrong length of rhs!")
         }
         if (met != length(met_single(object))) {
-            return("Wrong length of single_met!")
+            return("Wrong length of met_single!")
+        }
+        if (met != length(met_de(object))) {
+            return("Wrong length of met_de!")
         }
     
         # reactions stuff
@@ -122,7 +125,10 @@
             return("Wrong length of upper bounds!")
         }
         if (react != length(react_single(object))) {
-            return("Wrong length of single_react!")
+            return("Wrong length of react_single!")
+        }
+        if (react != length(react_de(object))) {
+            return("Wrong length of react_de!")
         }
 
         # stoichiometric matrix

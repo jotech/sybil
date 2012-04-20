@@ -162,7 +162,9 @@ simpleFBA <- function(model,
         }
 
         # do some kind of preprocessing
-        preP <- .ppProcessing(lpprob = lpmod, ppCmd = prCmd, loopvar = prCil)
+        preP <- sybil:::.ppProcessing(lpprob = lpmod,
+                                      ppCmd = prCmd,
+                                      loopvar = prCil)
 
         # optimization
         lp_ok     <- solveLp(lpmod)
@@ -182,7 +184,9 @@ simpleFBA <- function(model,
         }
 
         # do some kind of postprocessing
-        postP <- .ppProcessing(lpprob = lpmod, ppCmd = poCmd, loopvar = poCil)
+        postP <- sybil:::.ppProcessing(lpprob = lpmod,
+                                       ppCmd = poCmd,
+                                       loopvar = poCil)
 
         # reset the default bounds
         if (isTRUE(del_tmp)) {
@@ -258,7 +262,7 @@ simpleFBA <- function(model,
         }
 
         # do some kind of preprocessing
-        preP <- .ppProcessing(lpprob = lpmod, ppCmd = prCmd)
+        preP <- sybil:::.ppProcessing(lpprob = lpmod, ppCmd = prCmd)
 
         # optimization
         lp_ok     <- solveLp(lpmod)
@@ -273,7 +277,7 @@ simpleFBA <- function(model,
         #lp_fluxes    <- lp_fluxesTMP[(react_num(model)+1):(2*react_num(model))]
 
         # do some kind of postprocessing
-        postP <- .ppProcessing(lpprob = lpmod, ppCmd = poCmd)
+        postP <- sybil:::.ppProcessing(lpprob = lpmod, ppCmd = poCmd)
 
         # reset the default bounds
         if (isTRUE(del)) {
@@ -350,7 +354,7 @@ simpleFBA <- function(model,
         }
 
         # do some kind of preprocessing
-        preP <- .ppProcessing(lpprob = lpmod, ppCmd = prCmd)
+        preP <- sybil:::.ppProcessing(lpprob = lpmod, ppCmd = prCmd)
 
         # optimization
         lp_ok     <- solveLp(lpmod)
@@ -364,7 +368,7 @@ simpleFBA <- function(model,
         lp_fluxes    <- lp_fluxesTMP[(react_num(model)+1):(2*react_num(model))]
 
         # do some kind of postprocessing
-        postP <- .ppProcessing(lpprob = lpmod, ppCmd = poCmd)
+        postP <- sybil:::.ppProcessing(lpprob = lpmod, ppCmd = poCmd)
 
         # reset the default bounds
         if (isTRUE(del)) {

@@ -75,16 +75,16 @@ getMeanReturn <- function(code, solver = SYBIL_SETTINGS("SOLVER")) {
     out <- FALSE
     switch(solver,
         "glpk" = {
-            out <- return_codeGLPK(code)
+            out <- glpkAPI::return_codeGLPK(code)
         },
         "clp" = {
-            out <- return_codeCLP(code)
+            out <- clpAPI::return_codeCLP(code)
         },
         "lpSolveAPI" = {
             out <- return_codeLPSOLVE(code)
         },
         "cplex" = {
-            out <- return_codeCPLEX(code)
+            out <- cplexAPI::return_codeCPLEX(code)
         },
         {
             warning("not a valid solver")
@@ -101,16 +101,16 @@ getMeanStatus <- function(code,
     out <- FALSE
     switch(solver,
         "glpk" = {
-            out <- status_codeGLPK(code)
+            out <- glpkAPI::status_codeGLPK(code)
         },
         "clp" = {
-            out <- status_codeCLP(code)
+            out <- clpAPI::status_codeCLP(code)
         },
         "lpSolveAPI" = {
             out <- "see return code"
         },
         "cplex" = {
-            out <- status_codeCPLEX(env, code)
+            out <- cplexAPI::status_codeCPLEX(env, code)
         },
         {
             warning("not a valid solver")

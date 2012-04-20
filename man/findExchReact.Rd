@@ -30,13 +30,24 @@
 
 \value{
   If \code{model} is of class \code{\linkS4class{modelorg}} a list is returned:
-  \item{exchange }{An object of class \code{\linkS4class{reactId}} containing
-                   the id's of the exchange fluxes.}
-  \item{uptake   }{An integer vector giving the index of uptake reactions
-                   \code{react_id(model)[x$uptake]} has the reaction id's
-                   of the uptake reactions.}
-  Otherwise a logical vector is returned. If element \code{i} equals
-  \code{TRUE}, column \code{i} of \code{model} is an exchange reaction.
+  \item{exchange  }{An object of class \code{\linkS4class{reactId}} containing
+                    the id's of the exchange fluxes.}
+  \item{uptake    }{An integer vector giving the index of uptake reactions
+                    \code{react_id(model)[x$uptake]} has the reaction id's
+                    of the uptake reactions.}
+  \item{metabolite}{An integer vector giving the index of metabolite id's in
+                    \code{met_id(model)} having an exchange reaction.}
+  Otherwise, if \code{model} is of class \code{\link{matrix}} or
+  of class \code{\link[Matrix]{Matrix}}, a logical vector is returned.
+  If element \code{i} equals \code{TRUE}, column \code{i} of \code{model} is an
+  exchange reaction.
+}
+
+\details{
+  A exchange reaction \eqn{j} for a particular metabolite \eqn{i} has exactly
+  one non-zero entry in the stoichiometric matrix
+  \eqn{S_{ij} \in \{-1, 1\}}{S_ij \in {-1, 1}}. If \eqn{S_{ij} = -1}{S_ij = -1},
+  reaction \eqn{j} is considered to be an uptake (source) reaction.
 }
 
 \references{

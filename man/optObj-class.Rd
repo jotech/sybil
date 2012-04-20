@@ -8,6 +8,7 @@
 \alias{pointerToProb-class}
 \alias{pointerToProb}
 
+\alias{clpPtr-class}
 \alias{cplexPtr-class}
 \alias{glpkPtr-class}
 \alias{cplexPointer-class}

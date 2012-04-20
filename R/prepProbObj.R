@@ -50,7 +50,7 @@ prepProbObj <- function(model, nCols, nRows,
                         solver = SYBIL_SETTINGS("SOLVER"),
                         method = SYBIL_SETTINGS("METHOD"),
                         lpdir = SYBIL_SETTINGS("OPT_DIRECTION"),
-                        solverParm = SYBIL_SETTINGS("SOLVER_CTRL_PARAM")
+                        solverParm = SYBIL_SETTINGS("SOLVER_CTRL_PARM")
                        ) {
 
     if (!is(model, "modelorg")) {
@@ -81,7 +81,7 @@ prepProbObj <- function(model, nCols, nRows,
 #         # check weather we have some default parameters
 #         #parm <- checkDefaultMethod(solver, method)
 #         #solverParm <- parm$parm
-#         check <- setSolverParm(lp, SYBIL_SETTINGS("SOLVER_CTRL_PARAM"))
+#         check <- setSolverParm(lp, SYBIL_SETTINGS("SOLVER_CTRL_PARM"))
 #     } else if (all(solverParm == "none")) {
 #         solverParm <- NA
 #     }

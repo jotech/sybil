@@ -34,7 +34,7 @@ setClass("reactId",
               react_pos = "integer",
               react_id  = "character"
          ),
-         validity = .validreactId
+         validity = sybil:::.validreactId
 )
 
 

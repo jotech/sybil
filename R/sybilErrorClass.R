@@ -117,3 +117,16 @@ setReplaceMethod(f = "enum",
                      return(object)
                  }
 )
+
+
+#------------------------------------------------------------------------------#
+#                               other methods                                  #
+#------------------------------------------------------------------------------#
+
+setMethod("show", signature(object = "sybilError"),
+    function(object) {
+        cat("error no.:", enum(object), "\n")
+        cat(emsg(object), "\n")
+    }
+)
+

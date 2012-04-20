@@ -1,0 +1,5 @@
+%\VignetteIndexEntry{Class optsol}
+%\VignettePackage{SyBiL}
+\documentclass{article}
+\begin{document}
+\end{document}

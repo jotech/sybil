@@ -3,7 +3,7 @@
 
 \encoding{utf8}
 
-\title{Removes Reactions From a Model}
+\title{Remove Reactions From a Model}
 
 \description{
   The function \code{rmReact} removes reactions from a model.
@@ -26,7 +26,7 @@
 }
 
 \value{
- An object of class \code{\linkS4class{modelorg}}.  
+  An object of class \code{\linkS4class{modelorg}}.  
 }
 
 \references{
@@ -44,12 +44,10 @@
 
 \author{Gabriel Gelius-Dietrich}
 
-%\note{ ~~further notes~~ 
-%
-% ~Make other sections like Warning with \section{Warning }{....} ~
-%}
-
-  \seealso{\code{\linkS4class{modelorg}}, \code{\linkS4class{reactId}}, \code{\link{checkReactId}}}
+\seealso{
+  \code{\linkS4class{modelorg}},
+  \code{\linkS4class{reactId}} and \code{\link{checkReactId}}
+}
 
 \examples{
   data(Ec_core)

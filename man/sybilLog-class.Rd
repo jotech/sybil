@@ -191,7 +191,8 @@
     }
     \item{\code{logComment}}{\code{signature(object = "sybilLog")}
       (\code{cmt, commentChar}):
-      add a comment to the log file if \code{loglevel} is \code{> 2}.
+      add a comment to the log file if \code{loglevel} is \code{> 2} and to
+      \code{stdout} if \code{verblevel} is \code{> 2}.
       \tabular{rr}{
         \code{cmt}     \tab the comment text \cr
         \code{cmtChar} \tab a string to prefix \code{cmt},
@@ -224,25 +225,29 @@
       }
     }
     \item{\code{logOptimization}}{\code{signature(object = "sybilLog")}:
-      (\code{ok, stat, obj, del}):
+      (\code{ok, stat, obj, del, i}):
       add a row containing results of an optimization to the log file if
-      \code{loglevel} is \code{> 2}.
+      \code{loglevel} is \code{> 2} and to \code{stdout} if \code{verblevel} is
+      \code{> 2}.
       \tabular{rr}{
         \code{ok}   \tab (integer) return value of the used solver \cr
         \code{stat} \tab (integer) soluton status \cr
         \code{obj}  \tab (numeric) value of the objective function after
                          optimization \cr
         \code{del}  \tab (can be coerced to character) constrained fluxes \cr
+        \code{i}    \tab (integer) consecutive number \cr
       }
     }
     \item{\code{logOptimizationNE}}{\code{signature(object = "sybilLog")}:
-      add a row to the log file if \code{loglevel} is \code{> 2} indicating that
+      add a row to the log file if \code{loglevel} is \code{> 2} and to
+      \code{stdout} if \code{verblevel} is \code{> 2} indicating that
       no optimization was performed, usually if the deletion of a particular set
       of genes has no effect.
     }
     \item{\code{logOptimizationTH}}{\code{signature(object = "sybilLog")}:
       add a row containing a table headder for results of an optimization to the
-      log file if \code{loglevel} is \code{> 2}. This should be used prior
+      log file if \code{loglevel} is \code{> 2} and to \code{stdout} if
+      \code{verblevel} is \code{> 2}. This should be used prior
       \code{logOptimization}.
     }
     \item{\code{logStep<-}}{\code{signature(object = "sybilLog")}:

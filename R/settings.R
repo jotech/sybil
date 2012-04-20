@@ -23,35 +23,38 @@
 
 
 
-SYBIL_SETTINGS <- function(param, value) {
+SYBIL_SETTINGS <- function(parm, value) {
 
-    if ( (missing(param)) && (missing(value)) ) {
+    if ( (missing(parm)) && (missing(value)) ) {
        return(.SYBILenv$settings)
     }
 
     if (missing(value)) {
-        return(.SYBILenv$settings[[param]])
+        if (!parm %in% names(.SYBILenv$settings)) {
+            stop("unknown parameter ", sQuote(parm))
+        }
+        return(.SYBILenv$settings[[parm]])
     }
     
-    if ( (length(param) != 1) ||
-         ( (length(value) != 1) && (! (param == "SOLVER_CTRL_PARAM") ) ) ) {
-        stop("arguments 'param' and 'value' must have a length of 1")
+    if ( (length(parm) != 1) ||
+         ( (length(value) != 1) && (! (parm == "SOLVER_CTRL_PARM") ) ) ) {
+        stop("arguments 'parm' and 'value' must have a length of 1")
     }
     
-    switch(param,
+    switch(parm,
     
         "SOLVER" = {
             chmet <- checkDefaultMethod(value, NA)
-            .SYBILenv$settings[["SOLVER"]]            <- chmet$sol
-            .SYBILenv$settings[["METHOD"]]            <- chmet$met
-            .SYBILenv$settings[["SOLVER_CTRL_PARAM"]] <- chmet$param
+            .SYBILenv$settings[["SOLVER"]]           <- chmet$sol
+            .SYBILenv$settings[["METHOD"]]           <- chmet$met
+            .SYBILenv$settings[["SOLVER_CTRL_PARM"]] <- chmet$parm
         },
     
         "METHOD" = {
             chmet <- checkDefaultMethod(SYBIL_SETTINGS("SOLVER"), value)
-            .SYBILenv$settings[["SOLVER"]]            <- chmet$sol
-            .SYBILenv$settings[["METHOD"]]            <- chmet$met
-            .SYBILenv$settings[["SOLVER_CTRL_PARAM"]] <- chmet$param
+            .SYBILenv$settings[["SOLVER"]]           <- chmet$sol
+            .SYBILenv$settings[["METHOD"]]           <- chmet$met
+            .SYBILenv$settings[["SOLVER_CTRL_PARM"]] <- chmet$parm
         },
     
         "TOLERANCE" = {
@@ -92,17 +95,27 @@ SYBIL_SETTINGS <- function(param, value) {
             }
         },
     
-        "SOLVER_CTRL_PARAM" = {
+        "SOLVER_CTRL_PARM" = {
             if (is.data.frame(value)) {
-                .SYBILenv$settings[["SOLVER_CTRL_PARAM"]] <- value
+                .SYBILenv$settings[["SOLVER_CTRL_PARM"]] <- value
             }
             else {
-                stop("SOLVER_CTRL_PARAM must be data.frame")
+                stop("SOLVER_CTRL_PARM must be data.frame")
             }
         },
+
+#        "SOLVER_CTRL_PARAM" = {
+#            warning("parameter SOLVER_CTRL_PARAM is deprecated, use SOLVER_CTRL_PARM")
+#            if (is.data.frame(value)) {
+#                .SYBILenv$settings[["SOLVER_CTRL_PARM"]] <- value
+#            }
+#            else {
+#                stop("SOLVER_CTRL_PARM must be data.frame")
+#            }
+#        },
     
         {
-            stop("unknown parameter: ", sQuote(param))
+            stop("unknown parameter: ", sQuote(parm))
         }
     )
 }

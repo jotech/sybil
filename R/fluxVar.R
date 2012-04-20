@@ -37,7 +37,7 @@ fluxVar <- function(model, react, percentage = 100,
                     lpdir = SYBIL_SETTINGS("OPT_DIRECTION"),
                     solver = SYBIL_SETTINGS("SOLVER"),
                     method = SYBIL_SETTINGS("METHOD"),
-                    solverParm = SYBIL_SETTINGS("SOLVER_CTRL_PARAM"),
+                    solverParm = SYBIL_SETTINGS("SOLVER_CTRL_PARM"),
                     fld = FALSE, verboseMode = 2, ...) {
 
     # check prerequisites
@@ -60,7 +60,7 @@ fluxVar <- function(model, react, percentage = 100,
 
         lp_ok(saveMod)[j]   <- solution$ok
         lp_obj(saveMod)[j]  <- solution$obj
-        #lp_obj(saveMod)[j] <- .ceilValues(solution$lp_obj, tol = tol)
+        #lp_obj(saveMod)[j] <- sybil:::.ceilValues(solution$lp_obj, tol = tol)
         lp_stat(saveMod)[j] <- solution$stat
       
         if (fld == TRUE) {
@@ -79,10 +79,12 @@ fluxVar <- function(model, react, percentage = 100,
                              solverParm = solverParm, ...)
         if (optimal$ok == 0) {
             if (lpdir == "max") {
-                obj <- .floorValues(optimal$obj, tol = tol)*percentage/100
+                obj <- sybil:::.floorValues(optimal$obj,
+                                            tol = tol)*percentage/100
             }
             else {
-                obj <- .ceilValues(optimal$obj, tol = tol)*percentage/100
+                obj <- sybil:::.ceilValues(optimal$obj,
+                                           tol = tol)*percentage/100
             }
         }
         else {
@@ -138,13 +140,13 @@ fluxVar <- function(model, react, percentage = 100,
 
     if (verboseMode > 0) { message("calculating min/max values ...") }
 
-    if (verboseMode == 2) { progr <- .progressBar() }
+    if (verboseMode == 2) { progr <- sybil:::.progressBar() }
 
     j <- 1
     for (i in 1:num_of_probs_half) {
 
         if (verboseMode == 2) {
-            progr <- .progressBar(i, num_of_probs_half, progr)
+            progr <- sybil:::.progressBar(i, num_of_probs_half, progr)
         }
 
         changeObjCoefs(lpmod, react_pos(react)[i], 1)

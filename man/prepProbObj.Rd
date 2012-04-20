@@ -22,7 +22,7 @@
               solver = SYBIL_SETTINGS("SOLVER"),
               method = SYBIL_SETTINGS("METHOD"),
               lpdir = SYBIL_SETTINGS("OPT_DIRECTION"),
-              solverParm = SYBIL_SETTINGS("SOLVER_CTRL_PARAM"))
+              solverParm = SYBIL_SETTINGS("SOLVER_CTRL_PARM"))
 }
 
 \arguments{
@@ -84,7 +84,7 @@
   }
   \item{solverParm}{
     A data frame containing parameters for the specified solver.\cr
-    Default: \code{SYBIL_SETTINGS("SOLVER_CTRL_PARAM")}, (see Details below).
+    Default: \code{SYBIL_SETTINGS("SOLVER_CTRL_PARM")}, (see Details below).
   }
 }
 
@@ -97,8 +97,8 @@
   (e.g. number of rows and columns of the constraint matrix, etc.).
   
   Parameters can be set as data frame:
-  \code{solverParm = data.frame(param1 = val1, param2 = val2)}
-  with \code{param1} and \code{param2} beeing the names of
+  \code{solverParm = data.frame(parm1 = val1, parm2 = val2)}
+  with \code{parm1} and \code{parm2} beeing the names of
   two different parameters and \code{val1} and \code{val2} the
   corresponding values. For possible parameters and values see
   the documentation of the used solver package (e.g. \pkg{glpkAPI}).

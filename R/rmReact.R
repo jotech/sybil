@@ -102,7 +102,7 @@ rmReact <- function(model, react, rm_met = TRUE) {
   if (is(model, "modelorg_irrev")) {
       mod_out <- modelorg_irrev(mod_id(model), mod_name(model))
 
-      irrev(mod_out)        <- TRUE
+      irrev(mod_out) <- TRUE
 
       for (i in 1:length(rmReact)) {
           remInd <- rmReact[i]
@@ -131,6 +131,7 @@ rmReact <- function(model, react, rm_met = TRUE) {
   uppbnd(mod_out)       <- uppbnd(model)[keepReact]
   obj_coef(mod_out)     <- obj_coef(model)[keepReact]
   react_single(mod_out) <- react_single(model)[keepReact]
+  react_de(mod_out)     <- react_de(model)[keepReact]
 
   react_num(mod_out)    <- length(react_id(mod_out))
 
@@ -160,7 +161,7 @@ rmReact <- function(model, react, rm_met = TRUE) {
       keepGenes <- ifelse(is.na(keepGenes), FALSE, TRUE)
       #print(keepGenes)
 
-      rxnGeneMat(mod_out)        <- rxnGeneMat(mod_out)[, keepGenes]
+      rxnGeneMat(mod_out)   <- rxnGeneMat(mod_out)[, keepGenes]
       #print(dim(rxnGeneMat))
   }
   
@@ -168,7 +169,8 @@ rmReact <- function(model, react, rm_met = TRUE) {
   # check what to do with the reversible match stuff (model in irrev format)  
   if (is(model, "modelorg_irrev")) {
 
-      matchrev(mod_out)     <- .reassignFwBwMatch(matchrev(model), keepReact)
+      matchrev(mod_out)     <- sybil:::.reassignFwBwMatch(matchrev(model),
+                                                          keepReact)
 
       # propably we do not need this:
       react_rev(mod_out)[matchrev(mod_out) == 0] <- FALSE
@@ -198,6 +200,7 @@ rmReact <- function(model, react, rm_met = TRUE) {
       met_comp(mod_out)   <- met_comp(model)[keepMet]
       rhs(mod_out)        <- rhs(model)[keepMet]
       met_single(mod_out) <- met_single(model)[keepMet]
+      met_de(mod_out)     <- met_de(model)[keepMet]
   }
   else {
       met_num(mod_out)  <- met_num(model)

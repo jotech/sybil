@@ -49,7 +49,7 @@ fluxDistribution <- function(fluxes = NA, nrow = 1, ncol = 1) {
         Mfluxes <- fluxes
     }
     else {
-        Mfluxes <- Matrix(fluxes, nrow = nrow, ncol = ncol)
+        Mfluxes <- Matrix::Matrix(fluxes, nrow = nrow, ncol = ncol)
     }
     num_of_fluxes <- ncol(Mfluxes) * nrow(Mfluxes)
 

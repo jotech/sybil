@@ -24,10 +24,7 @@ optimizer(model, optsol, lb, ub,
           copyModel = FALSE,
           prCmd = NA, poCmd = NA,
           prDIR = NA, poDIR = NA,
-          verboseMode = 3,
-          loglevel = -1,
-          logfile = NA,
-          logfileEnc = NA,
+          verboseMode = 2,
           ...)
 }
 
@@ -66,27 +63,11 @@ optimizer(model, optsol, lb, ub,
     Default: \code{FALSE}.
   }
   \item{verboseMode}{
-    Single integer value, see \code{\link{sybilLog}} for possible values.
-    In addition, \code{loglevel > 2} prints a progress bar.\cr
-    Default: \code{3}.
-  }
-  \item{loglevel}{
-    Single integer value, see \code{\link{sybilLog}} for possible values.
-    Default: \code{-1}.
-  }
-  \item{logfile}{
-    A single character string giving the filename of the logfile.
-    If \code{logfile} is set to \code{NA} and \code{loglevel} is \code{> -1},
-    a default filename is used (see \code{\link{sybilLog}} for details).\cr
-    Default: \code{NA}.
-  }
-  \item{logfileEnc}{
-    A single character string giving the encoding for the logfile. If set to
-    \code{NA}, the default encoding is used: \code{getOption("encoding")}.
-    If \code{logfileEnc} is set to something different, the option
-    \code{useFancyQuotes} is turned
-    off: \code{options(useFancyQuotes = FALSE)}.\cr
-    Default: \code{NA}.
+    Single integer value, giving the amount of output to the console. Use
+    \code{\link{sink}} to redirect output to a file. If \code{loglevel == 2},
+    a progress bar will be produced. If \code{loglevel > 2}, intermediate
+    results will be printed.\cr
+    Default: \code{2}.
   }
   \item{checkOptSolObj}{
     Boolean: check the optsol object with \code{\link{checkOptSol}}.\cr

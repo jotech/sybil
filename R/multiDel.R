@@ -93,17 +93,19 @@ multiDel <- function(model, nProc = 2,
         }
         else {
             pp <- "multicore"
+            Pmclapply <- multicore::mclapply
         }
     }
     else {
         pp <- "parallel"
+        Pmclapply <- parallel::mclapply
     }
 
 
     # number of cores
     #ncore <- multicore:::detectCores()
     ncore <- switch(pp,
-        "parallel" = { detectCores() },
+        "parallel" = { parallel::detectCores() },
         "multicore" = { multicore:::detectCores() },
         { stop("can not determine number of cores") }
     )
@@ -142,44 +144,44 @@ multiDel <- function(model, nProc = 2,
 
     sol <- switch(todo,
         "oneGeneDel" = {
-            mclapply(dL1,
-                     function(x) oneGeneDel(model,
-                                                 geneList = x,
-                                                 verboseMode = 0, ...),
-                     mc.cores = nProc)
+            Pmclapply(dL1,
+                      function(x) oneGeneDel(model,
+                                             geneList = x,
+                                             verboseMode = 0, ...),
+                      mc.cores = nProc)
 
         },
         "doubleGeneDel" = {
-            mclapply(cdL, function(x) doubleGeneDel(model,
-                                                    geneList1 = x[[1]],
-                                                    geneList2 = x[[2]],
-                                                    verboseMode = 0, ...),
-                     mc.cores = nProc)
+            Pmclapply(cdL, function(x) doubleGeneDel(model,
+                                                     geneList1 = x[[1]],
+                                                     geneList2 = x[[2]],
+                                                     verboseMode = 0, ...),
+                      mc.cores = nProc)
         },
         "oneFluxDel" = {
-            mclapply(dL1, function(x) oneFluxDel(model,
-                                                 react = x,
-                                                 verboseMode = 0, ...),
-                     mc.cores = nProc)
+            Pmclapply(dL1, function(x) oneFluxDel(model,
+                                                  react = x,
+                                                  verboseMode = 0, ...),
+                      mc.cores = nProc)
         },
         "doubleFluxDel" = {
-            mclapply(cdL, function(x) doubleFluxDel(model,
-                                                    react1 = x[[1]],
-                                                    react2 = x[[2]],
-                                                    verboseMode = 0, ...),
-                     mc.cores = nProc)
+            Pmclapply(cdL, function(x) doubleFluxDel(model,
+                                                     react1 = x[[1]],
+                                                     react2 = x[[2]],
+                                                     verboseMode = 0, ...),
+                      mc.cores = nProc)
         },
         "fluxVar" = {
-            mclapply(dL1, function(x) fluxVar(model,
-                                              react = x,
-                                              verboseMode = 0, ...),
-                     mc.cores = nProc)
+            Pmclapply(dL1, function(x) fluxVar(model,
+                                               react = x,
+                                               verboseMode = 0, ...),
+                      mc.cores = nProc)
         },
         "geneDeletion" = {
-            mclapply(dL1, function(x) geneDeletion(model,
-                                                   genes = x,
-                                                   verboseMode = 0, ...),
-                     mc.cores = nProc)
+            Pmclapply(dL1, function(x) geneDeletion(model,
+                                                    genes = x,
+                                                    verboseMode = 0, ...),
+                      mc.cores = nProc)
         },
         {
             stop("argument todo is not valid!")

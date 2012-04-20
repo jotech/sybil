@@ -130,13 +130,22 @@ setMethod("plot", signature(x = "optsol_robAna", y = "missing"),
                    pch = 20,
                    fillColorBg = "grey",
                    fillBg = TRUE,
+                   absCtrl = TRUE,
                    ...) {
-              plot(x@ctrlfl, x@lp_obj, type = "n", xlab = xlab, ylab = ylab)
+
+              if (isTRUE(absCtrl)) {
+                  cr <- abs(x@ctrlfl)
+              }
+              else {
+                  cr <- x@ctrlfl
+              }
+
+              plot(cr, x@lp_obj, type = "n", xlab = xlab, ylab = ylab)
               if (fillBg == TRUE) {
-                  polygon(c(x@ctrlfl[1], x@ctrlfl, x@ctrlfl[length(x@ctrlfl)]),
+                  polygon(c(cr[1], cr, cr[length(cr)]),
                           c(min(x@lp_obj), x@lp_obj, min(x@lp_obj)),
                           col = fillColorBg, border = NA)
               }
-              points(x@ctrlfl, x@lp_obj, type = type, pch = pch, ...)
+              points(cr, x@lp_obj, type = type, pch = pch, ...)
           }
 )

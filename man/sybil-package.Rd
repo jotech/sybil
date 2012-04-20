@@ -8,38 +8,42 @@
 \docType{package}
 
 \title{
-  Systems Biology Library
+  SyBiL -- Systems Biology Library
 }
 
 \description{
-  The package \code{sybil} is a collection of functions designed for
-  in silico analysis of metabolic networks.
+  The package \pkg{sybil} is a collection of functions designed for
+  in silico analysis---in particular constrained based analysis---of metabolic
+  networks.
 }
 
 \details{
 
   The package SyBiL is designed to read csv files. This is done by
-  the function \code{readTSVmod}. This function returns
-  an object of the class \code{modelorg}.
+  the function \code{\link{readTSVmod}}. This function returns
+  an object of the class \code{\linkS4class{modelorg}}.
 
-  the beginning (or reading a csv file):\cr
-  \code{ec <- readTSVmod(reactList = "Ec_core.csv")}
+  Read csv files (example files included):
+  \preformatted{
+mpath <- system.file(package = "sybil", "extdata")
+model <- readTSVmod(prefix = "Ec_core",
+                    fpath = mpath, quote = "\"")
+  }
+  Perform flux balance analysis (FBA):\cr
+  \code{ec_f <- simpleFBA(model)}
 
-  find double reactions:\cr
-  \code{ec_d <- doubleReact(ec)}
+  Perform single gene deletion analysis:\cr
+  \code{ec_g <- oneGeneDel(model)}
 
-  remove reactions one and five:\cr
-  \code{ec_r <- rmReact(ec, c(1, 5))}
+  Plot the values of the objective function after optimization in a
+  histogramm:\cr
+  \code{hist(ec_g)}
 
-  convert to irreversible model:\cr
-  \code{ec_ir <- mod2irrev(ec)}
+  Perform flux variability analysis:\cr
+  \code{ec_v <- fluxVar(model)}
 
-  perform FBA:\cr
-  \code{ec_f <- simpleFBA(ec)}
-
-  perform single gene deletion analysis:\cr
-  \code{ec_o <- oneGeneDel(ec)}
-
+  Plot the result:\cr
+  \code{plot(ec_v)}
 }
 
 \author{
@@ -55,6 +59,8 @@
   BiGG: a Biochemical Genetic and Genomic knowledgebase of large scale metabolic
   reconstructions. \emph{BMC Bioinformatics} \bold{11}, 213.
 
+  The openCOBRA project \url{http://opencobra.sourceforge.net/}.
+
   Becker, S. A., Feist, A. M., Mo, M. L., Hannum, G., Palsson, B. Ø.  and
   Herrgard, M. J. (2007) Quantitative prediction of cellular metabolism with
   constraint-based models: the COBRA Toolbox. \emph{Nat Protoc} \bold{2},
@@ -68,13 +74,14 @@
 }
 
 \seealso{
-  Package \code{sybilSBML} (\code{readSBMLmod}).% (\code{\link[sybilSBML]{readSBMLmod}}).
+  Package \pkg{sybilSBML} and there the function \code{readSBMLmod} to read
+  metabolic models written in SBML language.
 }
 
 \examples{
   data(Ec_core)
-  Ec_ofd <- oneFluxDel(Ec_core)
-  hist(lp_obj(Ec_ofd))
+  Ec_ofd <- oneGeneDel(Ec_core)
+  hist(Ec_ofd)
 }
 
 \keyword{package}

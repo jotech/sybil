@@ -300,7 +300,7 @@ setReplaceMethod(f = "logClose",
     if (is(object@fh, "file")) {
 
         if (!isTRUE(didFoot(object))) {
-            lc <- .printLogComment("end unexpected:")
+            lc <- sybil:::.printLogComment("end unexpected:")
             cat("\n", lc, sep = "", file = object@fh, append = TRUE)
         }
 
@@ -329,7 +329,7 @@ setMethod(f = "logHead",
         return(FALSE)
     }
 
-    lc <- .printLogComment("start:")
+    lc <- sybil:::.printLogComment("start:")
     cat(lc, file = object@fh, append = TRUE)
 
     return(TRUE)
@@ -350,7 +350,7 @@ setReplaceMethod(f = "logFoot",
         return(object)
     }
 
-    lc <- .printLogComment("end:")
+    lc <- sybil:::.printLogComment("end:")
     cat("\n", lc, sep = "", file = object@fh, append = TRUE)
 
     object@didFoot <- value
@@ -457,7 +457,7 @@ setMethod(f = "logMessage",
 # other logging methods
 # ---------------------------------------------------------------------------- #
 
-# results of optimization
+# return TRUE if object@fh is a connection (file)
 setMethod(f = "logFH",
           signature = "sybilLog",
           definition = function(object) {
@@ -474,13 +474,18 @@ setMethod(f = "logComment",
           signature = "sybilLog",
           definition = function(object, cmt, cmtChar) {
 
+    msg <- gettext(paste(cmt, collapse = " "))
+
     if (missing(cmtChar)) {
         cmtChar <- "# "
     }
 
+    if (object@verblevel > 2) {
+        cat(cmtChar, msg, "\n", sep = "")
+    }
+
     if (object@loglevel > 2) {
         if (is(object@fh, "file")) {
-            msg <- gettext(paste(cmt, collapse = " "))
             cat(cmtChar, msg, "\n",
                 sep = "", file = object@fh, append = TRUE)
         }
@@ -496,10 +501,15 @@ setMethod(f = "logOptimizationTH",
           signature = "sybilLog",
           definition = function(object) {
 
+    th <- "# no.        | lp_ok | lp_stat | lp_obj      | constrained fluxes\n"
+    
+    if (object@verblevel > 2) {
+        cat(th)
+    }
+
     if (object@loglevel > 2) {
         if (is(object@fh, "file")) {
-            cat("# lp_ok | lp_stat | lp_obj      | constrained fluxes\n",
-                file = object@fh, append = TRUE)
+            cat(th, file = object@fh, append = TRUE)
         }
     }
 
@@ -511,12 +521,17 @@ setMethod(f = "logOptimizationTH",
 # results of optimization
 setMethod(f = "logOptimizationNE",
           signature = "sybilLog",
-          definition = function(object, del) {
+          definition = function(object, del, i) {
+
+    ne   <- sprintf("  %-10i | %-30s|", i, "no effect")
+    fdel <- paste(del, collapse = " ")
+
+    if (object@verblevel > 2) {
+        cat(ne, fdel, "\n")
+    }
 
     if (object@loglevel > 2) {
         if (is(object@fh, "file")) {
-            ne   <- sprintf("  %-30s|", "no effect")
-            fdel <- paste(del, collapse = " ")
             cat(ne, fdel, "\n", file = object@fh, append = TRUE)
         }
     }
@@ -529,17 +544,22 @@ setMethod(f = "logOptimizationNE",
 # results of optimization
 setMethod(f = "logOptimization",
           signature = "sybilLog",
-          definition = function(object, ok, stat, obj, del) {
+          definition = function(object, ok, stat, obj, del, i) {
+
+    fi    <- sprintf("  %-10i", i)
+    fok   <- sprintf("%-5i", ok)
+    fstat <- sprintf("%-7i", stat)
+    fobj  <- sprintf("%11s", sprintf("%.8f", obj))
+    fdel  <- paste(del, collapse = " ")
+
+    if (object@verblevel > 2) {
+        cat(fi, fok, fstat, fobj, fdel, sep = " | ")
+        cat("\n")
+    }
 
     if (object@loglevel > 2) {
         if (is(object@fh, "file")) {
-            
-            fok   <- sprintf("  %-5i", ok)
-            fstat <- sprintf("%-7i", stat)
-            fobj  <- sprintf("%11s", sprintf("%.8f", obj))
-            fdel  <- paste(del, collapse = " ")
-            
-            cat(fok, fstat, fobj, fdel, sep = " | ",
+            cat(fi, fok, fstat, fobj, fdel, sep = " | ",
                 file = object@fh, append = TRUE)
             cat("\n", file = object@fh, append = TRUE)
         }
@@ -612,8 +632,8 @@ setMethod(f = "logCall",
               fc <- sys.call(sys.parent(n = nog))
               cat("# call to function", dQuote(fc[[1]]),
                   "with arguments:\n", file = object@fh, append = TRUE)
-              .printNamedList(nList = as.list(fc)[-1],
-                              file = object@fh, append = TRUE)
+              sybil:::.printNamedList(nList = as.list(fc)[-1],
+                                      file = object@fh, append = TRUE)
           }
           else {}
       }
@@ -631,14 +651,14 @@ setMethod(f = "logCall",
 #                       fc <- as.character(func)
 #                       cat("# formal arguments to ", fc, "()\n",
 #                           sep = "", file = object@fh, append = TRUE)
-#                       .printNamedList(fargl, file = object@fh, append = TRUE)
+#                       sybil:::.printNamedList(fargl, file = object@fh, append = TRUE)
 #
 #                       if ( (length(thdargs) > 0) && (!is.na(thdargs)) ) {
 #                           cat("# further arguments to", fc, "(...)\n",
 #                               file = object@fh, append = TRUE)
 #                           if (length(thdargs) > 0) {
-#                               .printNamedList(thdargs,
-#                                               file = object@fh, append = TRUE)
+#                               sybil:::.printNamedList(thdargs,
+#                                                       file = object@fh, append = TRUE)
 #                           }
 #                           else {
 #                               cat("none\n", file = object@fh, append = TRUE)

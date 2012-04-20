@@ -41,35 +41,11 @@ readTSVmod <- function(prefix, suffix,
                        remMet = FALSE,
                        constrMet = FALSE,
                        tol = SYBIL_SETTINGS("TOLERANCE"),
-                       verboseMode = 2,
-                       loglevel = -1,
-                       logfile = NA,
-                       logfileEnc = NA,
                        fpath = SYBIL_SETTINGS("PATH_TO_MODEL"),
                        def_bnd = SYBIL_SETTINGS("MAXIMUM"),
                        quoteChar = "",
                        commentChar = "",
                        ...) {
-
-
-    #--------------------------------------------------------------------------#
-    # logging
-
-    on.exit(expr = {
-        if (exists("logObj")) {
-            logClose(logObj) <- NA
-        }
-    } )
-
-    # start logging
-    logObj <- sybilLog(filename = logfile,
-                       filepath = fpath,
-                       loglevel = loglevel,
-                       verblevel = verboseMode,
-                       logfileEnc = logfileEnc)
-
-    logHead(logObj)
-    logCall(logObj)
 
 
     #--------------------------------------------------------------------------#
@@ -90,8 +66,7 @@ readTSVmod <- function(prefix, suffix,
     # if argument prefix is empty, at least reactList must be not empty.
     if (missing(prefix)) {
         if (missing(reactList)) {
-            msg <- logError(logObj, "argument 'reactList' is required")
-            stop(emsg(msg))
+            stop("missing argument 'reactList' is required")
         }
         else {
             fnRL <- reactList
@@ -113,9 +88,7 @@ readTSVmod <- function(prefix, suffix,
 
 
     if (!isTRUE(file.exists(fpRL))) {
-        msg <- logError(logObj,
-                        c("failed to open reaction list", dQuote(fpRL)))
-        stop(emsg(msg))
+        stop("failed to open reaction list ", sQuote(fpRL))
     }
 
     if (!isTRUE(file.exists(fpML))) {
@@ -180,7 +153,7 @@ readTSVmod <- function(prefix, suffix,
                                       "stoichiometric coefficient",
                                       dQuote(st_str), "in file", dQuote(fpRL),
                                       "is not numeric, set to '1'.")
-                        logWarning(logObj, msg)
+                        warning(msg, call. = FALSE)
                         stoich <- 1
                     }
 
@@ -247,7 +220,7 @@ readTSVmod <- function(prefix, suffix,
                                  dQuote(reactABBR[rowind]),
                                  "metabolite no.", j, dQuote(CURR_MET[j]),
                                  "was merged")
-                    logWarning(logObj, msg)
+                    warning(msg, call. = FALSE)
                 }
 
 
@@ -272,19 +245,22 @@ readTSVmod <- function(prefix, suffix,
     # model description
     #--------------------------------------------------------------------------#
 
+    newModelName <- sub("(_react)?\\.[^.]+$", "", basename(fpRL), perl = TRUE)
+
     if (is.null(fpMD)) {
-        modNM     <- fpRL          # name
-        modID     <- fpRL          # id
-        modDC     <- ""            # description
-        modCO     <- NULL          # compartments
-        modCA     <- NULL          # compartment abbreviations
-        modNmet   <- NULL          # number of metabolites
-        modNreact <- NULL          # number of reactions
-        modNgenes <- NULL          # number of genes
-        modNnnz   <- NULL          # number of non-zero elements in S
+        
+        modNM     <- newModelName   # name
+        modID     <- newModelName   # id
+        modDC     <- ""             # description
+        modCO     <- NULL           # compartments
+        modCA     <- NULL           # compartment abbreviations
+        modNmet   <- NULL           # number of metabolites
+        modNreact <- NULL           # number of reactions
+        modNgenes <- NULL           # number of genes
+        modNnnz   <- NULL           # number of non-zero elements in S
     }
     else {
-        logStep(logObj) <- "reading model description"
+        message("reading model description, ... ", appendLF = FALSE)
 
         md    <- read.table(fpMD,
                             header = TRUE,
@@ -305,13 +281,13 @@ readTSVmod <- function(prefix, suffix,
         modNnnz   <- try(as.integer(md[ ,"Nnnz"]),           silent = TRUE)
 
         if (is(modNM, "try-error")) {
-            logWarning(logObj, "field 'name' is obligatory in model description")
-            modNM <- fpRL
+            warning("field 'name' is obligatory in model description")
+            modNM <- newModelName
         }
 
         if (is(modID, "try-error")) {
-            logWarning(logObj, "field 'id' is obligatory in model description.")
-            modID <- fpRL
+            warning("field 'id' is obligatory in model description.")
+            modID <- newModelName
         }
 
         if (is(modDC, "try-error")) {
@@ -360,10 +336,9 @@ readTSVmod <- function(prefix, suffix,
             modNnnz <- modNnnz[1]
         }
 
-
         remove(md)
 
-        logStep(logObj) <- NA
+        message("OK")
 
     }
 
@@ -386,7 +361,7 @@ readTSVmod <- function(prefix, suffix,
         metCOMP <- NULL
     }
     else {
-        logStep(logObj) <- "reading metabolite list"
+        message("reading metabolite list ... ", appendLF = FALSE)
 
         ml <- read.table(fpML,
                          header = TRUE,
@@ -413,8 +388,7 @@ readTSVmod <- function(prefix, suffix,
         }
 
         if (is(metNAME, "try-error")) {
-            msg <- "Field 'name' does not exist in metabolite list."
-            logWarning(logObj, msg)
+            warning("field 'name' does not exist in metabolite list")
             metNAME <- NULL
         }
 
@@ -424,7 +398,7 @@ readTSVmod <- function(prefix, suffix,
 
         remove(ml)
 
-        logStep(logObj) <- NA
+        message("OK")
     }
 
 
@@ -432,7 +406,7 @@ readTSVmod <- function(prefix, suffix,
     # reactions list
     #--------------------------------------------------------------------------#
 
-    logStep(logObj) <- "parsing reaction list"
+    message("parsing reaction list ... ", appendLF = FALSE)
 
     rl <- read.table(fpRL,
                      header = TRUE,
@@ -444,9 +418,7 @@ readTSVmod <- function(prefix, suffix,
     reactEQU  <- try(as.character(rl[,"equation"]),     silent = TRUE)
 
     if (is(reactEQU, "try-error")) {
-        msg <- logError(logObj,
-                      "field 'equation' does not exist in the reactions list.")
-        stop(emsg(msg))
+        stop("field 'equation' does not exist in the reactions list")
     }
     else {
         nreact <- length(reactEQU)          # number of reactions n
@@ -456,7 +428,7 @@ readTSVmod <- function(prefix, suffix,
                 msg <- paste(nreact," reactions detected,", modNreact,
                              "reactions expected, according to model",
                              "description file", dQuote(fpMD))
-                logWarning(logObj, msg)
+                warning(msg, call. = FALSE)
             }
         }
     }
@@ -474,9 +446,9 @@ readTSVmod <- function(prefix, suffix,
 
 
     if (is(reactABBR, "try-error")) {
-        msg <- paste("Field 'abbreviation' does not",
-                     "exist in reaction list.")
-        logWarning(logObj, msg)
+        msg <- paste("field 'abbreviation' does not",
+                     "exist in reaction list")
+        warning(msg, call. = FALSE)
         # If there is no field 'abbreviation', we use v1, v2, ..., vn as id's.
         reactABBR <- paste(rep("v", nreact), 1:nreact, sep = "")
     }
@@ -558,7 +530,7 @@ readTSVmod <- function(prefix, suffix,
 
     # exclude comments from metabolite id's in reaction strings
     if (isTRUE(excludeComments)) {
-        requatC <- gsub("\\s\\[[^]]+\\]", "", reactEQU, perl = TRUE)
+        requatC <- gsub("(\\w+)\\s+\\[[^]]+\\]", "\\1", reactEQU, perl = TRUE)
     }
     else {
         requatC <- reactEQU
@@ -606,7 +578,7 @@ readTSVmod <- function(prefix, suffix,
         if (length(arrowpos) > 1) {
             msg <- paste("more than one arrow symbols found, skipping",
                          "reaction no.", i, dQuote(reactABBR[i]))
-            logWarning(logObj, msg)
+            warning(msg, call. = FALSE)
             SKIP_REACTION[i] <- FALSE
             next
         }
@@ -614,7 +586,7 @@ readTSVmod <- function(prefix, suffix,
         if (arrowpos < 0) {
             msg <- paste("no reaction arrow found, skipping reaction no.",
                          i, dQuote(reactABBR[i]))
-            logWarning(logObj, msg)
+            warning(msg, call. = FALSE)
             SKIP_REACTION[i] <- FALSE
             next
         }
@@ -659,7 +631,7 @@ readTSVmod <- function(prefix, suffix,
         if ( (length(edprod) > 2) || (length(edprod) < 1) ) {
             msg <- paste("something went wrong here, skipping reaction no.",
                          i, dQuote(reactABBR[i]))
-            logWarning(logObj, msg)
+            warning(msg)
             SKIP_REACTION[i] <- FALSE
             next
         }
@@ -766,7 +738,7 @@ readTSVmod <- function(prefix, suffix,
 
 
         # gpr association
-        gene_rule <- .parseBoolean(reactRULE[i])
+        gene_rule <- sybil:::.parseBoolean(reactRULE[i])
         Rgenes[[i]] <- gene_rule$gene                # list of involved genes
         Rrules[i]   <- gene_rule$rule                # the rule string
         if (gene_rule$rule != "") {
@@ -776,14 +748,14 @@ readTSVmod <- function(prefix, suffix,
 
     }
 
-    logStep(logObj) <- NA
+    message("OK")
 
 
     #--------------------------------------------------------------------------#
     # gene to reaction mapping
     #--------------------------------------------------------------------------#
 
-    logStep(logObj) <- "GPR mapping"
+    message("GPR mapping ... ", appendLF = FALSE)
 
     allGenes <- unique(allGenes)
 
@@ -792,14 +764,14 @@ readTSVmod <- function(prefix, suffix,
             msg <- paste(length(allGenes), "genes detected,", modNgenes,
                          "genes expected, according to model description file",
                          dQuote(fpMD))
-            logWarning(logObj, msg)
+            warning(msg, call. = FALSE)
         }
     }
 
-    rxnGeneMat <- Matrix(FALSE,
-                         nrow = nreact,
-                         ncol = length(allGenes),
-                         sparse = TRUE)
+    rxnGeneMat <- Matrix::Matrix(FALSE,
+                                 nrow = nreact,
+                                 ncol = length(allGenes),
+                                 sparse = TRUE)
 
     for (i in 1 : nreact) {
 
@@ -817,33 +789,35 @@ readTSVmod <- function(prefix, suffix,
 
     }
 
-    logStep(logObj) <- NA
+    message("OK")
 
 
     #--------------------------------------------------------------------------#
     # subsystems
     #--------------------------------------------------------------------------#
 
-    logStep(logObj) <- "sub systems"
+    message("sub systems ... ", appendLF = FALSE)
 
     subSysdelim <- ifelse(isTRUE(oneSubSystem), NA, entrydelim)
-    ssys <- .prepareSubSysMatrix(reactSUBS, nreact, entrydelim = subSysdelim)
+    ssys <- sybil:::.prepareSubSysMatrix(reactSUBS,
+                                         nreact,
+                                         entrydelim = subSysdelim)
 
-    logStep(logObj) <- NA
+    message("OK")
 
 
     #--------------------------------------------------------------------------#
     # prepare modelorg
     #--------------------------------------------------------------------------#
 
-    logStep(logObj) <- "prepare modelorg object"
+    message("prepare modelorg object ... ", appendLF = FALSE)
 
     if (!is.null(modNmet)) {
         if (modNmet != NRmet) {
             msg <- paste(NRmet, "metabolites detected,", modNmet,
                          "metabolites expected, according to model",
                          "description file", dQuote(fpMD))
-            logWarning(logObj, msg)
+            warning(msg, call. = FALSE)
         }
     }
 
@@ -862,7 +836,7 @@ readTSVmod <- function(prefix, suffix,
     # stoichiometric matrix
 
     ## this takes long, try to improve that!! ##
-    RmatM <- Matrix(0, nrow = NRmet, ncol = nreact, sparse = TRUE)
+    RmatM <- Matrix::Matrix(0, nrow = NRmet, ncol = nreact, sparse = TRUE)
 
     for (k in seq(along = RmatRA)) {
         if (isTRUE(SKIP_REACTION[RmatJA[k]])) {
@@ -873,7 +847,7 @@ readTSVmod <- function(prefix, suffix,
                                  dQuote(reactABBR[RmatJA[k]]), "metabolite no.",
                                  RmatIA[k], dQuote(Rmet[RmatIA[k]]),
                                  "was balanced")
-                    logWarning(logObj, msg)
+                    warning(msg, call. = FALSE)
                 }
 
                 # add up stoichiometric coefficients --> balancing
@@ -894,8 +868,8 @@ readTSVmod <- function(prefix, suffix,
     #RmatMb <- RmatM != 0
     RmatMb <- abs(RmatM) > tol
 
-    SKIP_METABOLITE   <- rowSums(RmatMb) != 0    # TRUE, if a metabolite is used
-    UNUSED_REACTION   <- colSums(RmatMb) != 0    # TRUE, if a reaction is used
+    SKIP_METABOLITE   <- Matrix::rowSums(RmatMb) != 0    # TRUE, if a metabolite is used
+    UNUSED_REACTION   <- Matrix::colSums(RmatMb) != 0    # TRUE, if a reaction is used
 
     if (isTRUE(remUnusedMetReact)) {
         did <- "and therefore removed from S:"
@@ -916,9 +890,8 @@ readTSVmod <- function(prefix, suffix,
                                 "%d metabolite is %s %s",
                                 "%d metabolites are %s\n\t%s"),
                        nmet_list, msg_part, met_list)
-        logWarning(logObj, msg)
+        warning(msg, call. = FALSE)
     }
-    else {}
 
 
     #--------------------------------------------------------------------------#
@@ -933,9 +906,8 @@ readTSVmod <- function(prefix, suffix,
                                 "%d reaction is %s %s",
                                 "%d reactions are %s\n\t%s"),
                        nur_list, msg_part, ur_list)
-        logWarning(logObj, msg)
+        warning(msg, call. = FALSE)
     }
-    else{}
 
 
     #--------------------------------------------------------------------------#
@@ -950,6 +922,7 @@ readTSVmod <- function(prefix, suffix,
         SKIP_REACTION[!UNUSED_REACTION]   <- FALSE
     }
 
+
     #--------------------------------------------------------------------------#
     # single metabolites
 
@@ -958,9 +931,10 @@ readTSVmod <- function(prefix, suffix,
 
     if (isTRUE(singletonMet)) {
 
-        logStep(logObj) <- "identifying reactions containing single metabolites"
+        message("identifying reactions containing single metabolites ... ",
+                appendLF = FALSE)
 
-        singleton <- .singletonMetabolite(mat = RmatMb)
+        singleton <- sybil:::.singletonMetabolite(mat = RmatMb)
 
         sing_met[!singleton$smet]     <- FALSE
         sing_react[!singleton$sreact] <- FALSE
@@ -1002,9 +976,9 @@ readTSVmod <- function(prefix, suffix,
                          "%s %d reactions containing singleton metabolites:\n\t%s"),
                                 did_watr, nreact_list, react_list)
 
-                #logWarning(logObj, paste(msgm, msgr, sep = "\n\t "))
-                logWarning(logObj, msgm)
-                logWarning(logObj, msgr)
+                #warning(paste(msgm, msgr, sep = "\n\t "), call. = FALSE)
+                warning(msgm, call. = FALSE)
+                warning(msgr, call. = FALSE)
 
             }
             else {
@@ -1016,15 +990,14 @@ readTSVmod <- function(prefix, suffix,
                                    "%d metabolite is singleton in S: %s",
                                    "%d metabolites are singletons in S:\n\t%s"),
                                nmet_list, met_list)
-                logWarning(logObj, msg)
+                warning(msg, call. = FALSE)
             }
         }
         else {
-            logMessage(logObj, appendEllipsis = TRUE, "nothing found")
+            message("nothing found ... ", appendLF = FALSE)
             sing_met   <- logical(nrow(RmatM))
             sing_react <- logical(ncol(RmatM))
         }
-        logStep(logObj) <- NA
     }
 
 
@@ -1036,13 +1009,14 @@ readTSVmod <- function(prefix, suffix,
 
     if (isTRUE(deadEndMet)) {
 
-        logStep(logObj) <- "identifying reactions containing dead end metabolites"
+        message("identifying reactions containing dead end metabolites ... ",
+                appendLF = FALSE)
 
-        demr <- .deadEndMetabolite(mat   = RmatM,
-                                   lb    = Rlow,
-                                   exclM = sing_met,
-                                   exclR = sing_react,
-                                   tol   = tol)
+        demr <- sybil:::.deadEndMetabolite(mat   = RmatM,
+                                           lb    = Rlow,
+                                           exclM = sing_met,
+                                           exclR = sing_react,
+                                           tol   = tol)
 
         de_met[!demr$dem]   <- FALSE
         de_react[!demr$der] <- FALSE
@@ -1084,8 +1058,8 @@ readTSVmod <- function(prefix, suffix,
                                         "%s %d reactions containing dead end metabolites:\n\t%s"),
                                 did_watr, nreact_list, react_list)
 
-                logWarning(logObj, msgm)
-                logWarning(logObj, msgr)
+                warning(msgm, call. = FALSE)
+                warning(msgr, call. = FALSE)
 
             }
             else {
@@ -1097,16 +1071,15 @@ readTSVmod <- function(prefix, suffix,
                                        "%d dead end metabolite in S: %s",
                                        "%d dead end metabolites in S:\n\t%s"),
                                nmet_list, met_list)
-                logWarning(logObj, msg)
+                warning(msg, call. = FALSE)
             }
 
         }
         else {
-            logMessage(logObj, appendEllipsis = TRUE, "nothing found")
+            message("nothing found ... ", appendLF = FALSE)
             de_met   <- logical(nrow(RmatM))
             de_react <- logical(ncol(RmatM))
         }
-        logStep(logObj) <- NA
     }
 
 
@@ -1148,7 +1121,7 @@ readTSVmod <- function(prefix, suffix,
             msg <- paste("did not find some metabolite id's in the",
                          "list of metabolite names", dQuote(fpML),
                          "set to", sQuote(NA))
-            logWarning(logObj, msg)
+            warning(msg, call. = FALSE)
         }
     }
 
@@ -1205,33 +1178,29 @@ readTSVmod <- function(prefix, suffix,
     subSys(model)     <- ssys[SKIP_REACTION, , drop = FALSE]
 
 
-    logStep(logObj) <- NA
+    message("OK")
 
 
     #--------------------------------------------------------------------------#
     # validate model
     #--------------------------------------------------------------------------#
 
-    logStep(logObj) <- "validating object"
+    message("validating object ... ", appendLF = FALSE)
 
     check <- validObject(model, test = TRUE)
 
     if (check != TRUE) {
         msg <- paste("Validity check failed:", check, sep = "\n    ")
-        logWarning(logObj, msg)
+        warning(msg)
     }
 
-    logStep(logObj) <- NA
+    message("OK")
 
 
     #--------------------------------------------------------------------------#
     # return model
     #--------------------------------------------------------------------------#
 
-    logFoot(logObj)  <- TRUE
-    logClose(logObj) <- NA
-
-    #remove(logObj)
 
     return(model)
 

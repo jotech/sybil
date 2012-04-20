@@ -73,7 +73,9 @@ loadMatrixPerColumnLPSOLVE <- function(lpmod, constMat) {
 
     k <- 1
     while (k <= ncol(constMat)) {
-        set.column(lpmod, k, x[(p[k]):(p[k+1]-1)], i[(p[k]):(p[k+1]-1)])
+        lpSolveAPI::set.column(lpmod, k,
+                               x[(p[k]):(p[k+1]-1)],
+                               i[(p[k]):(p[k+1]-1)])
         k <- k + 1
     }
 

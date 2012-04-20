@@ -84,9 +84,6 @@ setMethod("pa", signature(object = "ppProc"),
 
 setReplaceMethod("pa", signature = (object = "ppProc"),
                  function(object, value) {
-                     #if (is(value, "cpxerr")) {
-                     #    value <- sybilError(err(value))
-                     #}
                      object@pa <- value
                      return(object)
                  }

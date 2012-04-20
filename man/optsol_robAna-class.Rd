@@ -134,7 +134,8 @@
     }
     \item{\code{plot}}{\code{signature(x = "optsol_robAna", y = "missing")}
       (\code{xlab = "Control Flux", ylab = "Objective Function", type = "b",
-             pch = 20, fillColorBg = "grey", fillBg = TRUE, ...}):\cr
+             pch = 20, fillColorBg = "grey", fillBg = TRUE,
+             absCtrl = TRUE, ...}):\cr
       plots the optimal values of the objective function vs. the control flux
       values.
       \describe{
@@ -155,6 +156,10 @@
         }
         \item{\code{fillBg}}{
           color the area below the curve.
+        }
+        \item{\code{absCtrl}}{
+          if set to \code{TRUE}, the control flux values (x axis) are plotted
+          as absolute values.
         }
         \item{\code{...}}{
           further graphical parameters to the \code{\link{points}} function.

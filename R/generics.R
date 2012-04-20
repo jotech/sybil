@@ -26,6 +26,12 @@
 #                                   generics                                   #
 #------------------------------------------------------------------------------#
 
+# from graphics
+setGeneric("plot")
+setGeneric("hist")
+
+
+# SyBiL
 setGeneric(name = "addCols",
            def  = function(lp, ...) { standardGeneric("addCols") }
 )
@@ -409,10 +415,10 @@ setGeneric(name = "logMessage",
            def  = function(object, appendEllipsis, ...) { standardGeneric("logMessage") }
 )
 setGeneric(name = "logOptimization",
-           def  = function(object, ok, stat, obj, del) { standardGeneric("logOptimization") }
+           def  = function(object, ok, stat, obj, del, i) { standardGeneric("logOptimization") }
 )
 setGeneric(name = "logOptimizationNE",
-           def  = function(object, del) { standardGeneric("logOptimizationNE") }
+           def  = function(object, del, i) { standardGeneric("logOptimizationNE") }
 )
 setGeneric(name = "logOptimizationTH",
            def  = function(object) { standardGeneric("logOptimizationTH") }

@@ -78,10 +78,10 @@ blockedReact <- function(model,
         ok    <- integer(nObj)
         stat  <- integer(nObj)
         if (isTRUE(fld)) {
-            flux <- Matrix(0, nrow = react_num(model), ncol = nObj)
+            flux <- Matrix::Matrix(0, nrow = react_num(model), ncol = nObj)
         }
         else {
-            flux <- Matrix(0, nrow = 1, ncol = 1)
+            flux <- Matrix::Matrix(0, nrow = 1, ncol = 1)
         }
     }
     
@@ -104,7 +104,7 @@ blockedReact <- function(model,
     obj_max <- 0
     obj_min <- 0
     
-    if (verboseMode > 1) { progr <- .progressBar() }
+    if (verboseMode > 1) { progr <- sybil:::.progressBar() }
   
     for (i in seq(along = intReact)) {
 
@@ -184,7 +184,9 @@ blockedReact <- function(model,
             }
         }
 
-        if (verboseMode > 1) { progr <- .progressBar(i, length(intReact), progr) }
+        if (verboseMode > 1) {
+            progr <- sybil:::.progressBar(i, length(intReact), progr)
+        }
 
     }
 

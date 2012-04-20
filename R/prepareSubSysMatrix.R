@@ -37,10 +37,10 @@
         ssys_tmp <- strsplit(reactSsys, entrydelim, fixed = TRUE)
 
         sys_names <- unique(unlist(ssys_tmp))
-        ssys <- Matrix(FALSE,
-                       nrow = length(reactSUBS),
-                       ncol = length(sys_names),
-                       sparse = TRUE)
+        ssys <- Matrix::Matrix(FALSE,
+                               nrow = length(reactSUBS),
+                               ncol = length(sys_names),
+                               sparse = TRUE)
 
         colnames(ssys) <- sys_names
 
@@ -57,7 +57,7 @@
 
     }
     else {
-        ssys <- Matrix(FALSE, nrow = nreact, ncol = 1, sparse = TRUE)
+        ssys <- Matrix::Matrix(FALSE, nrow = nreact, ncol = 1, sparse = TRUE)
         colnames(ssys) <- NA
     }
 

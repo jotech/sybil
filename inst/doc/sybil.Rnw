@@ -10,6 +10,7 @@
 \usepackage{xspace}
 \usepackage{paralist}
 \usepackage{footmisc}
+\usepackage{booktabs}
 \usepackage{natbib}
 \usepackage{hyperref}
 
@@ -54,7 +55,6 @@
 
 
 \maketitle
-\enlargethispage{1.5\baselineskip}
 
 \tableofcontents
 
@@ -64,8 +64,8 @@
 
 The R-package \pkgname{} is a Systems Biology Library for R, implementing
 algorithms for constraint based analysis of metabolic networks.
-%The software is available from the \pkgname{}
-%homepage\footnote{\url{http://www.cs.uni-duesseldorf.de/AG/BI/Software/SyBiL/}\label{sfoot}}.
+Among other functions, SyBiL currently provides efficient methods for
+flux-balance analysis (FBA) and MOMA.
 
 \pkgname{} makes use of the sparse matrix implementation in the R-package
 \pkg{Matrix} available from
@@ -94,8 +94,8 @@ metabolic model to analyse.  These descriptions are basically lists of
 reactions.
 Two fundamentally different types of text files are supported:
 \begin{inparaenum}[i)]
-\item in tabular form, or
-\item in an XML based format (SBML).
+\item in tabular form (section~\ref{tabmod}), or
+\item in SBML format (section~\ref{sbmlmod}).
 \end{inparaenum}
 
 
@@ -147,7 +147,8 @@ Every column in this table can have at most one entry, meaning each entry will
 be a single character string.  If a model description file is used, there should
 be at least the two columns \Comp{name} and \Comp{id}.  If they are
 missing---or if no model description file is used---they will be set to the file
-name of the reaction list, which must be there.
+name of the reaction list, which must be there (any file name extension and the
+string \Comp{\_react} at the end of the file name, will be removed).
 \begin{description}
 
 \item[name]
@@ -310,7 +311,8 @@ the system (those metabolites are only used in closed systems and will be
 removed during file parsing).
 
 If the reaction string does not start with a compartment flag, the flag can be
-appended to each metabolite name (e.\,g. for transport reactions):
+appended (without whitespace) to each metabolite id (e.\,g. for transport
+reactions):
 \begin{verbatim}
 h2o[e] <==> h2o[c]
 \end{verbatim}
@@ -382,24 +384,43 @@ b2    E[e] --> E[b]
 
 % ---------------------------------------------------------------------------- %
 
-\subsection{XML}
+\subsection{SBML} \label{sbmlmod}
 
-In order to read SBML written model files, the package \pkg{sybilSBML} is
-required (which is also available from available from CRAN\footref{cranfoot}).
+In order to read model files written in SBML, the package \pkg{sybilSBML} is
+required (which is also available from available from the \pkgname{}
+homepage\footnote{\url{http://www.cs.uni-duesseldorf.de/AG/BI/Software/SyBiL}\label{sybilhome}}.
 
 
 % ---------------------------------------------------------------------------- %
 
 \section{Usage}
 
-Load \pkgname:
+Load \pkgname{} in a running R session:
 <<>>=
 library(sybil)
 @
+
+\subsection{Documentation}
+
 Get a list of all functions provided with \pkgname:
-<<eval=FALSE>>=
+<<>>=
 library(help = "sybil")
 @
+Get details of the usage of a particular function in \pkgname
+(e.\,g. \Comp{doubleGeneDel()}):
+<<>>=
+help(doubleGeneDel)
+@
+Search through help files for a specific topic
+(e.\,g. ``flux variablilty analysis''):
+<<>>=
+help.search("flux variablilty analysis")
+@
+Open this vignette:
+<<eval=FALSE>>=
+vignette("sybil")
+@
+% Demo??
 In the following, it is assumed, that package \pkg{glpkAPI} is installed
 additionally to \pkgname, thus GLPK is used as optimization software.
 
@@ -418,16 +439,17 @@ dataset. The example dataset consists of three files:
 These files are located in the directory \Comp{extdata/} in the package
 \pkgname und can be read in by using the comand \Comp{readTSVmod}:
 <<>>=
-mpath <- system.file(package = "sybil", "extdata")
-model <- readTSVmod(prefix = "Ec_core", fpath = mpath, quote = "\"")
-model
+mp  <- system.file(package = "sybil", "extdata")
+mod <- readTSVmod(prefix = "Ec_core", fpath = mp, quoteChar = "\"")
+mod
 @
 If the fields in the input files for \Comp{readTSVmod} are quoted, use the
-argument quote (see also documentation of \Comp{read.table}).
+argument \Comp{quoteChar} The value of \Comp{quoteChar} is passed to the
+argument \Comp{quote} of the function \Comp{read.table}.
 Models (instances of class \Comp{modelorg}, see section~\ref{classmod}) can be
 converted to files in tabular form with the command \Comp{modelorg2tsv}:
 <<eval=FALSE>>=
-modelorg2tsv(model, prefix = "Ec_core")
+modelorg2tsv(mod, prefix = "Ec_core")
 @
 Load the example dataset included in \pkgname.
 <<>>=
@@ -477,6 +499,7 @@ simpleFBA(Ec_core, poCmd = list("getRedCosts"))
 
 
 \subsection{Knock-out mutants}
+\label{komut}
 
 In order to compute the metabolic phenotype of \emph{in silico} knock-out
 mutants, the function \Comp{oneGeneDel} can be used.
@@ -536,7 +559,7 @@ functional state $Z_{\mathrm{opt}}$. The example below is based upon the
 metabolic model of the human red blood cell
 by \citet{Palsson:2006fk} and \citet{Price:2004fk}.
 <<>>=
-rbc <- readTSVmod(reactList = "rbc.tsv", fpath = mpath, quote = "\"")
+rbc <- readTSVmod(reactList = "rbc.tsv", fpath = mp, quoteChar = "\"")
 @
 Perform flux variablilty analysis.
 <<fig=TRUE>>=
@@ -643,6 +666,7 @@ provide access to the C-API of the corresponding optimization software.
 They are also available from CRAN\footref{cranfoot}.
 
 \subsection{Setting parameters to the optimization software}
+\label{optparm}
 
 All functions performing optimizations can handle the argument
 \Comp{solverParm} getting a data frame containing parameters used by the
@@ -694,12 +718,91 @@ and sets the timeout to ten seconds.
 
 \subsection{Setting parameters in SyBiL}
 
-Settings to \pkgname{} can be set using the function \Comp{SYBIL\_SETTINGS}.
-Set parameter solver to \cplex for every optimization.
+Parameters to \pkgname{} can be set using the function \Comp{SYBIL\_SETTINGS}.
+Parameter names and their default values are shown in table~\ref{sybilparm},
+all possible values are described in the \Comp{SYBIL\_SETTINGS} documentation.
+<<>>=
+help(SYBIL_SETTINGS)
+@
+\begin{table}
+\centering
+\begin{tabular}{ll}
+\toprule
+parameter name            & default value            \\
+\midrule
+\Comp{SOLVER}             & \Comp{glpk}              \\
+\Comp{METHOD}             & \Comp{simplex}           \\
+\Comp{SOLVER\_CTRL\_PARM} & \Comp{as.data.frame(NA)} \\
+\Comp{ALGORITHM}          & \Comp{FBA}               \\
+\Comp{TOLERANCE}          & \Comp{1E-6}              \\
+\Comp{MAXIMUM}            & \Comp{1000}              \\
+\Comp{OPT\_DIRECTION}     & \Comp{max}               \\
+\Comp{PATH\_TO\_MODEL}    & \Comp{.}                 \\
+\bottomrule
+\end{tabular}
+\caption{Available parameters in \pkgname{} and their default values.}
+\label{sybilparm}
+\end{table}
+The function \Comp{SYBIL\_SETTINGS} gets at most two arguments:
 <<eval=FALSE>>=
+SYBIL_SETTINGS("parameter name", value)
+@
+the first one giving the name of the parameter to set (as character string) and
+the second one giving the desired value. If \Comp{SYBIL\_SETTINGS} is called
+with only one argument
+<<eval=FALSE>>=
+SYBIL_SETTINGS("parameter name")
+@
+the current setting of \Comp{"parameter name"} will be returned. All parameters
+and their values can be achieved by calling \Comp{SYBIL\_SETTINGS} without
+any argument.
+<<eval=FALSE>>=
+SYBIL_SETTINGS()
+@
+
+
+\subsubsection{Solver software specific}
+
+The two parameters \Comp{SOLVER} and \Comp{METHOD} depend on each other, e.\,g.
+the method called \Comp{simplex} is only available when \Comp{glpk} is used as
+solver software. Each solver has its own specific set of methods available in
+order to solve optimization problems. If one changes the parameter \Comp{SOLVER}
+to, let's say \Comp{cplex}, the parameter \Comp{METHOD} will automatically
+be adjusted to the default method used by \Comp{cplex}.
+Set parameter solver to \cplex{} for every optimization:
+<<>>=
 SYBIL_SETTINGS("SOLVER", "cplex")
 @
-Now, \cplex is used as default solver e.\,g. in \Comp{simpleFBA}.
+Now, \cplex{} is used as default solver e.\,g. in \Comp{simpleFBA} or
+\Comp{oneGeneDel}, and parameter \Comp{METHOD} has changed to the default method
+in \pkg{cplexAPI}. Get the current setting for \Comp{Method}:
+<<>>=
+SYBIL_SETTINGS("METHOD")
+@
+Reset the solver to \Comp{glpk}:
+<<>>=
+SYBIL_SETTINGS("SOLVER", "glpk")
+@
+Now, the default method again is \Comp{simplex}
+<<>>=
+SYBIL_SETTINGS("METHOD")
+@
+It is not possible to set a wrong method for a given solver. If the desired
+method is not available, allways the default method is used.
+Parameters to the solver software (parameter \Comp{SOLVER\_CTRL\_PARM}) must be
+set as \Comp{data.frame} as described in section~\ref{optparm}.
+
+
+\subsubsection{Analysis specific}
+
+The parameter \Comp{ALGORITHM} controls the way gene deletion anslysis will be
+performed. The default setting \Comp{FBA} will use flux-balance analysis (FBA)
+as described in \citet{Edwards:2002kx} and \citet{Orth:2010vn}. Setting this
+parameter to \Comp{linearMOMA}, results in a linearized version of the MOMA
+algorithm described in \citet{Segre:2002fk}. If set to \Comp{linearMOMA\_COBRA},
+a linearized version of MOMA like in the COBRA Toolbox
+\citep{Becker:2007uq,Schellenberger:2011fk} is used.
+See also section~\ref{komut} for details on gene deletion analysis.
 
 
 % ---------------------------------------------------------------------------- %
@@ -747,9 +850,20 @@ the \pkg{Matrix}-package.
 
 Objects of class \Comp{modelorg} can easily be created. Sources are common file
 formats like tab delimited files from the
-BiGG-Database \citep{Schellenberger:2010fk}\footnote{\url{http://bigg.ucsd.edu}}
-or SBML-Files (with package \pkg{sybilSBML}). See section \ref{inputformats} on
+BiGG database \citep{Schellenberger:2010fk}\footnote{\url{http://bigg.ucsd.edu}}
+or SBML files (with package \pkg{sybilSBML}\footref{sybilhome}).
+See section~\ref{inputformats} on
 page \pageref{inputformats} about supported file formats and their description.
+Read a reaction list generated from the BiGG database:
+<<eval=FALSE>>=
+mod <- readTSVmod(reactList = "reactionList.txt")
+@
+Here, \Comp{"reactionList.txt"} is an from BiGG database exported reaction
+list. Usually, these files do neither contain an objective function, nor upper
+and lower bounds on the reaction rates. They need to be added to the returned
+object of class \Comp{modelorg} using the methods \Comp{obj\_coef<-},
+\Comp{lowbnd<-} and \Comp{uppbnd<-}, or by adding the columns \Comp{obj\_coef},
+\Comp{lowbnd} and \Comp{uppbnd} to the input file.
 
 
 \subsection{Class optsol} \label{classopt}
@@ -884,8 +998,6 @@ lp
 % ---------------------------------------------------------------------------- %
 
 \newpage
-
-\nocite{Becker:2007uq,Schellenberger:2011fk}
 
 \bibliographystyle{abbrvnat}
 \bibliography{sybil}
