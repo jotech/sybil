@@ -6,20 +6,20 @@
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
 #  
-#  This file is part of SyBiL.
+#  This file is part of sybil.
 #
-#  SyBiL is free software: you can redistribute it and/or modify
+#  sybil is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
-#  SyBiL is distributed in the hope that it will be useful,
+#  sybil is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License
-#  along with SyBiL.  If not, see <http://www.gnu.org/licenses/>.
+#  along with sybil.  If not, see <http://www.gnu.org/licenses/>.
 
 
 ################################################
@@ -32,13 +32,7 @@
 # The algorithm is the same.
 
 
-fluxVar <- function(model, react, percentage = 100,
-                    tol = SYBIL_SETTINGS("TOLERANCE"),
-                    lpdir = SYBIL_SETTINGS("OPT_DIRECTION"),
-                    solver = SYBIL_SETTINGS("SOLVER"),
-                    method = SYBIL_SETTINGS("METHOD"),
-                    solverParm = SYBIL_SETTINGS("SOLVER_CTRL_PARM"),
-                    fld = FALSE, verboseMode = 2, ...) {
+fluxVar <- function(model, react, fld = FALSE, verboseMode = 2, ...) {
 
     # check prerequisites
     if (!is(model, "modelorg")) {
@@ -54,142 +48,103 @@ fluxVar <- function(model, react, percentage = 100,
         }
     }
 
-    # -------------------------------------------------------------- #
-  
-    saveOptSol <- function(saveMod, solution, j, fld) {
-
-        lp_ok(saveMod)[j]   <- solution$ok
-        lp_obj(saveMod)[j]  <- solution$obj
-        #lp_obj(saveMod)[j] <- sybil:::.ceilValues(solution$lp_obj, tol = tol)
-        lp_stat(saveMod)[j] <- solution$stat
-      
-        if (fld == TRUE) {
-            fluxes(saveMod)[,j]  <- solution$flux
-        }
-
-        return(saveMod)
-    }
-
-    # -------------------------------------------------------------- #
-
-    if (any(obj_coef(model) != 0)) {
-        hasObj <- TRUE
-        optimal <- simpleFBA(model, lpdir = lpdir,
-                             solver = solver, method = method,
-                             solverParm = solverParm, ...)
-        if (optimal$ok == 0) {
-            if (lpdir == "max") {
-                obj <- sybil:::.floorValues(optimal$obj,
-                                            tol = tol)*percentage/100
-            }
-            else {
-                obj <- sybil:::.ceilValues(optimal$obj,
-                                           tol = tol)*percentage/100
-            }
-        }
-        else {
-            stop("No optimal solution!")
-        }
-    }
-    else {
-        hasObj <- FALSE
-    }
-  
-    lpmod <- prepProbObj(model,
-                         nCols      = react_num(model),
-                         nRows      = met_num(model),
-                         solver     = solver,
-                         method     = method,
-                         lpdir      = lpdir,
-                         solverParm = solverParm
-             )
-
-    # add a row to the problem
-    if (hasObj == TRUE) {
-        type <- ifelse(lpdir == "max", "L", "U")
-        oind <- which(obj_coef(model) != 0)
-        oval <- obj_coef(model)[oind]
-        addRowsToProb(lpmod, met_num(model)+1,
-                      type, obj, obj, list(oind), list(oval))
-        changeObjCoefs(lpmod, 1:react_num(model), rep(0, react_num(model)))
-    }
-
 
 #------------------------------------------------------------------------------#
 #                            data strucktures                                  #
 #------------------------------------------------------------------------------#
 
+    # problem object
+    lpmod <- sysBiolAlg(model, algorithm = "fv", ...)
 
-    # new object for the solution
-    fluxVariability <- optsol_fluxVar(solver = solver,
-                                      method = method,
-                                      nprob  = 2 * length(react_pos(react)),
-                                      lpdir  = lpdir,
-                                      ncols  = react_num(model),
-                                      nrows  = met_num(model),
-                                      objf   = printObjFunc(model),
-                                      fld    = fld,
-                                      rc     = react
-                       )
+    # simulation solutions
+    nObj  <- 2 * length(react_pos(react))
+    obj   <- numeric(nObj)
+    ok    <- integer(nObj)
+    stat  <- integer(nObj)
+    if (isTRUE(fld)) {
+        flux <- Matrix::Matrix(0, nrow = react_num(model), ncol = nObj)
+    }
+    else {
+        flux <- Matrix::Matrix(0, nrow = 1, ncol = 1)
+    }
 
-
-
-    obj_values <- numeric(2*length(react_pos(react)))
-
+    # reactions to optimize
     num_of_probs_half <- length(react_pos(react))
+    fvR               <- react_pos(react)
+    
+
+#------------------------------------------------------------------------------#
+#                               optimizations                                  #
+#------------------------------------------------------------------------------#
 
     if (verboseMode > 0) { message("calculating min/max values ...") }
 
     if (verboseMode == 2) { progr <- sybil:::.progressBar() }
 
-    j <- 1
-    for (i in 1:num_of_probs_half) {
+    # it is a bit faster, if we do first all minimisations and
+    # afterwards all maximisations
+
+    cc <- numeric(react_num(model))
+    od <- "min"
+    j <- 0
+    for (i in 1:nObj) {
 
         if (verboseMode == 2) {
-            progr <- sybil:::.progressBar(i, num_of_probs_half, progr)
-        }
-
-        changeObjCoefs(lpmod, react_pos(react)[i], 1)
-
-        setObjDir(lpmod, "min")
-        fluxVarSol_MIN <- simpleFBA(lpmod, lpdir = "min",
-                                    solver = solver,
-                                    method = method, fld = fld,
-                                    prCil = j, poCil = j, ...)
-
-        setObjDir(lpmod, "max")
-        fluxVarSol_MAX <- simpleFBA(lpmod, lpdir = "max",
-                                    solver = solver,
-                                    method = method, fld = fld,
-                                    prCil = j+1, poCil = j+1, ...)
-
-        changeObjCoefs(lpmod, react_pos(react)[i], 0)
-
-        if (verboseMode > 2) {
-            print(sprintf("%-5s %-15s %12s %12s", i,
-                          substr(react_id(model)[react_pos(react)[i]], 1, 15),
-                          sprintf("%.6f", fluxVarSol_MIN$obj),
-                          sprintf("%.6f", fluxVarSol_MAX$obj)))
-        }
-
-        if (abs(fluxVarSol_MIN$obj) > abs(fluxVarSol_MAX$obj)) {
-            fluxVariability <- saveOptSol(fluxVariability,
-                                          fluxVarSol_MAX, j, fld)
-            j <- j + 1
-            fluxVariability <- saveOptSol(fluxVariability,
-                                          fluxVarSol_MIN, j, fld)
-        } else {
-            fluxVariability <- saveOptSol(fluxVariability,
-                                          fluxVarSol_MIN, j, fld)
-            j <- j + 1
-            fluxVariability <- saveOptSol(fluxVariability,
-                                          fluxVarSol_MAX, j, fld)
+            progr <- sybil:::.progressBar(i, nObj, progr)
         }
 
         j <- j + 1
-  }
+        if (i == (num_of_probs_half+1)) {
+            od <- "max"
+            j <- 1
+        }
+
+        
+        cc[j] <- 1
+
+        fluxVarSol <- optimizeProb(lpmod, lpdir = od, obj_coef = cc)
+
+        cc[j] <- 0
+
+        if (verboseMode > 2) {
+            print(sprintf("%-5s %-15s %12s", j,
+                          substr(react_id(model)[fvR[j]], 1, 15),
+                          sprintf("%.6f", fluxVarSol$obj)))
+        }
+
+        obj[i]    <- fluxVarSol$obj
+        ok[i]     <- fluxVarSol$ok
+        stat[i]   <- fluxVarSol$stat
+        if (isTRUE(fld)) {
+            flux[,i]   <- fluxVarSol$flux
+        }
+    }
   
-  return(fluxVariability)
+
+#------------------------------------------------------------------------------#
+#                             save the results                                 #
+#------------------------------------------------------------------------------#
+
+    optsol <- new("optsol_fluxVar",
+        mod_id       = mod_id(model),
+        solver       = solver(problem(lpmod)),
+        method       = method(problem(lpmod)),
+        algorithm    = algorithm(lpmod),
+        num_of_prob  = as.integer(nObj),
+        lp_num_cols  = nc(lpmod),
+        lp_num_rows  = nr(lpmod),
+        lp_obj       = as.numeric(obj),
+        lp_ok        = as.integer(ok),
+        lp_stat      = as.integer(stat),
+        lp_dir       = getObjDir(problem(lpmod)),
+        obj_coef     = obj_coef(model),
+        fldind       = fldind(lpmod),
+        fluxdist     = fluxDistribution(flux),
+
+        react        = react
+    )
+
+    return(optsol)
 
 }
 

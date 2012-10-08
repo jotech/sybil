@@ -1,5 +1,5 @@
-importFrom("graphics", hist, plot)
-exportMethods(plot, hist)
+importFrom("graphics", plot)
+importFrom("lattice", histogram)
 
 import(Matrix)
 
@@ -10,19 +10,17 @@ checksol,
 fluxDistribution,
 modelorg_irrev,
 modelorg,
-optObj_clp,
-optObj_cplex,
-optObj_glpk,
+optObj_clpAPI,
+optObj_cplexAPI,
+optObj_glpkAPI,
 optObj_lpSolveAPI,
 optObj,
 optsol_blockedReact,
-optsol_doublefluxdel,
-optsol_doublegenedel,
 optsol_fluxdel,
 optsol_fluxVar,
 optsol_genedel,
+optsol_optimizeProb,
 optsol_robAna,
-optsol_simpleFBA,
 optsol,
 pointerToProb,
 ppProc,

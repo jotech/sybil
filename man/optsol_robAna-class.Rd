@@ -4,7 +4,6 @@
 \docType{class}
 
 \alias{optsol_robAna-class}
-\alias{optsol_robAna}
 
 \alias{ctrlfl,optsol_robAna-method}
 \alias{ctrlfl<-,optsol_robAna-method}
@@ -24,41 +23,8 @@
 }
 
 \section{Objects from the Class}{
-  Objects can be created by calls of the function \code{optsol_robAna}:
-
-  \code{test <- optsol_robAna(solver, method, nprob, lpdir, ncols, nrows, objf, fld, cr, crf)}.
-  \describe{
-    \item{\code{solver}:}{Object of class \code{"character"}
-      indicating the used solver.
-    }
-    \item{\code{method}:}{Object of class \code{"character"}
-      indicating the algorithm used by \code{solver}.
-    }
-    \item{\code{nprob}:}{Object of class \code{"numeric"}
-      number of problems to solve.
-    }
-    \item{\code{lpdir}:}{Object of class \code{"character"}
-      direction of optimization.
-    }
-    \item{\code{ncols}:}{Object of class \code{"numeric"}
-      number of variables in the model.
-    }
-    \item{\code{nrows}:}{Object of class \code{"numeric"}
-      number of constraints in the model.
-    }
-    \item{\code{objf}:}{Object of class \code{"character"}
-      a character string describing the objective function.
-    }
-    \item{\code{fld}:}{Object of class \code{"logical"}
-      logical, if \code{TRUE}, memory for flux distributions will be allocated.
-    }
-    \item{\code{cr}:}{Object of class \code{"reactId"}
-      giving the id of the control flux.
-    }
-    \item{\code{crf}:}{Object of class \code{"numeric"}
-      a vector of flux values for the control reaction.
-    }
-  }
+  Objects can be created by calls of the form
+  \code{new("optsol_robAna", ...)}.
 }
 
 \section{Slots}{
@@ -71,17 +37,23 @@
     }
     \item{\code{preProc}:}{Object of class \code{"ppProc"}
       containing the results of pre-processing.
-      See also \code{\link{simpleFBA}}.
+      See also \code{\link{optimizeProb}}.
     }
     \item{\code{postProc}:}{Object of class \code{"ppProc"}
       containing the results of post-processing.
-      See also \code{\link{simpleFBA}}.
+      See also \code{\link{optimizeProb}}.
+    }
+    \item{\code{mod_id}:}{Object of class \code{"character"}
+      containing the model id of the used model.
     }
     \item{\code{solver}:}{Object of class \code{"character"}
       indicating the used solver.
     }
     \item{\code{method}:}{Object of class \code{"character"}
       indicating the used method.
+    }
+    \item{\code{algorithm}:}{Object of class \code{"character"}
+      containing the name of the algorithm used for optimizations.
     }
     \item{\code{num_of_prob}:}{Object of class \code{"integer"}
       indicating the number of optimization problems.
@@ -104,8 +76,13 @@
     \item{\code{lp_dir}:}{Object of class \code{"character"}
       indicating the direction of optimization.
     }
-    \item{\code{obj_function}:}{Object of class \code{"character"}
-      containing the name of the objective function.
+    \item{\code{obj_coef}:}{Object of class \code{"numeric"}
+      containing the objective coefficients of the used model.
+    }
+    \item{\code{fldind}:}{Object of class \code{"integer"}
+      pointers to columns (variables) representing a flux (reaction) in the
+      original network. The variable \code{fldind[i]} in the problem object
+      represents reaction \code{i} in the original network. 
     }
     \item{\code{fluxdist}:}{Object of class \code{"fluxDistribution"}
       containing the solutons flux distributions.
@@ -114,8 +91,8 @@
 }
 
 \section{Extends}{
-  Class \code{"\linkS4class{optsol_simpleFBA}"}, directly.
-  Class \code{"\linkS4class{optsol}"}, by class "optsol_simpleFBA", distance 2.
+  Class \code{"\linkS4class{optsol_optimizeProb}"}, directly.
+  Class \code{"\linkS4class{optsol}"}, by class "optsol_optimizeProb", distance 2.
 }
 
 \section{Methods}{

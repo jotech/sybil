@@ -4,7 +4,6 @@
 \docType{class}
 
 \alias{optsol_blockedReact-class}
-\alias{optsol_blockedReact}
 
 \alias{blocked,optsol_blockedReact-method}
 \alias{blocked<-,optsol_blockedReact-method}
@@ -27,29 +26,8 @@
 }
 
 \section{Objects from the Class}{
-  Objects can be created by calls of the function \code{optsol_blockedReact}:
-
-  \code{test <- optsol_blockedReact(solver, nprob, lpdir, ncols, nrows, fld)}.
-  \describe{
-    \item{\code{solver}:}{Object of class \code{"character"}
-      indicating the used solver.
-    }
-    \item{\code{nprob}:}{Object of class \code{"numeric"}
-      number of problems to solve.
-    }
-    \item{\code{lpdir}:}{Object of class \code{"character"}
-      direction of optimization.
-    }
-    \item{\code{ncols}:}{Object of class \code{"numeric"}
-      number of variables in the model.
-    }
-    \item{\code{nrows}:}{Object of class \code{"numeric"}
-      number of constraints in the model.
-    }
-    \item{\code{fld}:}{Object of class \code{"logical"}
-      logical, if \code{TRUE}, memory for flux distributions will be allocated.
-    }
-  }
+  Objects can be created by calls of the form
+  \code{new("optsol_blockedReact", ...)}.
 }
 
 \section{Slots}{
@@ -60,11 +38,17 @@
     \item{\code{react}:}{Object of class \code{"reactId"}
       containing the reaction id's.
     }
+    \item{\code{mod_id}:}{Object of class \code{"character"}
+      containing the model id of the used model.
+    }
     \item{\code{solver}:}{Object of class \code{"character"}
       indicating the used solver.
     }
     \item{\code{method}:}{Object of class \code{"character"}
       indicating the used method.
+    }
+    \item{\code{algorithm}:}{Object of class \code{"character"}
+      containing the name of the algorithm used for optimizations.
     }
     \item{\code{num_of_prob}:}{Object of class \code{"integer"}
       indicating the number of optimization problems.
@@ -87,8 +71,13 @@
     \item{\code{lp_dir}:}{Object of class \code{"character"}
       indicating the direction of optimization.
     }
-    \item{\code{obj_function}:}{Object of class \code{"character"}
-      containing the name of the objective function.
+    \item{\code{obj_coef}:}{Object of class \code{"numeric"}
+      containing the objective coefficients of the used model.
+    }
+    \item{\code{fldind}:}{Object of class \code{"integer"}
+      pointers to columns (variables) representing a flux (reaction) in the
+      original network. The variable \code{fldind[i]} in the problem object
+      represents reaction \code{i} in the original network. 
     }
     \item{\code{fluxdist}:}{Object of class \code{"fluxDistribution"}
       containing the solutons flux distributions.

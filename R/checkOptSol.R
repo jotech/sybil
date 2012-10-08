@@ -6,20 +6,20 @@
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
 #
-#  This file is part of SyBiL.
+#  This file is part of sybil.
 #
-#  SyBiL is free software: you can redistribute it and/or modify
+#  sybil is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
-#  SyBiL is distributed in the hope that it will be useful,
+#  sybil is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License
-#  along with SyBiL.  If not, see <http://www.gnu.org/licenses/>.
+#  along with sybil.  If not, see <http://www.gnu.org/licenses/>.
 
 
 ################################################
@@ -52,8 +52,8 @@ checkOptSol <- function(optsol, onlywarn = FALSE) {
     else {
 		lp_check <- checksol()
 
-		if (solver(optsol) == "cplex") {
-			TEMP_ENV <- openEnvCPLEX()
+		if (solver(optsol) == "cplexAPI") {
+			TEMP_ENV <- cplexAPI::openEnvCPLEX()
 		}
 		else {
 			TEMP_ENV <- NULL
@@ -76,7 +76,7 @@ checkOptSol <- function(optsol, onlywarn = FALSE) {
 										env = TEMP_ENV))
 
 		if (!is.null(TEMP_ENV)) {
-			closeEnvCPLEX(TEMP_ENV)
+			cplexAPI::closeEnvCPLEX(TEMP_ENV)
 		}
     }
 

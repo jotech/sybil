@@ -6,20 +6,20 @@
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
 #  
-#  This file is part of SyBiL.
+#  This file is part of sybil.
 #
-#  SyBiL is free software: you can redistribute it and/or modify
+#  sybil is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
-#  SyBiL is distributed in the hope that it will be useful,
+#  sybil is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License
-#  along with SyBiL.  If not, see <http://www.gnu.org/licenses/>.
+#  along with sybil.  If not, see <http://www.gnu.org/licenses/>.
 
 
 #------------------------------------------------------------------------------#
@@ -65,21 +65,21 @@ return_codeLPSOLVE <- function(code) {
 
 loadMatrixPerColumnLPSOLVE <- function(lpmod, constMat) {
 
-    out <- TRUE
-
+    stopifnot(is(constMat, "Matrix"))
+    
     x <- constMat@x
     p <- constMat@p + 1
     i <- constMat@i + 1
 
     k <- 1
     while (k <= ncol(constMat)) {
-        lpSolveAPI::set.column(lpmod, k,
-                               x[(p[k]):(p[k+1]-1)],
-                               i[(p[k]):(p[k+1]-1)])
+        lpSolveAPI::set.column(lpmod,
+                               column  = k,
+                               x       = x[(p[k]):(p[k+1]-1)],
+                               indices = i[(p[k]):(p[k+1]-1)])
         k <- k + 1
     }
 
-    return(out)
 }
 
 

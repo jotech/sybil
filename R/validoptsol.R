@@ -6,20 +6,20 @@
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
 #
-#  This file is part of SyBiL.
+#  This file is part of sybil.
 #
-#  SyBiL is free software: you can redistribute it and/or modify
+#  sybil is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
-#  SyBiL is distributed in the hope that it will be useful,
+#  sybil is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License
-#  along with SyBiL.  If not, see <http://www.gnu.org/licenses/>.
+#  along with sybil.  If not, see <http://www.gnu.org/licenses/>.
 
 
 ################################################
@@ -38,28 +38,28 @@
         return("needs an object of class optsol!")
     }
     
-    if (length(solver(object)) != 1) {
-        return("solver must have a length of 1!")
-    }
-    # if ((length(solver(object)) != 1) || (length(method(object)) != 1)) {
-    #     return("solver and method must have a length of 1!")
-    # }
-    
-    if (length(lp_dir(object)) == 0) {
-    
-        if (length(solver(object)) != 1) {
-            return("solver must have a length of 1!")
-        }
-        if (length(method(object)) != 1) {
-            return("method must have a length of 1!")
-        }
-    
-    }
-    else {
-    
-        if (length(lp_dir(object)) != 1) {
-            return("lp_dir must have a length of 1!")
-        }
+#    if (length(solver(object)) != 1) {
+#        return("solver must have a length of 1!")
+#    }
+#    # if ((length(solver(object)) != 1) || (length(method(object)) != 1)) {
+#    #     return("solver and method must have a length of 1!")
+#    # }
+#    
+#    if (length(lp_dir(object)) == 0) {
+#    
+#        if (length(solver(object)) != 1) {
+#            return("solver must have a length of 1!")
+#        }
+#        if (length(method(object)) != 1) {
+#            return("method must have a length of 1!")
+#        }
+#    
+#    }
+#    else {
+#    
+#        if (length(lp_dir(object)) != 1) {
+#            return("lp_dir must have a length of 1!")
+#        }
         if (length(lp_num_cols(object)) != 1) {
             return("lp_num_cols must have a length of 1!")
         }
@@ -79,6 +79,6 @@
             return("wrong length of lp_stat!")
         }
     
-    }
+#    }
     return(TRUE)
 }

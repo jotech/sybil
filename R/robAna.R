@@ -6,20 +6,20 @@
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
 #
-#  This file is part of SyBiL.
+#  This file is part of sybil.
 #
-#  SyBiL is free software: you can redistribute it and/or modify
+#  sybil is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
-#  SyBiL is distributed in the hope that it will be useful,
+#  sybil is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License
-#  along with SyBiL.  If not, see <http://www.gnu.org/licenses/>.
+#  along with sybil.  If not, see <http://www.gnu.org/licenses/>.
 
 
 ################################################
@@ -31,14 +31,8 @@
 # The algorithm is the same.
 
 
-robAna <- function(model,
-                   ctrlreact,
-                   numP = 20,
-                   lpdir = SYBIL_SETTINGS("OPT_DIRECTION"),
-                   solver = SYBIL_SETTINGS("SOLVER"),
-                   method = SYBIL_SETTINGS("METHOD"),
-                   solverParm = SYBIL_SETTINGS("SOLVER_CTRL_PARM"),
-                   fld = FALSE, verboseMode = 2, ...) {
+robAna <- function(model, ctrlreact,
+                   numP = 20, verboseMode = 2, fld = FALSE, ...) {
 
     if (!is(model, "modelorg")) {
         stop("needs an object of class modelorg!")
@@ -57,9 +51,11 @@ robAna <- function(model,
     ctrlr <- react_pos(tmp)
 
     # ------------------------------------------------------------------------ #
-    minmaxsol <- function(mod, mmdir) {
+    minmaxsol <- function(mmdir) {
 
-        tmp_sol  <- simpleFBA(mod, lpdir = mmdir)
+        obj <- numeric(length(fldind(lpmod)))
+        obj[ctrlr] <- 1
+        tmp_sol  <- optimizeProb(lpmod, lpdir = mmdir, obj_coef = obj)
         if (tmp_sol$ok != 0) {
             stop("Optimization for min/max solution ended not successfull!")
         }
@@ -73,43 +69,30 @@ robAna <- function(model,
 #                       minimum and maximum solution                           #
 #------------------------------------------------------------------------------#
 
-    tmpModel <- changeObjFunc(model, ctrlr)
 
-    lpmin <- minmaxsol(mod = tmpModel, mmdir = "max")
-    lpmax <- minmaxsol(mod = tmpModel, mmdir = "min")
+    lpmod <- sysBiolAlg(model, algorithm = "fba", ...)
 
-    remove(tmpModel)
-
+    lpmin <- minmaxsol(mmdir = "max")
+    lpmax <- minmaxsol(mmdir = "min")
 
     # sequence of numP numbers between lpmin and lpmax,
     # all with the same distance
     ctrlfl <- seq(lpmin, lpmax, length.out = numP)
 
 
-    # new object for the solution
-    robust <- optsol_robAna(solver = solver,
-                            method = method,
-                            nprob  = numP,
-                            lpdir  = lpdir,
-                            ncols  = react_num(model),
-                            nrows  = met_num(model),
-                            objf   = printObjFunc(model),
-                            fld    = fld,
-                            cr     = tmp,
-                            crf    = ctrlfl)
-
-
 #------------------------------------------------------------------------------#
 #                                optimization                                  #
 #------------------------------------------------------------------------------#
 
-    lpmod <- prepProbObj(model,
-                         nCols      = react_num(model),
-                         nRows      = met_num(model),
-                         solver     = solver,
-                         method     = method,
-                         lpdir      = lpdir,
-                         solverParm = solverParm)
+    obj   <- numeric(numP)
+    ok    <- integer(numP)
+    stat  <- integer(numP)
+    if (isTRUE(fld)) {
+        flux <- Matrix::Matrix(0, nrow = nc(lpmod), ncol = numP)
+    }
+    else {
+        flux <- NA
+    }
 
     if (verboseMode > 0)  { message("running optimizations ", appendLF = FALSE) }
     if (verboseMode == 1) { message("... ", appendLF = FALSE) }
@@ -119,37 +102,50 @@ robAna <- function(model,
 
         if (verboseMode == 2) { sybil:::.progressDots(5, i, numP) }
 
-        optsol <- simpleFBA(lpmod,
+        sol <- optimizeProb(lpmod,
                             react = ctrlr,
                             lb = ctrlfl[i],
-                            ub = ctrlfl[i],
-                            lpdir = lpdir,
-                            solver = solver,
-                            method = method,
-                            fld = fld,
-                            checkIds = FALSE,
-                            prCil = i,
-                            poCil = i, ...)
+                            ub = ctrlfl[i])
 
         if (verboseMode > 2) {
             print(sprintf("%-5s %-15s %12s", i,
                           substr(react_id(model)[ctrlr], 1, 15),
-                          sprintf("%.6f", optsol$obj)))
+                          sprintf("%.6f", sol$obj)))
         }
 
-        lp_ok(robust)[i]   <- optsol$ok
-        lp_obj(robust)[i]  <- optsol$obj
-        lp_stat(robust)[i] <- optsol$stat
+        ok[i]   <- sol$ok
+        obj[i]  <- sol$obj
+        stat[i] <- sol$stat
 
         if (fld == TRUE) {
-            fluxes(robust)[,i] <- optsol$flux
+            flux[ ,i] <- sol$flux
         }
     }
 
     #ctrlfl(robust) <- abs(ctrlfl(robust))
     if (verboseMode > 0) { message("OK") }
 
-    return(robust)
+    optsol <- new("optsol_robAna",
+        mod_id       = mod_id(model),
+        solver       = solver(problem(lpmod)),
+        method       = method(problem(lpmod)),
+        algorithm    = algorithm(lpmod),
+        num_of_prob  = as.integer(numP),
+        lp_num_cols  = nc(lpmod),
+        lp_num_rows  = nr(lpmod),
+        lp_obj       = as.numeric(obj),
+        lp_ok        = as.integer(ok),
+        lp_stat      = as.integer(stat),
+        lp_dir       = getObjDir(problem(lpmod)),
+        obj_coef     = obj_coef(model),
+        fldind       = fldind(lpmod),
+        fluxdist     = fluxDistribution(flux),
+
+        ctrlr        = tmp,
+        ctrlfl       = as.numeric(ctrlfl)
+    )
+
+    return(optsol)
 }
 
 

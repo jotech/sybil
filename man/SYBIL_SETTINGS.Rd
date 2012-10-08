@@ -12,15 +12,15 @@
 \encoding{utf8}
 
 \title{
-  Set and Get SyBiL Parameters
+  Set and Get sybil Parameters
 }
 
 \description{
-  Manage a set of default parameter settings for SyBiL.
+  Manage a set of default parameter settings for sybil.
 }
 
 \usage{
-  SYBIL_SETTINGS(parm, value)
+  SYBIL_SETTINGS(parm, value, ...)
 }
 
 \arguments{
@@ -29,6 +29,10 @@
   }
   \item{value}{
     The corresponding value.
+  }
+  \item{...}{
+    Further arguments passed to \code{\link{checkDefaultMethod}}. Only used if
+    parameters \code{"SOLVER"} or \code{"METHOD"} are set.
   }
 }
 
@@ -46,29 +50,30 @@
       installed API package.\cr
       \describe{
           \item{\pkg{glpkAPI}:}{
-            \code{"glpk"},
+            \code{"glpkAPI"},
           }
           \item{\pkg{cplexAPI}:}{
-            \code{"cplex"},
+            \code{"cplexAPI"},
           }
           \item{\pkg{clpAPI}:}{
-            \code{"clp"},
+            \code{"clpAPI"},
           }
           \item{\pkg{lpSolveAPI}:}{
             \code{"lpSolveAPI"}.
           }
       }
-      Default: \code{"glpk"}.
+      Default: \code{"glpkAPI"}.
     }
     \item{\code{"METHOD"}}{
       The default method to solve lp problems. Possible values are
       \describe{
           \item{\pkg{glpkAPI}:}{
-            \code{"simplex"}, \code{"interior"} or \code{"exact"}.
+            \code{"simplex"}, \code{"interior"}, \code{"exact"} or \code{mip}.
           }
           \item{\pkg{cplexAPI}:}{
             \code{"lpopt"}, \code{"primopt"} \code{"dualopt"}, \code{"baropt"},
-            \code{"hybbaropt"}, \code{"hybnetopt"} or \code{"siftopt"}.
+            \code{"hybbaropt"}, \code{"hybnetopt"}, \code{"siftopt"},
+            \code{mipopt} or \code{qpopt}.
           }
           \item{\pkg{clpAPI}:}{
             \code{"general_solve"}, \code{"inidual"} \code{"iniprimal"},
@@ -81,7 +86,7 @@
       }
       Default: \code{"simplex"}.\cr
       If the parameter \code{"SOLVER"} is changed, the corrsponding default
-      \code{"METHOD"} is the first one mentioned, e.g. for \code{"cplex"},
+      \code{"METHOD"} is the first one mentioned, e.g. for \code{"cplexAPI"},
       it will be \code{"lpopt"}. This change is done automatically when changing
       the solver. It is not possible, to set a not existing \code{"METHOD"}
       for a particular \code{"SOLVER"}, the corresponding default value will
@@ -96,9 +101,8 @@
       Default: \code{1000}.
     }
     \item{\code{"ALGORITHM"}}{
-      Algorithm to use for e.g. FBA. Can be \code{"FBA"}, \code{"linearMOMA"},
-      or \code{"linearMOMA_COBRA"}.\cr
-      Default: \code{"FBA"}.
+      Algorithm to use for e.g. FBA.\cr
+      Default: \code{"fba"}.
     }
     \item{\code{"OPT_DIRECTION"}}{
       Direction of optimization. Can be \code{"max"} or \code{"min"}.\cr
@@ -117,7 +121,7 @@
 }
 
 \value{
-  If successful, a set of parameters to SyBiL will be returned.
+  If successful, a set of parameters to sybil will be returned.
 }
 
 \author{
@@ -126,6 +130,9 @@
   Maintainer: Gabriel Gelius-Dietrich <geliudie@uni-duesseldorf.de>
 }
 
+\seealso{
+  \code{\link{checkDefaultMethod}}
+}
 
 \examples{
   ## show all current parameters
@@ -135,11 +142,11 @@
   SYBIL_SETTINGS("SOLVER")
 
   ## change current solver to glpkAPI
-  SYBIL_SETTINGS("SOLVER", "glpk")
+  SYBIL_SETTINGS("SOLVER", "glpkAPI")
 \dontrun{
   ## this needs cplexAPI installed
   ## change current solver to cplexAPI
-  SYBIL_SETTINGS("SOLVER", "cplex")
+  SYBIL_SETTINGS("SOLVER", "cplexAPI")
 }
 }
 

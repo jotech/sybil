@@ -6,20 +6,20 @@
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
 #  
-#  This file is part of SyBiL.
+#  This file is part of sybil.
 #
-#  SyBiL is free software: you can redistribute it and/or modify
+#  sybil is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
-#  SyBiL is distributed in the hope that it will be useful,
+#  sybil is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License
-#  along with SyBiL.  If not, see <http://www.gnu.org/licenses/>.
+#  along with sybil.  If not, see <http://www.gnu.org/licenses/>.
 
 
 ################################################
@@ -29,22 +29,11 @@
 # In each iteration one gene is switched of (vi = 0)
 # and the objective function will be computed.
 #
-# Parameters:
-#      model:   an object of class model
-#      react:   fluxes to delete
-#      lpdir:   optimization direction
-#     solver:   lp problem solver (glpk [default], lpSolve)
-#     method:   simplex[default], interior
-#        fld:   boolean, TRUE: get the flux distribution.
-#        ...:   further arguments, passed to optimizer()
-#
-# Returns an object of class optsol_fluxdel.
+# The function oneGeneDel() is inspired by the function
+# singleRxnDeletion() contained in the COBRA Toolbox.
 
 
-oneFluxDel <- function(model, react, lpdir = SYBIL_SETTINGS("OPT_DIRECTION"),
-                       solver = SYBIL_SETTINGS("SOLVER"),
-                       method = SYBIL_SETTINGS("METHOD"),
-                       fld = FALSE, ...) {
+oneFluxDel <- function(model, react, ...) {
 
     if (!is(model, "modelorg")) {
         stop("needs an object of class modelorg!")
@@ -60,25 +49,11 @@ oneFluxDel <- function(model, react, lpdir = SYBIL_SETTINGS("OPT_DIRECTION"),
     }
 
     react <- sort(react_pos(react))
-    num_of_prob = length(react)
-  
-    # new object for the solution
-    optsol <- optsol_fluxdel(solver = solver,
-                             nprob  = num_of_prob,
-                             lpdir  = lpdir,
-                             ncols  = react_num(model),
-                             nrows  = met_num(model),
-                             objf   = printObjFunc(model),
-                             fld    = fld
-                            )
 
-    react_id(optsol) <- react_id(model)
-    allGenes(optsol) <- allGenes(model)
-    method(optsol) <- method
-
-    dels(optsol)[2:(num_of_prob + 1),] <- react
-
-    optsol <- optimizer(model = model, optsol = optsol, ...)
+    optsol <- optimizer(model = model,
+                        delete = matrix(react, ncol = 1),
+                        geneFlag = FALSE,
+                        ...)
 
     return(optsol)
 

@@ -6,24 +6,24 @@
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
 #
-#  This file is part of SyBiL.
+#  This file is part of sybil.
 #
-#  SyBiL is free software: you can redistribute it and/or modify
+#  sybil is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
-#  SyBiL is distributed in the hope that it will be useful,
+#  sybil is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License
-#  along with SyBiL.  If not, see <http://www.gnu.org/licenses/>.
+#  along with sybil.  If not, see <http://www.gnu.org/licenses/>.
 
 
 
-SYBIL_SETTINGS <- function(parm, value) {
+SYBIL_SETTINGS <- function(parm, value, ...) {
 
     if ( (missing(parm)) && (missing(value)) ) {
        return(.SYBILenv$settings)
@@ -44,14 +44,19 @@ SYBIL_SETTINGS <- function(parm, value) {
     switch(parm,
     
         "SOLVER" = {
-            chmet <- checkDefaultMethod(value, NA)
+
+            chmet <- checkDefaultMethod(solver = value,
+                                        method = "",
+                                        probType = "", ...)
             .SYBILenv$settings[["SOLVER"]]           <- chmet$sol
             .SYBILenv$settings[["METHOD"]]           <- chmet$met
             .SYBILenv$settings[["SOLVER_CTRL_PARM"]] <- chmet$parm
         },
     
         "METHOD" = {
-            chmet <- checkDefaultMethod(SYBIL_SETTINGS("SOLVER"), value)
+            chmet <- checkDefaultMethod(solver = SYBIL_SETTINGS("SOLVER"),
+                                        method = value,
+                                        probType = "", ...)
             .SYBILenv$settings[["SOLVER"]]           <- chmet$sol
             .SYBILenv$settings[["METHOD"]]           <- chmet$met
             .SYBILenv$settings[["SOLVER_CTRL_PARM"]] <- chmet$parm
@@ -66,15 +71,16 @@ SYBIL_SETTINGS <- function(parm, value) {
         },
     
         "ALGORITHM" = {
-            if ( (value == "FBA")            ||
-                 (value == "linearMOMA")     ||
-                 (value == "linearMOMA_COBRA") ) {
-                .SYBILenv$settings[["ALGORITHM"]] <- as.character(value)
-            }
-            else {
-                stop("ALGORITHM can be either 'FBA', ",
-                     "'linearMOMA' or 'linearMOMA_COBRA'")
-            }
+#            if ( (value == "FBA")            ||
+#                 (value == "linearMOMA")     ||
+#                 (value == "linearMOMA_COBRA") ) {
+#                .SYBILenv$settings[["ALGORITHM"]] <- as.character(value)
+#            }
+#            else {
+#                stop("ALGORITHM can be either 'FBA', ",
+#                     "'linearMOMA' or 'linearMOMA_COBRA'")
+#            }
+            .SYBILenv$settings[["ALGORITHM"]] <- as.character(value)
         },
     
         "OPT_DIRECTION" = {
@@ -96,24 +102,22 @@ SYBIL_SETTINGS <- function(parm, value) {
         },
     
         "SOLVER_CTRL_PARM" = {
-            if (is.data.frame(value)) {
-                .SYBILenv$settings[["SOLVER_CTRL_PARM"]] <- value
+            if ( (is.data.frame(value)) || (is.list(value)) ) {
+                if ("NA" %in% names(SYBIL_SETTINGS("SOLVER_CTRL_PARM"))) {
+                    .SYBILenv$settings[["SOLVER_CTRL_PARM"]] <- value
+                }
+                else {
+                    pn <- names(value)
+                    for (i in seq(along = value)) {
+                        .SYBILenv$settings[["SOLVER_CTRL_PARM"]][[pn[i]]] <- value[[pn[i]]]
+                    }
+                }
             }
             else {
-                stop("SOLVER_CTRL_PARM must be data.frame")
+                stop("SOLVER_CTRL_PARM must be data.frame or list")
             }
         },
 
-#        "SOLVER_CTRL_PARAM" = {
-#            warning("parameter SOLVER_CTRL_PARAM is deprecated, use SOLVER_CTRL_PARM")
-#            if (is.data.frame(value)) {
-#                .SYBILenv$settings[["SOLVER_CTRL_PARM"]] <- value
-#            }
-#            else {
-#                stop("SOLVER_CTRL_PARM must be data.frame")
-#            }
-#        },
-    
         {
             stop("unknown parameter: ", sQuote(parm))
         }

@@ -9,7 +9,7 @@
 \description{
   The function \code{checkOptSol} evaluates the results of the solution
   of a linear optimization; the returned objects e.g. from
-  \code{\link{simpleFBA}}.
+  \code{\link{optimizeProb}}.
 }
 
 \usage{
@@ -17,13 +17,13 @@
 }
 
 \arguments{
-  \item{optsol}{An object of class \code{\link{optsol}}.}
+  \item{optsol}{An object of class \code{\link[=optsol-class]{optsol}}.}
   \item{onlywarn}{Logical, default: FALSE.}
 }
 
 \details{
   The function \code{checkOptSol} is used by functions performing a
-  linear optimization (e.g. \code{\link{simpleFBA}}). In that case, the
+  linear optimization (e.g. \code{\link{optimizeProb}}). In that case, the
   argument \code{onlywarn} is set to TRUE. If the optimization ends
   unsuccesfull, a warning will be produced.
 
@@ -42,12 +42,12 @@
 
 \seealso{
   \code{\linkS4class{checksol}},
-  \code{\link{simpleFBA}} and \code{\link{oneFluxDel}}
+  \code{\link{optimizeProb}} and \code{\link{oneFluxDel}}
 }
 
 \examples{
   data(Ec_core)
-  Ec_f <- simpleFBA(Ec_core, retOptSol = TRUE)
+  Ec_f <- optimizeProb(Ec_core, retOptSol = TRUE)
   Ec_check <- checkOptSol(Ec_f)
 }
 

@@ -6,20 +6,20 @@
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
 #  
-#  This file is part of SyBiL.
+#  This file is part of sybil.
 #
-#  SyBiL is free software: you can redistribute it and/or modify
+#  sybil is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
-#  SyBiL is distributed in the hope that it will be useful,
+#  sybil is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License
-#  along with SyBiL.  If not, see <http://www.gnu.org/licenses/>.
+#  along with sybil.  If not, see <http://www.gnu.org/licenses/>.
 
 
 # optsol_robAnaClass
@@ -32,56 +32,10 @@
 setClass("optsol_robAna",
          representation(
               ctrlr    = "reactId",   # id of the control reaction,
-              ctrlfl   = "numeric"    # fixed flux value for the control reaction
+              ctrlfl   = "numeric"    # fixed flux values for the control reaction
          ),
-         contains = "optsol_simpleFBA"
+         contains = "optsol_optimizeProb"
 )
-
-
-#------------------------------------------------------------------------------#
-#                              user constructor                                #
-#------------------------------------------------------------------------------#
-
-# optsol_robAnaClass
-optsol_robAna <- function(solver, method, nprob, lpdir, ncols, nrows, objf, fld, cr, crf) {
-    if (missing(solver) ||
-        missing(method) ||
-        missing(nprob)  ||
-        missing(lpdir)  ||
-        missing(ncols)  ||
-        missing(nrows)  ||
-        missing(objf)   ||
-        missing(fld)    ||
-        missing(cr)     ||
-        missing(crf)
-       ) {
-        stop("Not enough arguments for creating an object of class optsol_robAna!")
-    }
-
-    if (fld == TRUE) {
-        fldist <- fluxDistribution(0, ncols, nprob)
-    }
-    else {
-        fldist <- fluxDistribution(NA)
-    }
-
-    new("optsol_robAna",
-        solver       = as.character(solver),
-        method       = as.character(method),
-        num_of_prob  = as.integer(nprob),
-        lp_num_cols  = as.integer(ncols),
-        lp_num_rows  = as.integer(nrows),
-        lp_obj       = numeric(nprob),
-        lp_ok        = integer(nprob),
-        lp_stat      = integer(nprob),
-        lp_dir       = as.character(lpdir),
-        obj_function = as.character(objf),
-        fluxdist     = fldist,
-        ctrlr        = cr,
-        ctrlfl       = as.numeric(crf)
-       )
-
-}
 
 
 #------------------------------------------------------------------------------#

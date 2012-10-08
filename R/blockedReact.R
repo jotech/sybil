@@ -6,20 +6,20 @@
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
 #  
-#  This file is part of SyBiL.
+#  This file is part of sybil.
 #
-#  SyBiL is free software: you can redistribute it and/or modify
+#  sybil is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
-#  SyBiL is distributed in the hope that it will be useful,
+#  sybil is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License
-#  along with SyBiL.  If not, see <http://www.gnu.org/licenses/>.
+#  along with sybil.  If not, see <http://www.gnu.org/licenses/>.
 
 
 ################################################
@@ -28,16 +28,9 @@
 # This function finds blocked reactions in a specified IO-environment.
 #
 #
-# Parameters:
-#      model:   an object of class modelorg
-#     solver:   lp problem solver (glpk [default], lpsolve)
-#     method:   simplex[default], interior
-#        tol:   tolerance
-#
+
 
 blockedReact <- function(model,
-                         solver = SYBIL_SETTINGS("SOLVER"),
-                         method = SYBIL_SETTINGS("METHOD"),
                          tol = SYBIL_SETTINGS("TOLERANCE"),
                          exex = TRUE,
                          fld = FALSE,
@@ -81,19 +74,14 @@ blockedReact <- function(model,
             flux <- Matrix::Matrix(0, nrow = react_num(model), ncol = nObj)
         }
         else {
-            flux <- Matrix::Matrix(0, nrow = 1, ncol = 1)
+            flux <- NA
         }
     }
     
     obj_coef(model) <- as.integer(rep(0, react_num(model)))
 
-	lp_mod <- prepProbObj(model,
-			 			  nCols = react_num(model),
-						  nRows = met_num(model),
-						  solver = solver,
-						  method = method,
-						  ...
-						 )
+	lpmod <- sysBiolAlg(model, algorithm = "fv", tol = tol, ...)
+
   
 #------------------------------------------------------------------------------#
 #                        finding blocked reactions                             #
@@ -103,18 +91,19 @@ blockedReact <- function(model,
 
     obj_max <- 0
     obj_min <- 0
+    cc <- numeric(react_num(model))
     
     if (verboseMode > 1) { progr <- sybil:::.progressBar() }
   
     for (i in seq(along = intReact)) {
 
-        changeObjCoefs(lp_mod, intReact[i], 1)
         solpl <- ifelse(isTRUE(modIrr), i+1, 2*i)
         
 #         if (uppbnd(model)[intReact[i]] > 0) {
         
-            setObjDir(lp_mod, "max")
-            sol <- simpleFBA(lp_mod, fld = fld)
+            #print(intReact[i])
+            cc[intReact[i]] <- 1
+            sol <- optimizeProb(lpmod, lpdir = "max", obj_coef = cc)
             obj_max <- sol$obj
             if (isTRUE(retOptSol)) {
                 obj[(solpl-1)]   <- sol$obj
@@ -140,8 +129,7 @@ blockedReact <- function(model,
 #         if (lowbnd(model)[intReact[i]] < 0) {
         if (!is(model, "modelorg_irrev")) {
         
-            setObjDir(lp_mod, "min")
-            sol <- simpleFBA(lp_mod, fld = fld)
+            sol <- optimizeProb(lpmod, lpdir = "min", obj_coef = cc)
             obj_min <- sol$obj
             if (isTRUE(retOptSol)) {
                 obj[solpl]   <- sol$obj
@@ -170,7 +158,7 @@ blockedReact <- function(model,
         #print(paste("min", obj_min))
         #print(" ")
 
-        changeObjCoefs(lp_mod, intReact[i], 0)
+        cc[intReact[i]] <- 0
 
         if (is(model, "modelorg_irrev")) {
             blocked_react[intReact[i]] <- ifelse(abs(obj_max) < tol, TRUE, FALSE)
@@ -196,21 +184,25 @@ blockedReact <- function(model,
     #print(blocked_react)
 
     if (isTRUE(retOptSol)) {
-        optsol <- optsol_blockedReact(solver = solver,
-                                      nprob  = nObj,
-                                      ncols  = react_num(model),
-                                      nrows  = met_num(model),
-                                      fld = fld
-                                     )
-        react(optsol)   <- reactId(intReact, react_id(model)[intReact])
-        lp_obj(optsol)  <- obj
-        lp_ok(optsol)   <- ok
-        lp_stat(optsol) <- stat
-        blocked(optsol) <- blocked_react
-        method(optsol)  <- method
-        if(isTRUE(fld)) {
-            fluxes(optsol) <- flux
-        }
+        optsol <- new("optsol_blockedReact",
+            mod_id       = mod_id(model),
+            solver       = solver(problem(lpmod)),
+            method       = method(problem(lpmod)),
+            algorithm    = algorithm(lpmod),
+            num_of_prob  = as.integer(nObj),
+            lp_num_cols  = nc(lpmod),
+            lp_num_rows  = nr(lpmod),
+            lp_obj       = as.numeric(obj),
+            lp_ok        = as.integer(ok),
+            lp_stat      = as.integer(stat),
+            lp_dir       = getObjDir(problem(lpmod)),
+            obj_coef     = obj_coef(model),
+            fldind       = fldind(lpmod),
+            fluxdist     = fluxDistribution(flux),
+    
+            blocked      = blocked_react,
+            react        = reactId(intReact, react_id(model)[intReact])
+        )
     }
     else {
         optsol <- blocked_react

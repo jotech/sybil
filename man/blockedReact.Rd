@@ -14,8 +14,6 @@
 
 \usage{
   blockedReact(model,
-               solver = SYBIL_SETTINGS("SOLVER"),
-               method = SYBIL_SETTINGS("METHOD"),
                tol = SYBIL_SETTINGS("TOLERANCE"),
                exex = TRUE,
                fld = FALSE,
@@ -27,17 +25,6 @@
 \arguments{
   \item{model}{
     An object of class \code{\link{modelorg}}.
-  }
-  \item{solver}{
-    Single character value.  The solver to use.  See
-    \code{\link{SYBIL_SETTINGS}} for possible values.\cr
-    Default: \code{SYBIL_SETTINGS("SOLVER")}.
-  }
-  \item{method}{
-    Single character value.  The optimization algorithm to use.  Possible values
-    depend on the setting in \code{solver}.  See \code{\link{SYBIL_SETTINGS}}
-    for possible values.\cr
-    Default: \code{SYBIL_SETTINGS("METHOD")}.
   }
   \item{tol}{
     Tolerance value.\cr
@@ -53,7 +40,8 @@
     Default: \code{FALSE}
   }
   \item{retOptSol}{
-    Boolean.  Return an object of class \code{\link{optsol_blockedReact}} or
+    Boolean.  Return an object of class
+    \code{\link[=optsol_blockedReact-class]{optsol_blockedReact}} or
     just a list containing the results.\cr
     Default: \code{FALSE}.
   }
@@ -63,8 +51,8 @@
     Default: \code{2}.
   }
   \item{\dots}{
-    Further arguments passed to \code{\link{prepProbObj}}.  Argument
-    \code{solverParm} is a good candidate.
+    Further arguments passed to \code{\link[=sysBiolAlg_fv-class]{sysBiolAlg}}.
+    Argument \code{solverParm} is a good candidate.
   }
 }
 
@@ -90,7 +78,8 @@
 }
 
 \seealso{
-  \code{\link{modelorg}}, \code{\link{optsol_blockedReact}} and
+  \code{\link{modelorg}},
+  \code{\link[=optsol_blockedReact-class]{optsol_blockedReact}} and
   \code{\link{SYBIL_SETTINGS}}.
 }
 

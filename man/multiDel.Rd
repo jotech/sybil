@@ -2,7 +2,7 @@
 \alias{multiDel}
 
 \title{
-  Parallel (Multicore) Support for SyBiL
+  Parallel (Multicore) Support for sybil
 }
 
 \description{

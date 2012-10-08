@@ -6,20 +6,20 @@
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
 #
-#  This file is part of SyBiL.
+#  This file is part of sybil.
 #
-#  SyBiL is free software: you can redistribute it and/or modify
+#  sybil is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
-#  SyBiL is distributed in the hope that it will be useful,
+#  sybil is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License
-#  along with SyBiL.  If not, see <http://www.gnu.org/licenses/>.
+#  along with sybil.  If not, see <http://www.gnu.org/licenses/>.
 
 
 #------------------------------------------------------------------------------#
@@ -47,22 +47,25 @@ wrong_solver_msg <- function(lp, method, printOut = TRUE) {
 
 # which optimizations did not end successful
 checkSolStat <- function(stat, solver = SYBIL_SETTINGS("SOLVER")) {
+
     out <- FALSE
     switch(solver,
-        "glpk" = {
+        "glpkAPI" = {
             out <- which(stat != 5)
         },
-        "clp" = {
+        "clpAPI" = {
             out <- which(stat != 0)
         },
         "lpSolveAPI" = {
             out <- which(stat != 0)
         },
-        "cplex" = {
+        "cplexAPI" = {
             out <- which(stat != 1)
         },
         {
-            warning("not a valid solver")
+            cmd <- paste(solver,"::checkSolutionStatus(stat)", sep = "")
+            out <- tryCatch(eval(parse(text = cmd)), error = function(e) NA)    
+            #warning("not a valid solver")
         }
     )
     return(out)
@@ -72,22 +75,26 @@ checkSolStat <- function(stat, solver = SYBIL_SETTINGS("SOLVER")) {
 #------------------------------------------------------------------------------#
 
 getMeanReturn <- function(code, solver = SYBIL_SETTINGS("SOLVER")) {
+
     out <- FALSE
     switch(solver,
-        "glpk" = {
+        "glpkAPI" = {
             out <- glpkAPI::return_codeGLPK(code)
         },
-        "clp" = {
+        "clpAPI" = {
             out <- clpAPI::return_codeCLP(code)
         },
         "lpSolveAPI" = {
             out <- return_codeLPSOLVE(code)
         },
-        "cplex" = {
+        "cplexAPI" = {
             out <- cplexAPI::return_codeCPLEX(code)
         },
         {
-            warning("not a valid solver")
+            cmd <- paste(solver,"::getReturnString(code)", sep = "")
+            out <- tryCatch(eval(parse(text = cmd)),
+                            error = function(e) as.character(NA))    
+            #warning("not a valid solver")
         }
     )
     return(out)
@@ -100,20 +107,23 @@ getMeanStatus <- function(code,
                           solver = SYBIL_SETTINGS("SOLVER"), env = NULL) {
     out <- FALSE
     switch(solver,
-        "glpk" = {
+        "glpkAPI" = {
             out <- glpkAPI::status_codeGLPK(code)
         },
-        "clp" = {
+        "clpAPI" = {
             out <- clpAPI::status_codeCLP(code)
         },
         "lpSolveAPI" = {
             out <- "see return code"
         },
-        "cplex" = {
+        "cplexAPI" = {
             out <- cplexAPI::status_codeCPLEX(env, code)
         },
         {
-            warning("not a valid solver")
+            cmd <- paste(solver,"::getStatusString(code)", sep = "")
+            out <- tryCatch(eval(parse(text = cmd)),
+                            error = function(e) as.character(NA))    
+            #warning("not a valid solver")
         }
     )
     return(out)

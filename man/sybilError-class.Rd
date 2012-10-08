@@ -64,7 +64,7 @@
 \author{Gabriel Gelius-Dietrich}
 
 \seealso{
-  \code{\link{simpleFBA}}
+  \code{\link{optimizeProb}}
 }
       
 \examples{

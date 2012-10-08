@@ -23,8 +23,9 @@
 
 \description{
   Structure of the class \code{"ppProc"}. Objects of that class are
-  returned as part of class \code{\link{optsol}} when performing pre- or
-  post-processing of an optimization, e.g. in \code{\link{simpleFBA}}.
+  returned as part of class \code{\link[=optsol-class]{optsol}} when performing
+  pre- or post-processing of an optimization, e.g. in
+  \code{\link{optimizeProb}}.
 }
 
 \section{Objects from the Class}{
@@ -81,7 +82,7 @@
 \author{Gabriel Gelius-Dietrich}
 
 \seealso{
-  \code{\link{simpleFBA}} and \code{\link{optimizer}}
+  \code{\link{optimizeProb}} and \code{\link{optimizer}}
 }
       
 \examples{

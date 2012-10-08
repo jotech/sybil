@@ -1,5 +1,7 @@
 \name{simpleFBA}
+
 \alias{simpleFBA}
+\alias{simpleFBA-deprecated}
 
 \encoding{utf8}
 
@@ -13,19 +15,19 @@
 }
 
 \usage{
-  simpleFBA(model, react = NA, lb = NA, ub = NA,
+  simpleFBA(model, react = NA, lb = NA, ub = NA, gene = NA,
             lpdir = SYBIL_SETTINGS("OPT_DIRECTION"),
             minTotalFlux = FALSE, minDist = FALSE, wtFluxes = NA,
             solver = SYBIL_SETTINGS("SOLVER"),
             method = SYBIL_SETTINGS("METHOD"),
-            fld = FALSE, retOptSol = FALSE, checkIds = TRUE,
+            fld = FALSE, retOptSol = FALSE,
             prCmd = NA, poCmd = NA, prCil = NA, poCil = NA, ...)
 }
 
 \arguments{
   \item{model}{
     An object of class \code{\linkS4class{modelorg}} or of class
-    \code{\linkS4class{optObj}}.
+    \code{\link[=optObj-class]{optObj}}.
   }
   \item{react}{
     An object of class \code{\linkS4class{reactId}}, character or integer.
@@ -44,9 +46,19 @@
     Same functionality as \code{lb}, but for upper bounds.\cr
     Default: \code{NA}.
   }
+  \item{gene}{
+    A character or integer vector containing gene id's or indices of gene id's
+    in \code{\link{allGenes}(model)}. If arguments \code{lb} and/or \code{ub}
+    are additionally used (not \code{NA}), upper and lower bounds will be
+    applied to all fluxes on which the deletion of the genes given in
+    \code{gene} have an effect. In this case, the first value in \code{lb} and
+    \code{ub} is used.
+    Default: \code{NA}.
+  }
   \item{lpdir}{
-    Character value, direction of optimisation.  Can be set to \code{"min"} or
-    \code{"max"}.\cr
+    Character value, direction of optimization.  Can be set to \code{"min"} or
+    \code{"max"}. This parameter is used only if argument \code{model} is
+    of class \code{\linkS4class{modelorg}}.\cr
     Default: \code{SYBIL_SETTINGS("OPT_DIRECTION")}.
   }
   \item{minTotalFlux}{
@@ -66,13 +78,15 @@
   }
   \item{solver}{
     Single character value.  The solver to use.  See
-    \code{\link{SYBIL_SETTINGS}} for possible values.\cr
+    \code{\link{SYBIL_SETTINGS}} for possible values. This parameter is used
+    only if argument \code{model} is of class \code{\linkS4class{modelorg}}.\cr
     Default: \code{SYBIL_SETTINGS("SOLVER")}.
   }
   \item{method}{
     Single character value.  The optimization algorithm to use.  Possible values
     depend on the setting in \code{solver}.  See \code{\link{SYBIL_SETTINGS}}
-    for possible values.\cr
+    for possible values. This parameter is used only if argument \code{model} is
+    of class \code{\linkS4class{modelorg}}.\cr
     Default: \code{SYBIL_SETTINGS("METHOD")}.
   }
   \item{fld}{
@@ -80,14 +94,10 @@
     Default: \code{FALSE}.
   }
   \item{retOptSol}{
-    Boolean.  Return an object of class \code{\link{optsol_simpleFBA}} or just a
+    Boolean.  Return an object of class
+    \code{\link[=optsol_optimizeProb-class]{optsol_optimizeProb}} or just a
     list containing the results.\cr
     Default: \code{FALSE}.
-  }
-  \item{checkIds}{
-    Boolean.  If set to \code{TRUE}, the validity of entries in \code{react} are
-    checked using \code{\link{checkReactId}}.\cr
-    Default: \code{TRUE}.
   }
   \item{prCmd}{
     A list of preprocessing commands.  See Details below.\cr
@@ -141,8 +151,9 @@
       \mbox{\boldmath$v$\unboldmath}
   }{c^T v} under the a given environment and the assumption of steady state.
   The result of the optimization is returned as list or object of class
-  \code{optsol_simpleFBA} containing the optimal value of the objective function
-  and return and status values returned by the solver.
+  \code{\link[=optsol_optimizeProb-class]{optsol_optimizeProb}} containing the
+  optimal value of the objective function and return and status values returned
+  by the solver.
   
   When the argument \code{minTotalFlux} is set to \code{TRUE}, a second
   optimization will be performed in order to minimize the sum of the absolute
@@ -226,10 +237,12 @@
       \item If any argument is character, enclose it in single
             quotes \code{' '}.
       \item Use the keyword \kbd{LP_PROB} in order to refer to the variable name
-            of the problem object (object of class \code{\link{optObj}}).
+            of the problem object (object of class
+            \code{\link[=optObj-class]{optObj}}).
       \item If the length of the character vector is one, it is treated as a
             function call with the problem object
-            (object of class \code{\link{optObj}}) as single argument.
+            (object of class \code{\link[=optObj-class]{optObj}}) as single
+            argument.
   }
   The result will be an object of class \code{\link{ppProc}}.
   A few examples for arguments \code{prCmd} or \code{poCmd} (all arguments must
@@ -267,12 +280,25 @@
   }
   For more information on the usage of \code{prCmd} and \code{poCmd}, see the
   examples section below.
+
+  The paramters \code{solver}, \code{method} and \code{lpdir} are only used if
+  argument \code{model} is of class \code{\linkS4class{modelorg}}.
+  If \code{model} is of class \code{\link[=optObj-class]{optObj}}, a previous
+  call to \code{\link{prepProbObj}} to generate an object of class
+  \code{\link[=optObj-class]{optObj}} is assumed. This object already knows
+  about this parameters.
+}
+
+\note{
+  The function \code{simpleFBA} is deprecated and will be defunct in the
+  next release. Use \code{\link{optimizeProb}} instead.
 }
 
 \value{
   \code{SimpleFBA} returns either an object of class
-  \code{\link{optsol_simpleFBA}} if argument \code{retOptSol} is set to
-  \code{TRUE}, or simply a list containing the results of the optimization:
+  \code{\link[=optsol_optimizeProb-class]{optsol_optimizeProb}} if argument
+  \code{retOptSol} is set to \code{TRUE}, or simply a list containing the
+  results of the optimization:
   \item{ok}{Return value of the optimizer (e.g. \dQuote{solution process was
             successful} or \dQuote{time limit exceeded}).}
   \item{stat}{Status value of the optimization (e.g. \dQuote{solution is
@@ -299,7 +325,8 @@
 }
 
 \seealso{
-  \code{\link{modelorg}}, \code{\link{optsol_simpleFBA}},
+  \code{\link{modelorg}},
+  \code{\link[=optsol_optimizeProb-class]{optsol_optimizeProb}},
   \code{\link{prepProbObj}}, \code{\link{checkReactId}},
   \code{\link{SYBIL_SETTINGS}} and \code{\link{ppProc}}.
 }
@@ -317,7 +344,7 @@ data(Ec_core)
 Ec_sf <- simpleFBA(Ec_core)
 
 ## run simpleFBA(), Ec_sf will be an object of
-## class optsol_simpleFBA
+## class optsol_optimizeProb
 Ec_sf <- simpleFBA(Ec_core, retOptSol = TRUE)
 
 ## do FBA, change the upper and lower bounds for the reactions

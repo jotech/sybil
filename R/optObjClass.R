@@ -6,46 +6,25 @@
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
 #
-#  This file is part of SyBiL.
+#  This file is part of sybil.
 #
-#  SyBiL is free software: you can redistribute it and/or modify
+#  sybil is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
-#  SyBiL is distributed in the hope that it will be useful,
+#  sybil is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License
-#  along with SyBiL.  If not, see <http://www.gnu.org/licenses/>.
+#  along with sybil.  If not, see <http://www.gnu.org/licenses/>.
 
 
 #------------------------------------------------------------------------------#
 #                       definition of the class optObj                         #
 #------------------------------------------------------------------------------#
-
-setClass(Class = "lpExtPtr")       # lpSolveAPI
-setClass(Class = "glpkPtr")        # glpkAPI
-setClass(Class = "clpPtr")         # clpAPI
-setClass(Class = "cplexPtr")       # cplexAPI
-
-setClass(Class = "cplexPointer",
-         representation(
-             env = "cplexPtr",
-             lp  = "cplexPtr"
-         )
-)
-
-setClassUnion(name    = "pointerToProb",
-              members = c("externalptr",
-                          "lpExtPtr",
-                          "glpkPtr",
-                          "clpPtr",
-                          "cplexPointer"
-             )
-)
 
 setClass(Class = "optObj",
          representation(
@@ -53,7 +32,8 @@ setClass(Class = "optObj",
               solver   = "character",
               method   = "character",
               probType = "character"
-         )
+         ),
+         contains = "VIRTUAL"
 )
 
 # derivatives
@@ -64,80 +44,17 @@ setClass(Class = "optObj",
 #                              user constructor                                #
 #------------------------------------------------------------------------------#
 
-optObj <- function(solver, method, pType = "lp") {
+optObj <- function(solver = SYBIL_SETTINGS("SOLVER"),
+                   method = SYBIL_SETTINGS("METHOD"),
+                   pType = "lp", prefix = "optObj", sep = "_") {
 
-    if (missing(solver)) {
-        stop("Creating an object of class optObj needs a solver!")
-    }
+    validSoMe <- checkDefaultMethod(solver, method, pType)
 
-    if (missing(method)) {
-        method <- checkDefaultMethod(solver,
-                                     SYBIL_SETTINGS("METHOD"))[["met"]]
-    }
+    obj <- new(paste(prefix, validSoMe$sol, sep = sep),
+               sv = validSoMe$sol,
+               mt = validSoMe$met,
+               pt = as.character(pType))
 
-    solver <- as.character(solver)
-    method <- as.character(method)
-    pType  <- as.character(pType)
-
-    slv_obj <- switch(solver,
-        # ----------------------- #
-        "glpk" = {
-            checkPackage <- require("glpkAPI")
-            if(isTRUE(checkPackage)) {
-                "optObj_glpk"
-            }
-            else {
-                stop("Package glpkAPI not found.")
-            }
-        },
-        # ----------------------- #
-        "clp" = {
-            checkPackage <- require("clpAPI")
-            if(isTRUE(checkPackage)) {
-                "optObj_clp"
-            }
-            else {
-                stop("Package clpAPI not found.")
-            }
-        },
-        # ----------------------- #
-        "lpSolveAPI" = {
-            checkPackage <- require("lpSolveAPI")
-            if(isTRUE(checkPackage)) {
-                method <- "lp_solve"
-                "optObj_lpSolveAPI"
-            }
-            else {
-                stop("Package lpSolveAPI not found.")
-            }
-        },
-        # ----------------------- #
-        "cplex" = {
-            checkPackage <- require("cplexAPI")
-            if(isTRUE(checkPackage)) {
-                 "optObj_cplex"
-           }
-            else {
-                stop("Package cplexAPI not found.")
-            }
-        },
-        # ----------------------- #
-#         "boot" = {
-#             checkPackage <- require("boot")
-#             if(isTRUE(checkPackage)) {
-#                 "optObj_boot"
-#             }
-#             else {
-#                 stop("Package boot not found.")
-#             }
-#         },
-        # ----------------------- #
-        {
-            stop("not a valid solver")
-        }
-    )
-
-    obj <- new(slv_obj, sv = solver, mt = method, pt = pType)
     return(obj)
 }
 
@@ -151,30 +68,12 @@ setMethod(f = "initialize",
           signature = "optObj",
           definition = function(.Object, sv, mt, pt) {
 
-              if ( (!missing(sv)) || (!missing(mt)) || (!missing(pt)) ) {
+              if ( (!missing(sv)) && (!missing(mt)) && (!missing(pt)) ) {
                   
                   .Object@solver   <- as.character(sv)
                   .Object@method   <- as.character(mt)
                   .Object@probType <- as.character(pt)
                   
-              }
-              return(.Object)
-          }
-)
-
-# contructor for class cplexPointer
-setMethod(f = "initialize",
-          signature = "cplexPointer",
-          definition = function(.Object, en, pr) {
-
-              if ( (!missing(en)) || (!missing(pr)) ) {
-                  if ( (cplexAPI::isCPLEXenvPointer(en)) &&
-                       (cplexAPI::isCPLEXprobPointer(pr)) ) {
-                  
-                      .Object@env <- en
-                      .Object@lp  <- pr
-
-                  }
               }
               return(.Object)
           }
@@ -191,13 +90,6 @@ setMethod("solver", signature(object = "optObj"),
               return(object@solver)
           }
 )
-
-# setReplaceMethod("solver", signature = (object = "optObj"),
-#                  function(object, value) {
-#                      object@solver <- value
-#                      return(object)
-#                  }
-# )
 
 
 # method
@@ -235,1129 +127,77 @@ setMethod("dim", "optObj",
 
 
 #------------------------------------------------------------------------------#
-# oobj
 
-# all further methods are interface methods to the lp solvers
-
-setMethod("delProb", signature(lp = "optObj"),
-
-    function(lp, closeEnv = TRUE) {
-
-        out <- FALSE
-
-        switch(lp@solver,
-            # ----------------------- #
-            "glpk" = {
-                glpkAPI::delProbGLPK(lp@oobj)
-                out <- TRUE
-            },
-            # ----------------------- #
-            "clp" = {
-                clpAPI::delProbCLP(lp@oobj)
-                out <- TRUE
-            },
-            # ----------------------- #
-            "lpSolveAPI" = {
-                #finalizeLpSolveProb(lp@oobj)
-                #lpSolveAPI::delete.lp(lp@oobj)
-                #lp@oobj <- NULL
-                lp <- new("optObj_lpSolveAPI")
-                out <- TRUE
-            },
-            # ----------------------- #
-            "cplex" = {
-                if (isTRUE(closeEnv)) {
-                    cplexAPI::closeProbCPLEX(list(env = lp@oobj@env,
-                                                  lp = lp@oobj@lp))
-                } else {
-                    cplexAPI::delProbCPLEX(lp@oobj@env, lp@oobj@lp)
+setMethod("show", signature(object = "optObj"),
+    function(object) {
+        if (length(probType(object)) > 0) {
+            switch (probType(object),
+                "lp" = {
+                    cat("linear programming problem object\n")
+                },
+                "mip" = {
+                    cat("mixed integer linear programming problem object\n")
+                },
+                "qp" = {
+                    cat("continous problem object with quadratic objective\n")
+                },
+                {
+                    cat("problem object of type ", probType(object),"\n")
                 }
-                out <- TRUE
-            },
-            # ----------------------- #
-            {
-                warning("not a valid instance of class optObj")
+            )
+            cat("solver:", solver(object), "\n")
+            cat("method:", method(object), "\n")
+            size <- tryCatch(dim(object), error = function(e) NA)
+            if (any(is.na(size))) {
+                cat("problem is not initialized\n")
             }
-        )
-
-        return(out)
-    }
-)
-
-
-#------------------------------------------------------------------------------#
-
-setMethod("initProb", signature(lp = "optObj"),
-
-    function(lp, nrows = 0, ncols = 0) {
-
-        switch(lp@solver,
-            # ----------------------- #
-            "glpk" = {
-                lp@oobj <- glpkAPI::initProbGLPK()
-                glpkAPI::termOutGLPK(glpkAPI::GLP_OFF)
-                #glpkAPI::setSimplexDefaultParmGLPK()
-            },
-            # ----------------------- #
-            "clp" = {
-                lp@oobj <- clpAPI::initProbCLP()
-                clpAPI::setLogLevelCLP(lp@oobj, 0)
-            },
-            # ----------------------- #
-            "lpSolveAPI" = {
-                lp@oobj <- lpSolveAPI::make.lp(nrow = nrows, ncol = ncols)
-                #reg.finalizer(lp@oobj, finalizeLpSolveProb, TRUE)
-            },
-            # ----------------------- #
-            "cplex" = {
-                #lp@oobj <- cplexAPI::openProbCPLEX()
-                tmp <- cplexAPI::openProbCPLEX()
-                lp@oobj <- new("cplexPointer",
-                               en = tmp[["env"]],
-                               pr = tmp[["lp"]])
-                out <- cplexAPI::setIntParmCPLEX(lp@oobj@env,
-                                                 cplexAPI::CPX_PARAM_SCRIND,
-                                                 cplexAPI::CPX_OFF)
-            },
-            # ----------------------- #
-            {
-                warning("not a valid instance of class optObj")
-                return(FALSE)
-            }
-        )
-
-        return(lp)
-    }
-)
-
-
-#------------------------------------------------------------------------------#
-
-setMethod("backupProb", signature(lp = "optObj"),
-
-    function(lp) {
-
-        out <- FALSE
-        np  <- FALSE
-
-        switch(lp@solver,
-            # ----------------------- #
-            "glpk" = {
-                # reset parameters!!! Parameters are reset to default when
-                # doing initProbGLPK() !!!
-                np <- glpkAPI::initProbGLPK()
-                glpkAPI::copyProbGLPK(lp@oobj, np)
-            },
-            # ----------------------- #
-            "clp" = {
-                #fname <- paste("CLP_PROB_",
-                #               format(Sys.time(), "%H%M%OS3"), sep = "")
-                fname <- tempfile(pattern = "CLP_PROB_", fileext = ".tmp")
-                ft <- clpAPI::saveModelCLP(lp@oobj, fname)
-                if (ft != 0) {
-                    stop("cannot save model")
-                }
-                np <- clpAPI::initProbCLP()
-                clpAPI::setLogLevelCLP(np, 0)
-                ft <- clpAPI::restoreModelCLP(np, fname)
-                if (ft != 0) {
-                    stop("cannot read model")
-                }
-                else {
-                    unlink(fname)
-                }
-            },
-            # ----------------------- #
-            "lpSolveAPI" = {
-                #fname <- paste("LPSOLVE_PROB_",
-                #               format(Sys.time(), "%H%M%OS3"), sep = "")
-                fname <- tempfile(pattern = "LPSOLVE_PROB_", fileext = ".tmp")
-                lpSolveAPI::write.lp(lp@oobj, filename = fname, type = "lp")
-                if (isTRUE(file.exists(fname))) {
-                    np <- lpSolveAPI::read.lp(fname, type = "lp")
-                    unlink(fname)
-                }
-                else {
-                    stop("cannot read model")
-                }
-            },
-            # ----------------------- #
-            "cplex" = {
-                np <- cplexAPI::cloneProbCPLEX(lp@oobj@env, lp@oobj@lp)
-            },
-            # ----------------------- #
-            {
-                wrong_type_msg(lp)
-            }
-        )
-
-        # create new lp problem
-        if (!identical(np, FALSE)) {
-            out <- optObj(lp@solver, lp@method)
-            if (lp@solver == "cplex") {
-                out@oobj <- list(env = lp@oobj@env, lp = np)
+            else if (all(size == 0)) {
+                cat("problem is currently empty\n")
             }
             else {
-                out@oobj <- np
+                cat("problem has", size[2],
+                    ngettext(size[2], "variable", "variables"))
+                cat(" and", size[1],
+                    ngettext(size[1], "constraint", "constraints"), "\n")
             }
-
         }
-
-        return(out)
-    }
-)
-
-
-#------------------------------------------------------------------------------#
-
-setMethod("setSolverParm", signature(lp = "optObj"),
-
-    function(lp, solverParm) {
-
-        out <- FALSE
-        if (!is(solverParm, "data.frame")) {
-            warning(paste("Argument 'solverParm' must be of class",
-                          "'data.frame'."
-                    )
-            )
-            return(out)
+        else {
+            cat("empty problem object\n")
         }
-
-        if (any(is.na(solverParm))) {
-            warning("Argument 'solverParm' contains 'NA' values.")
-            return(out)
-        }
-
-        switch(lp@solver,
-            # ----------------------- #
-            "glpk" = {
-                parm <- sapply(dimnames(solverParm)[[2]],
-                               function(x) eval(parse(text = x)))
-                val  <- solverParm[1,]
-                if (lp@method == "interior") {
-                    glpkAPI::setInteriorParmGLPK(parm, val)
-                    out <- TRUE
-                }
-                else {
-                    glpkAPI::setSimplexParmGLPK(parm, val)
-                    out <- TRUE
-                }
-            },
-            # ----------------------- #
-            "clp" = {
-            # no parameters in COIN-OR CLP yet.
-            #    lp@oobj <- clpAPI::initProbCLP()
-            #    clpAPI::setLogLevelCLP(lp@oobj, 0)
-            },
-            # ----------------------- #
-            "lpSolveAPI" = {
-                pname <- colnames(solverParm)
-                for (i in seq(along = solverParm)) {
-                    command <- paste("lpSolveAPI::lp.control(lp@oobj, ",
-                                     pname[i], "='" , solverParm[[i]], "')", sep = "")
-                    #print(command)
-                    eval(parse(text = command))
-                }
-                #print(lp.control(lp@oobj))
-                out <- TRUE
-            },
-            # ----------------------- #
-            "cplex" = {
-                 intdbl  <- sapply(solverParm, is.integer)
-                 strparm <- sapply(solverParm, is.numeric)
-                 int  <- solverParm[intdbl]
-                 dbl  <- solverParm[intdbl == FALSE & strparm == TRUE]
-                 char <- solverParm[strparm == FALSE]
-
-                 if (length(int) > 0) {
-                     intp <- sapply(dimnames(int)[[2]],
-                                    function(x) eval(parse(text = x)))
-                     intv <- int[1,]
-                     for (i in seq(along = int)) {
-                         out  <- cplexAPI::setIntParmCPLEX(lp@oobj@env,
-                                                           intp[i], intv[i])
-                     }
-                 }
-
-                 if (length(dbl) > 0) {
-                     dblp <- sapply(dimnames(dbl)[[2]],
-                                    function(x) eval(parse(text = x)))
-                     dblv <- dbl[1,]
-                     for (i in seq(along = dbl)) {
-                         out  <- cplexAPI::setDblParmCPLEX(lp@oobj@env,
-                                                           dblp[i], dblv[i])
-                     }
-                 }
-
-                 if (length(char) > 0) {
-                     charp <- sapply(dimnames(char)[[2]],
-                                     function(x) eval(parse(text = x)))
-                     charv <- char[1,]
-                     for (i in seq(along = char)) {
-                         out  <- cplexAPI::setStrParmCPLEX(lp@oobj@env,
-                                                           charp[i], charv[i])
-                     }
-                 }
-
-            },
-            # ----------------------- #
-            {
-                wrong_type_msg(lp)
-            }
-        )
-
-        return(out)
     }
 )
 
 
 #------------------------------------------------------------------------------#
-
-setMethod("getSolverParm", signature(lp = "optObj"),
-
-    function(lp) {
-
-        out <- FALSE
-        switch(lp@solver,
-            # ----------------------- #
-            "glpk" = {
-                if (lp@method == "interior") {
-                    out <- glpkAPI::getInteriorParmGLPK()
-                }
-                else {
-                    out <- glpkAPI::getSimplexParmGLPK()
-                }
-            },
-            # ----------------------- #
-            "clp" = {
-                wrong_solver_msg(lp, "getSolverParm")
-                out <- FALSE
-            },
-            # ----------------------- #
-            "lpSolveAPI" = {
-                lpSolveAPI::lp.control(lp@oobj)
-                out <- TRUE
-            },
-            # ----------------------- #
-            "cplex" = {
-                out <- cplexAPI::writeParmCPLEX(lp@oobj@env,
-                                                "cplex_parameters.prm")
-                message("Wrote the file 'cplex_parameters.prm'.")
-            },
-            # ----------------------- #
-            {
-                wrong_type_msg(lp)
-            }
-        )
-
-        return(out)
-    }
-)
-
-
+#                                 deprecated                                   #
 #------------------------------------------------------------------------------#
 
-setMethod("setObjDir", signature(lp = "optObj"),
-
-    function(lp, lpdir) {
-
-        out <- FALSE
-        switch(lp@solver,
-            # ----------------------- #
-            "glpk" = {
-                dr <- ifelse(lpdir == "max", glpkAPI::GLP_MAX, glpkAPI::GLP_MIN)
-                glpkAPI::setObjDirGLPK(lp@oobj, dr)
-                out <- TRUE
-            },
-            # ----------------------- #
-            "clp" = {
-                dr <- ifelse(lpdir == "max", -1, 1)
-                clpAPI::setObjDirCLP(lp@oobj, dr)
-                out <- TRUE
-            },
-            # ----------------------- #
-            "lpSolveAPI" = {
-                lpSolveAPI::lp.control(lp@oobj, sense = lpdir)
-                out <- TRUE
-            },
-            # ----------------------- #
-            "cplex" = {
-                dr <- ifelse(lpdir == "max",
-                             cplexAPI::CPX_MAX,
-                             cplexAPI::CPX_MIN)
-                cplexAPI::setObjDirCPLEX(lp@oobj@env, lp@oobj@lp, dr)
-                out <- TRUE
-            },
-            # ----------------------- #
-            {
-                wrong_type_msg(lp)
-            }
-        )
-
-        return(out)
-    }
-)
-
-
+# oobj
 #------------------------------------------------------------------------------#
 
-setMethod("getObjDir", signature(lp = "optObj"),
-
-    function(lp) {
-
-        out <- FALSE
-        switch(lp@solver,
-            # ----------------------- #
-            "glpk" = {
-                out <- glpkAPI::getObjDirGLPK(lp@oobj)
-            },
-            # ----------------------- #
-            "clp" = {
-                out <- clpAPI::getObjDirCLP(lp@oobj)
-            },
-            # ----------------------- #
-            "lpSolveAPI" = {
-                out <- lpSolveAPI::lp.control(lp@oobj)[["sense"]]
-            },
-            # ----------------------- #
-            "cplex" = {
-                out <- cplexAPI::getObjDirCPLEX(lp@oobj@env, lp@oobj@lp)
-            },
-             # ----------------------- #
-            {
-                wrong_type_msg(lp)
-            }
-        )
-
-        return(out)
-    }
-)
-
-
-#------------------------------------------------------------------------------#
-
-setMethod("addRows", signature(lp = "optObj"),
-
-    function(lp, nrows) {
-
-        out <- FALSE
-        switch(lp@solver,
-            # ----------------------- #
-            "glpk" = {
-                out <- glpkAPI::addRowsGLPK(lp@oobj, nrows)
-            },
-            # ----------------------- #
-            "clp" = {
-                # maybe we can do here something with resize()!
-                wrong_solver_msg(lp, "addRows", printOut = TRUE)
-            },
-            # ----------------------- #
-            "lpSolveAPI" = {
-                ncols <- dim(lp@oobj)[2]
-                out <- lpSolveAPI::resize.lp(lp@oobj, nrows, ncols)
-            },
-            # ----------------------- #
-            "cplex" = {
-                out <- cplexAPI::newRowsCPLEX(lp@oobj@env, lp@oobj@lp, nrows)
-            },
-            # ----------------------- #
-            {
-                wrong_type_msg(lp)
-            }
-        )
-
-        return(out)
-    }
-)
-
-
-#------------------------------------------------------------------------------#
-
-setMethod("addCols", signature(lp = "optObj"),
-
-    function(lp, ncols) {
-
-        out <- FALSE
-        switch(lp@solver,
-            # ----------------------- #
-            "glpk" = {
-                out <- glpkAPI::addColsGLPK(lp@oobj, ncols)
-            },
-            # ----------------------- #
-            "clp" = {
-                # maybe we can do here something with resize()!
-                wrong_solver_msg(lp, "addCols", printOut = TRUE)
-            },
-            # ----------------------- #
-            "lpSolveAPI" = {
-                nrows <- dim(lp@oobj)[1]
-                out <- lpSolveAPI::resize.lp(lp@oobj, nrows, ncols)
-            },
-            # ----------------------- #
-            "cplex" = {
-                out <- cplexAPI::newColsCPLEX(lp@oobj@env, lp@oobj@lp, ncols)
-            },
-            # ----------------------- #
-            {
-                wrong_type_msg(lp)
-            }
-        )
-
-        return(out)
-    }
-)
-
-
-#------------------------------------------------------------------------------#
-
-setMethod("addRowsCols", signature(lp = "optObj"),
-
-    function(lp, nrows, ncols) {
-
-        out <- FALSE
-        switch(lp@solver,
-            # ----------------------- #
-            "glpk" = {
-                outi <- glpkAPI::addRowsGLPK(lp@oobj, nrows)
-                outj <- glpkAPI::addColsGLPK(lp@oobj, ncols)
-                out  <- c(outi, outj)
-            },
-            # ----------------------- #
-            "clp" = {
-                clpAPI::resizeCLP(lp@oobj, nrows, ncols)
-                out <- TRUE
-            },
-            # ----------------------- #
-            "lpSolveAPI" = {
-                out <- lpSolveAPI::resize.lp(lp@oobj, nrows, ncols)
-            },
-            # ----------------------- #
-            "cplex" = {
-                outi <- cplexAPI::newRowsCPLEX(lp@oobj@env, lp@oobj@lp, nrows)
-                outj <- cplexAPI::newColsCPLEX(lp@oobj@env, lp@oobj@lp, ncols)
-                out  <- c(outi, outj)
-            },
-            # ----------------------- #
-            {
-                wrong_type_msg(lp)
-            }
-        )
-
-        return(out)
-    }
-)
-
-#------------------------------------------------------------------------------#
-
-setMethod("getNumRows", signature(lp = "optObj"),
-
-    function(lp) {
-
-        out <- FALSE
-        switch(lp@solver,
-            # ----------------------- #
-            "glpk" = {
-                out <- glpkAPI::getNumRowsGLPK(lp@oobj)
-            },
-            # ----------------------- #
-            "clp" = {
-                out <- clpAPI::getNumRowsCLP(lp@oobj)
-            },
-            # ----------------------- #
-            "lpSolveAPI" = {
-                out <- dim(lp@oobj)[1]
-            },
-            # ----------------------- #
-            "cplex" = {
-                out <- cplexAPI::getNumRowsCPLEX(lp@oobj@env, lp@oobj@lp)
-            },
-            # ----------------------- #
-            {
-                wrong_type_msg(lp)
-            }
-        )
-
-        return(out)
-    }
-)
-
-
-#------------------------------------------------------------------------------#
-
-setMethod("getNumCols", signature(lp = "optObj"),
-
-    function(lp) {
-
-        out <- FALSE
-        switch(lp@solver,
-            # ----------------------- #
-            "glpk" = {
-                out <- glpkAPI::getNumColsGLPK(lp@oobj)
-            },
-            # ----------------------- #
-            "clp" = {
-                out <- clpAPI::getNumColsCLP(lp@oobj)
-            },
-            # ----------------------- #
-            "lpSolveAPI" = {
-                out <- dim(lp@oobj)[2]
-            },
-            # ----------------------- #
-            "cplex" = {
-                out <- cplexAPI::getNumColsCPLEX(lp@oobj@env, lp@oobj@lp)
-            },
-            # ----------------------- #
-            {
-                wrong_type_msg(lp)
-            }
-        )
-
-        return(out)
-    }
-)
-
-
-#------------------------------------------------------------------------------#
-
-setMethod("addRowsToProb", signature(lp = "optObj"),
-
-    # i: vector containing the new row indices (must be ascending)
-    # cind: list, containing the column indices of the new nz elements
-    # nzval: list, containing the new nz elements
-    #
-    # i, type, lb, cind and nzval must have the same length
-    #
-    # type can be one of the following:
-    # "F" = free variable                -INF <  x <  INF
-    # "L" = variable with lower bound      lb <= x <  INF
-    # "U" = variable with upper bound    -INF <  x <= ub
-    # "D" = double-bounded variable        lb <= x <= ub
-    # "E" = fixed variable                 lb  = x  = ub
-    # "R" = ranged constraint
-
-    function(lp, i, type, lb, ub, cind, nzval) {
-
-        out <- FALSE
-        switch(lp@solver,
-            # ----------------------- #
-            "glpk" = {
-                ord <- glpkAPI::addRowsGLPK(lp@oobj, length(i))
-                gtype = integer(length(type))
-                for (k in seq(along = i)) {
-                    gtype[k] <- switch(type[k],
-                                       "F" = { glpkAPI::GLP_FR },
-                                       "L" = { glpkAPI::GLP_LO },
-                                       "U" = { glpkAPI::GLP_UP },
-                                       "D" = { glpkAPI::GLP_DB },
-                                       "E" = { glpkAPI::GLP_FX },
-                                             { glpkAPI::GLP_FX }
-                    )
-                    glpkAPI::setMatRowGLPK(lp@oobj, i[k],
-                                           length(cind[[k]]),
-                                           cind[[k]], nzval[[k]])
-                }
-                out <- glpkAPI::setRowsBndsGLPK(lp@oobj, i, lb, ub, gtype)
-            },
-            # ----------------------- #
-            "clp" = {
-                cst <- c(0, cumsum(unlist(lapply(cind, length))))
-                out <- clpAPI::addRowsCLP(lp@oobj, length(i), lb, ub,
-                                          cst, unlist(cind)-1, unlist(nzval))
-            },
-            # ----------------------- #
-            "lpSolveAPI" = {
-                for (k in seq(along = i)) {
-                    ltype <- switch(type[k],
-                                    "L" = { 2 },
-                                    "U" = { 1 },
-                                    "E" = { 3 },
-                                          { 3 }
-                    )
-                    out <- lpSolveAPI::add.constraint(lp@oobj, nzval[[k]],
-                                                      ltype, lb[k], cind[[k]])
-                }
-            },
-            # ----------------------- #
-            "cplex" = {
-                cptype = character(length(type))
-                for (l in seq(along = type)) {
-                    cptype[l] <- switch(type[l],
-                        "L" = { "G" },
-                        "U" = { "L" },
-                        "E" = { "E" },
-                        "R" = { "R" },
-                              { "E" }
-                    )
-                }
-                beg <- c(0, cumsum(unlist(lapply(cind, length))))
-                out <- cplexAPI::addRowsCPLEX(lp@oobj@env, lp@oobj@lp, 0,
-                                              length(i), length(nzval), beg,
-                                              unlist(cind)-1, unlist(nzval),
-                                              lb, cptype)
-            },
-            # ----------------------- #
-            {
-                wrong_type_msg(lp)
-            }
-        )
-
-        return(out)
-    }
-)
-
-
-#------------------------------------------------------------------------------#
-
-setMethod("changeColsBnds", signature(lp = "optObj"),
-
-    function(lp, j, lb, ub) {
-
-        out <- FALSE
-        switch(lp@solver,
-            # ----------------------- #
-            "glpk" = {
-                glpkAPI::setColsBndsGLPK(lp@oobj, j, lb, ub)
-                out <- TRUE
-            },
-            # ----------------------- #
-            "clp" = {
-                tmp_lb <- clpAPI::getColLowerCLP(lp@oobj)
-                tmp_ub <- clpAPI::getColUpperCLP(lp@oobj)
-                tmp_lb[j] <- lb
-                tmp_ub[j] <- ub
-                clpAPI::chgColLowerCLP(lp@oobj, tmp_lb)
-                clpAPI::chgColUpperCLP(lp@oobj, tmp_ub)
-                out <- TRUE
-            },
-            # ----------------------- #
-            "lpSolveAPI" = {
-                out <- lpSolveAPI::set.bounds(lp@oobj, lb, ub, j)
-            },
-            # ----------------------- #
-            "cplex" = {
-                out <- cplexAPI::chgColsBndsCPLEX(lp@oobj@env,
-                                                  lp@oobj@lp, j-1, lb, ub)
-            },
-            # ----------------------- #
-            {
-                wrong_type_msg(lp)
-            }
-        )
-
-        return(out)
-    }
-)
-
-
-#------------------------------------------------------------------------------#
-
-setMethod("changeColsBndsObjCoefs", signature(lp = "optObj"),
-
-    function(lp, j, lb, ub, obj_coef) {
-
-        out <- FALSE
-        switch(lp@solver,
-            # ----------------------- #
-            "glpk" = {
-                glpkAPI::setColsBndsObjCoefsGLPK(lp@oobj, j, lb, ub, obj_coef)
-                out <- TRUE
-            },
-            # ----------------------- #
-            "clp" = {
-                # usable only for model creation!
-                clpAPI::chgColLowerCLP(lp@oobj, lb)
-                clpAPI::chgColUpperCLP(lp@oobj, ub)
-                clpAPI::chgObjCoefsCLP(lp@oobj, obj_coef)
-                out <- TRUE
-            },
-            # ----------------------- #
-            "lpSolveAPI" = {
-                outb <- lpSolveAPI::set.bounds(lp@oobj, lb, ub, j)
-                outo <- lpSolveAPI::set.objfn(lp@oobj, obj_coef, j)
-                out  <- c(outb, outo)
-            },
-            # ----------------------- #
-            "cplex" = {
-                outb <- cplexAPI::chgColsBndsCPLEX(lp@oobj@env,
-                                                   lp@oobj@lp, j-1, lb, ub)
-                outo <- cplexAPI::chgObjCPLEX(lp@oobj@env, lp@oobj@lp,
-                                              length(j), j-1, obj_coef)
-                out  <- c(outb, outo)
-                # usable only for model creation!
-                # out <- cplexAPI::newColsCPLEX(lp@oobj@env, lp@oobj@lp,
-                #                               length(j), obj_coef, lb, ub)
-            },
-            # ----------------------- #
-            {
-                wrong_type_msg(lp)
-            }
-        )
-
-        return(out)
-    }
-)
-
-
-#------------------------------------------------------------------------------#
-
-setMethod("getColsLowBnds", signature(lp = "optObj"),
-
-    function(lp, j) {
-
-        out <- FALSE
-        switch(lp@solver,
-            # ----------------------- #
-            "glpk" = {
-                out <- glpkAPI::getColsLowBndsGLPK(lp@oobj, j)
-            },
-            # ----------------------- #
-            "clp" = {
-                out <- clpAPI::getColLowerCLP(lp@oobj)[j]
-            },
-            # ----------------------- #
-            "lpSolveAPI" = {
-                out <- lpSolveAPI::get.bounds(lp@oobj, j)[["lower"]]
-            },
-            # ----------------------- #
-            "cplex" = {
-                out <- cplexAPI::getLowBndsIdsCPLEX(lp@oobj@env,
-                                                    lp@oobj@lp, j-1)
-            },
-            # ----------------------- #
-            {
-                wrong_type_msg(lp)
-            }
-        )
-
-        return(out)
-    }
-)
-
-
-#------------------------------------------------------------------------------#
-
-setMethod("getColsUppBnds", signature(lp = "optObj"),
-
-    function(lp, j) {
-
-        out <- FALSE
-        switch(lp@solver,
-            # ----------------------- #
-            "glpk" = {
-                out <- glpkAPI::getColsUppBndsGLPK(lp@oobj, j)
-            },
-            # ----------------------- #
-            "clp" = {
-                out <- clpAPI::getColUpperCLP(lp@oobj)[j]
-            },
-            # ----------------------- #
-            "lpSolveAPI" = {
-                out <- lpSolveAPI::get.bounds(lp@oobj, j)[["upper"]]
-            },
-            # ----------------------- #
-            "cplex" = {
-                out <- cplexAPI::getUppBndsIdsCPLEX(lp@oobj@env,
-                                                    lp@oobj@lp, j-1)
-            },
-            # ----------------------- #
-            {
-                wrong_type_msg(lp)
-            }
-        )
-
-        return(out)
-    }
-)
-
-
-#------------------------------------------------------------------------------#
-
-setMethod("changeRowsBnds", signature(lp = "optObj"),
-
-    function(lp, i, lb, ub) {
-
-        out <- FALSE
-        switch(lp@solver,
-            # ----------------------- #
-            "glpk" = {
-                glpkAPI::setRowsBndsGLPK(lp@oobj, i, lb, ub)
-                out <- TRUE
-            },
-            # ----------------------- #
-            "clp" = {
-                tmp_lb <- clpAPI::getRowLowerCLP(lp@oobj)
-                tmp_ub <- clpAPI::getRowUpperCLP(lp@oobj)
-                tmp_lb[i] <- lb
-                tmp_ub[i] <- ub
-                clpAPI::chgRowLowerCLP(lp@oobj, tmp_lb)
-                clpAPI::chgRowUpperCLP(lp@oobj, tmp_ub)
-                out <- TRUE
-            },
-            # ----------------------- #
-            "lpSolveAPI" = {
-                out <- lpSolveAPI::set.constr.value(lp@oobj,
-                                                    rhs = ub,
-                                                    lhs = lb,
-                                                    constraints = i)
-            },
-            # ----------------------- #
-            "cplex" = {
-                wrong_solver_msg(lp, "changeRowsBnds", printOut = TRUE)
-            },
-            # ----------------------- #
-            {
-                wrong_type_msg(lp)
-            }
-        )
-
-        return(out)
-    }
-)
-
-
-#------------------------------------------------------------------------------#
-
-setMethod("setRhsZero", signature(lp = "optObj"),
-
-    function(lp) {
-
-        out <- FALSE
-        switch(lp@solver,
-            # ----------------------- #
-            "glpk" = {
-                glpkAPI::setRhsZeroGLPK(lp@oobj)
-                out <- TRUE
-            },
-            # ----------------------- #
-            "clp" = {
-                nrows <- clpAPI::getNumRowsCLP(lp@oobj)
-                zeros <- rep(0, nrows)
-                clpAPI::chgRowLowerCLP(lp@oobj, zeros)
-                clpAPI::chgRowUpperCLP(lp@oobj, zeros)
-                out <- TRUE
-            },
-            # ----------------------- #
-            "lpSolveAPI" = {
-                nrows <- dim(lp@oobj)[1]
-                outb <- lpSolveAPI::set.constr.value(lp@oobj,
-                                                     rhs = rep(0, nrows),
-                                                     lhs = NULL,
-                                                     constraints = c(1:nrows))
-                outt <- lpSolveAPI::set.constr.type(lp@oobj,
-                                                    rep(3, nrows), c(1:nrows))
-                out <- c(outb, outt)
-            },
-            # ----------------------- #
-            "cplex" = {
-                nrows  <- cplexAPI::getNumRowsCPLEX(lp@oobj@env, lp@oobj@lp)
-                zeros  <- rep(0, nrows)
-                indic  <- c(0:(nrows-1))
-                outb   <- cplexAPI::chgRhsCPLEX(lp@oobj@env, lp@oobj@lp,
-                                                nrows, indic, zeros)
-                outt   <- cplexAPI::chgSenseCPLEX(lp@oobj@env, lp@oobj@lp,
-                                                  nrows, indic, rep("E", nrows))
-                out <- c(outb, outt)
-                # usable only for model creation!
-                # ( Variable nrows has to be argument of setRhsZero()! )
-                # out <- cplexAPI::newRowsCPLEX(lp@oobj@env, lp@oobj@lp, nrows,
-                #                               rep(0, nrows), rep("E", nrows))
-            },
-            # ----------------------- #
-            {
-                wrong_type_msg(lp)
-            }
-        )
-
-        return(out)
-    }
-)
-
-
-#------------------------------------------------------------------------------#
-
-setMethod("getRowsLowBnds", signature(lp = "optObj"),
-
-    function(lp, i) {
-
-        out <- FALSE
-        switch(lp@solver,
-            # ----------------------- #
-            "glpk" = {
-                out <- glpkAPI::getRowsLowBndsGLPK(lp@oobj, i)
-            },
-            # ----------------------- #
-            "clp" = {
-                out <- clpAPI::getRowLowerCLP(lp@oobj)[i]
-            },
-            # ----------------------- #
-            "lpSolveAPI" = {
-                out <- lpSolveAPI::get.constr.value(lp@oobj,
-                                                    side = "lhs",
-                                                    constraints = i)
-            },
-            # ----------------------- #
-            "cplex" = {
-                wrong_solver_msg(lp, "getRowsLowBnds", printOut = TRUE)
-            },
-            # ----------------------- #
-            {
-                wrong_type_msg(lp)
-            }
-        )
-
-        return(out)
-    }
-)
-
-
-#------------------------------------------------------------------------------#
-
-setMethod("getRowsUppBnds", signature(lp = "optObj"),
-
-    function(lp, i) {
-
-        out <- FALSE
-        switch(lp@solver,
-            # ----------------------- #
-            "glpk" = {
-                out <- glpkAPI::getRowsUppBndsGLPK(lp@oobj, i)
-            },
-            # ----------------------- #
-            "clp" = {
-                out <- clpAPI::getRowUpperCLP(lp@oobj)[i]
-            },
-            # ----------------------- #
-            "lpSolveAPI" = {
-                out <- lpSolveAPI::get.constr.value(lp@oobj,
-                                                    side = "rhs",
-                                                    constraints = i)
-            },
-            # ----------------------- #
-            "cplex" = {
-                wrong_solver_msg(lp, "getRowsUppBnds", printOut = TRUE)
-            },
-            # ----------------------- #
-            {
-                wrong_type_msg(lp)
-            }
-        )
-
-        return(out)
-    }
-)
-
-
-#------------------------------------------------------------------------------#
-
-setMethod("changeObjCoefs", signature(lp = "optObj"),
-
-    function(lp, j, obj_coef) {
-
-        out <- FALSE
-        switch(lp@solver,
-            # ----------------------- #
-            "glpk" = {
-                glpkAPI::setObjCoefsGLPK(lp@oobj, j, obj_coef)
-                out <- TRUE
-            },
-            # ----------------------- #
-            "clp" = {
-                tmp_obj_coef <- clpAPI::getObjCoefsCLP(lp@oobj)
-                tmp_obj_coef[j] <- obj_coef
-                clpAPI::chgObjCoefsCLP(lp@oobj, tmp_obj_coef)
-                out <- TRUE
-            },
-            # ----------------------- #
-            "lpSolveAPI" = {
-                out <- lpSolveAPI::set.objfn(lp@oobj, obj_coef, j)
-            },
-            # ----------------------- #
-            "cplex" = {
-                out <- cplexAPI::chgObjCPLEX(lp@oobj@env, lp@oobj@lp,
-                                             length(j), j-1, obj_coef)
-            },
-            # ----------------------- #
-            {
-                wrong_type_msg(lp)
-            }
-        )
-
-        return(out)
-    }
-)
-
-
-#------------------------------------------------------------------------------#
-
-setMethod("getObjCoefs", signature(lp = "optObj"),
-
-    function(lp, j) {
-
-        out <- FALSE
-        switch(lp@solver,
-            # ----------------------- #
-            "glpk" = {
-                out <- glpkAPI::getObjCoefsGLPK(lp@oobj, j)
-            },
-            # ----------------------- #
-            "clp" = {
-                out <- clpAPI::getObjCoefsCLP(lp@oobj)[j]
-            },
-            # ----------------------- #
-            "lpSolveAPI" = {
-                #wrong_solver_msg(lp, "getObjCoefs", printOut = TRUE)
-                out <- numeric(length(j))
-                for (i in seq(along = j)) {
-                    out[i] <- lpSolveAPI::get.column(lp@oobj, j[i])$column[1]
-                }
-            },
-            # ----------------------- #
-            "cplex" = {
-                if (length(j) > 1) {
-                    b <- min(j) - 1
-                    e <- max(j) - 1
-                }
-                else {
-                    b <- j - 1
-                    e <- j - 1
-                }
-                out <- cplexAPI::getObjCPLEX(lp@oobj@env, lp@oobj@lp, b, e)
-            },
-            # ----------------------- #
-            {
-                wrong_type_msg(lp)
-            }
-        )
-
-        return(out)
-    }
-)
-
-
-#------------------------------------------------------------------------------#
+# all further methods are interface methods to the lp solvers
 
 setMethod("loadMatrix", signature(lp = "optObj"),
 
     function(lp, ...) {
 
-        out <- FALSE
+        .Deprecated(new = "loadLPprob", old = "loadMatrix")
+        
         switch(lp@solver,
             # ----------------------- #
-            "glpk" = {
+            "glpkAPI" = {
                 glpkAPI::loadMatrixGLPK(lp@oobj, ...)
-                out <- TRUE
             },
             # ----------------------- #
-            "clp" = {
+            "clpAPI" = {
                 clpAPI::loadMatrixCLP(lp@oobj, ...)
-                out <- TRUE
             },
             # ----------------------- #
             "lpSolveAPI" = {
                 out <- loadMatrixPerColumnLPSOLVE(lp@oobj, ...)
             },
             # ----------------------- #
-            "cplex" = {
+            "cplexAPI" = {
                 out <- cplexAPI::chgCoefListCPLEX(lp@oobj@env, lp@oobj@lp, ...)
             },
             # ----------------------- #
@@ -1366,7 +206,7 @@ setMethod("loadMatrix", signature(lp = "optObj"),
             }
         )
 
-        return(out)
+        return(TRUE)
     }
 )
 
@@ -1377,6 +217,8 @@ setMethod("loadProblemData", signature(lp = "optObj"),
 
     function(lp, model) {
 
+        .Deprecated(new = "loadLPprob", old = "loadProblemData")
+        
         if (!is(model, "modelorg")) {
             stop("needs an object of class modelorg!")
         }
@@ -1384,7 +226,7 @@ setMethod("loadProblemData", signature(lp = "optObj"),
         out <- FALSE
         switch(lp@solver,
             # ----------------------- #
-            "glpk" = {
+            "glpkAPI" = {
                 out <- vector(mode = "list", length = 4)
                 out[[1]] <- addRowsCols(lp, met_num(model), react_num(model))
                 TMPmat <- as(S(model), "TsparseMatrix")
@@ -1405,7 +247,7 @@ setMethod("loadProblemData", signature(lp = "optObj"),
                 out[[4]] <- setRhsZero(lp)
             },
             # ----------------------- #
-            "clp" = {
+            "clpAPI" = {
                 zeros    <- rep(0, met_num(model))
                 TMPmat <- as(S(model), "CsparseMatrix")
                 check    <- clpAPI::loadProblemCLP(lp@oobj,
@@ -1434,7 +276,7 @@ setMethod("loadProblemData", signature(lp = "optObj"),
                 out[[3]] <- setRhsZero(lp)
             },
             # ----------------------- #
-            "cplex" = {
+            "cplexAPI" = {
                 out <- vector(mode = "list", length = 3)
                 TMPmat <- as(S(model), "TsparseMatrix")
 
@@ -1471,6 +313,8 @@ setMethod("loadProblemData", signature(lp = "optObj"),
 setMethod("loadProblemDataLM", signature(lp = "optObj"),
 
     function(lp, model, wtflux, nCols, nRows, COBRAflag = FALSE, lpdir = NA) {
+
+        .Deprecated(new = "loadLPprob", old = "loadProblemDataLM")
 
         if (!is(model, "modelorg")) {
             stop("needs an object of class modelorg!")
@@ -1585,7 +429,7 @@ setMethod("loadProblemDataLM", signature(lp = "optObj"),
 
         switch(lp@solver,
             # ----------------------- #
-            "glpk" = {
+            "glpkAPI" = {
                 out <- vector(mode = "list", length = 4)
 
                 if (isTRUE(COBRAflag)) {
@@ -1631,7 +475,7 @@ setMethod("loadProblemDataLM", signature(lp = "optObj"),
 
             },
             # ----------------------- #
-            "clp" = {
+            "clpAPI" = {
 
                 TMPmat <- as(LHS, "CsparseMatrix")
                 out   <- clpAPI::loadProblemCLP(lp@oobj,
@@ -1680,7 +524,7 @@ setMethod("loadProblemDataLM", signature(lp = "optObj"),
 
             },
             # ----------------------- #
-            "cplex" = {
+            "cplexAPI" = {
                 out <- vector(mode = "list", length = 3)
 
                 if (isTRUE(COBRAflag)) {
@@ -1726,6 +570,8 @@ setMethod("loadProblemDataLM", signature(lp = "optObj"),
 setMethod("loadProblemDataMTF", signature(lp = "optObj"),
 
     function(lp, model, wtflux, nCols, nRows) {
+
+        .Deprecated(new = "loadLPprob", old = "loadProblemDataMTF")
 
         if (!is(model, "modelorg")) {
             stop("needs an object of class modelorg!")
@@ -1803,7 +649,7 @@ setMethod("loadProblemDataMTF", signature(lp = "optObj"),
 
         switch(lp@solver,
             # ----------------------- #
-            "glpk" = {
+            "glpkAPI" = {
                 out <- vector(mode = "list", length = 4)
 
                 rtype <- c(rep(glpkAPI::GLP_FX, nr),
@@ -1833,7 +679,7 @@ setMethod("loadProblemDataMTF", signature(lp = "optObj"),
                                                      rtype)
             },
             # ----------------------- #
-            "clp" = {
+            "clpAPI" = {
 
                 TMPmat <- as(LHS, "CsparseMatrix")
                 out   <- clpAPI::loadProblemCLP(lp@oobj,
@@ -1871,7 +717,7 @@ setMethod("loadProblemDataMTF", signature(lp = "optObj"),
 
             },
             # ----------------------- #
-            "cplex" = {
+            "cplexAPI" = {
                 out <- vector(mode = "list", length = 3)
 
                 rtype <- c(rep("E", nr), rep("G", 2*nc + 1))
@@ -1900,501 +746,4 @@ setMethod("loadProblemDataMTF", signature(lp = "optObj"),
     }
 )
 
-
-#------------------------------------------------------------------------------#
-
-setMethod("scaleProb", signature(lp = "optObj"),
-
-    function(lp, opt) {
-
-        out <- FALSE
-        switch(lp@solver,
-            # ----------------------- #
-            "glpk" = {
-                # check if tryCatch works here!!
-                glpkAPI::scaleProbGLPK(lp@oobj, opt)
-                out <- TRUE
-            },
-            # ----------------------- #
-            "clp" = {
-                clpAPI::scaleModelCLP(lp@oobj, opt)
-                out <- TRUE
-            },
-            # ----------------------- #
-            "lpSolveAPI" = {
-                invisible(lpSolveAPI::lp.control(lp@oobj, scaling = opt))
-                out <- TRUE
-            },
-            # ----------------------- #
-            "cplex" = {
-                out <- cplexAPI::setIntParmCPLEX(lp@oobj@env,
-                                                 cplexAPI::CPX_PARAM_REDUCE,
-                                                 opt)
-            },
-            # ----------------------- #
-            {
-                wrong_type_msg(lp)
-            }
-        )
-
-        return(out)
-    }
-)
-
-
-#------------------------------------------------------------------------------#
-
-setMethod("solveLp", signature(lp = "optObj"),
-
-    function(lp) {
-
-        out          <- FALSE
-        method_valid <- FALSE
-        switch(lp@solver,
-            # ----------------------- #
-            "glpk" = {
-#                 if (glpkAPI::bfExistsGLPK(lp@oobj) != 0) {
-#                     if (glpkAPI::bfUpdatedGLPK(lp@oobj) != 0) {
-#                         basis <- glpkAPI::factorizeGLPK(lp@oobj)
-#                         #print(basis)
-#                     }
-#                 }
-                switch(lp@method,
-                    "interior" = {
-                        out <- glpkAPI::solveInteriorGLPK(lp@oobj)
-                        method_valid <- TRUE
-                    },
-                    "exact" = {
-                        out <- glpkAPI::solveSimplexExactGLPK(lp@oobj)
-                        method_valid <- TRUE
-                    },
-                    {
-                        out <- glpkAPI::solveSimplexGLPK(lp@oobj)
-                    }
-                )
-            },
-            # ----------------------- #
-            "clp" = {
-                switch(lp@method,
-                    "inidual" = {
-                        out <- clpAPI::solveInitialDualCLP(lp@oobj)
-                        method_valid <- TRUE
-                    },
-                    "iniprimal" = {
-                        out <- clpAPI::solveInitialPrimalCLP(lp@oobj)
-                        method_valid <- TRUE
-                    },
-                    "inibarrier" = {
-                        out <- clpAPI::solveInitialBarrierCLP(lp@oobj)
-                        method_valid <- TRUE
-                    },
-                    "inibarriernoc" = {
-                        out <- clpAPI::solveInitialBarrierNoCrossCLP(lp@oobj)
-                        method_valid <- TRUE
-                    },
-                    "dual" = {
-                        out <- clpAPI::dualCLP(lp@oobj)
-                        method_valid <- TRUE
-                    },
-                    "primal" = {
-                        out <- clpAPI::primalCLP(lp@oobj)
-                        method_valid <- TRUE
-                    },
-                    "idiot" = {
-                        clpAPI::idiotCLP(lp@oobj) # idiotCLP has no return value
-                        out <- 0
-                        method_valid <- TRUE
-                    },
-                    {
-                        out <- clpAPI::solveInitialCLP(lp@oobj)
-                    }
-                )
-            },
-            # ----------------------- #
-            "lpSolveAPI" = {
-                out <- solve(lp@oobj)
-            },
-            # ----------------------- #
-            "cplex" = {
-                switch(lp@method,
-                    "primopt" = {
-                        out <- cplexAPI::primoptCPLEX(lp@oobj@env, lp@oobj@lp)
-                        method_valid <- TRUE
-                    },
-                    "dualopt" = {
-                        out <- cplexAPI::dualoptCPLEX(lp@oobj@env, lp@oobj@lp)
-                        method_valid <- TRUE
-                    },
-                    "baropt" = {
-                        out <- cplexAPI::baroptCPLEX(lp@oobj@env, lp@oobj@lp)
-                        method_valid <- TRUE
-                    },
-                    "hybbaropt" = {
-                        out <- cplexAPI::hybbaroptCPLEX(lp@oobj@env, lp@oobj@lp,
-                                                        method = 0)
-                        method_valid <- TRUE
-                    },
-                    "hybnetopt" = {
-                        out <- cplexAPI::hybnetoptCPLEX(lp@oobj@env, lp@oobj@lp,
-                                              method = cplexAPI::CPX_ALG_PRIMAL)
-                        method_valid <- TRUE
-                    },
-                    "siftopt" = {
-                        out <- cplexAPI::siftoptCPLEX(lp@oobj@env, lp@oobj@lp)
-                        method_valid <- TRUE
-                    },
-                    {
-                        out <- cplexAPI::lpoptCPLEX(lp@oobj@env, lp@oobj@lp)
-                    }
-                )
-            },
-            # ----------------------- #
-            {
-                wrong_type_msg(lp)
-            }
-        )
-
-        return(out)
-    }
-)
-
-
-#------------------------------------------------------------------------------#
-
-setMethod("getObjVal", signature(lp = "optObj"),
-
-    function(lp) {
-
-        out <- FALSE
-        switch(lp@solver,
-            # ----------------------- #
-            "glpk" = {
-                if (lp@method == "interior") {
-                    out <- glpkAPI::getObjValIptGLPK(lp@oobj)
-                }
-                else {
-                    out <- glpkAPI::getObjValGLPK(lp@oobj)
-                }
-            },
-            # ----------------------- #
-            "clp" = {
-                out <- clpAPI::getObjValCLP(lp@oobj)
-            },
-            # ----------------------- #
-            "lpSolveAPI" = {
-                out <- lpSolveAPI::get.objective(lp@oobj)
-            },
-            # ----------------------- #
-            "cplex" = {
-                out <- cplexAPI::getObjValCPLEX(lp@oobj@env, lp@oobj@lp)
-            },
-            # ----------------------- #
-            {
-                wrong_type_msg(lp)
-            }
-        )
-
-        return(out)
-    }
-)
-
-
-#------------------------------------------------------------------------------#
-
-setMethod("getRedCosts", signature(lp = "optObj"),
-
-    function(lp) {
-
-        out <- FALSE
-        switch(lp@solver,
-            # ----------------------- #
-            "glpk" = {
-                if (lp@method == "interior") {
-                    out <- glpkAPI::getColsDualIptGLPK(lp@oobj)
-                }
-                else {
-                    out <- glpkAPI::getColsDualGLPK(lp@oobj)
-                }
-            },
-            # ----------------------- #
-            "clp" = {
-                out <- clpAPI::getColDualCLP(lp@oobj)
-            },
-            # ----------------------- #
-            "lpSolveAPI" = {
-                out <- lpSolveAPI::get.dual.solution(lp@oobj)
-            },
-            # ----------------------- #
-            "cplex" = {
-                nr  <- cplexAPI::getNumRowsCPLEX(lp@oobj@env, lp@oobj@lp)
-                out <- cplexAPI::getDjCPLEX(lp@oobj@env, lp@oobj@lp, 0, nr-1)
-            },
-            # ----------------------- #
-            {
-                wrong_type_msg(lp)
-            }
-        )
-
-        return(out)
-    }
-)
-
-
-#------------------------------------------------------------------------------#
-
-setMethod("getSolStat", signature(lp = "optObj"),
-
-    function(lp) {
-
-        out <- NA
-        switch(lp@solver,
-            # ----------------------- #
-            "glpk" = {
-                if (lp@method == "interior") {
-                    out <- glpkAPI::getSolStatIptGLPK(lp@oobj)
-                }
-                else {
-                    out <- glpkAPI::getSolStatGLPK(lp@oobj)
-                }
-            },
-            # ----------------------- #
-            "clp" = {
-                out <- clpAPI::getSolStatusCLP(lp@oobj)
-            },
-            # ----------------------- #
-            "lpSolveAPI" = {
-                wrong_solver_msg(lp, "getSolStat", printOut = FALSE)
-            },
-            # ----------------------- #
-            "cplex" = {
-                out <- cplexAPI::getStatCPLEX(lp@oobj@env, lp@oobj@lp)
-            },
-            # ----------------------- #
-            {
-                wrong_type_msg(lp)
-            }
-        )
-
-        return(out)
-    }
-)
-
-
-#------------------------------------------------------------------------------#
-
-setMethod("getFluxDist", signature(lp = "optObj"),
-
-    function(lp) {
-
-        out <- FALSE
-        switch(lp@solver,
-            # ----------------------- #
-            "glpk" = {
-                if (lp@method == "interior") {
-                    out <- glpkAPI::getColsPrimIptGLPK(lp@oobj)
-                }
-                else {
-                    out <- glpkAPI::getColsPrimGLPK(lp@oobj)
-                }
-            },
-            # ----------------------- #
-            "clp" = {
-                out <- clpAPI::getColPrimCLP(lp@oobj)
-            },
-            # ----------------------- #
-            "lpSolveAPI" = {
-                out <- lpSolveAPI::get.variables(lp@oobj)
-            },
-            # ----------------------- #
-            "cplex" = {
-                ncols <- cplexAPI::getNumColsCPLEX(lp@oobj@env, lp@oobj@lp)
-                out   <- cplexAPI::getProbVarCPLEX(lp@oobj@env, lp@oobj@lp,
-                                                   0, ncols - 1)
-            },
-            # ----------------------- #
-            {
-                wrong_type_msg(lp)
-            }
-        )
-
-        return(out)
-    }
-)
-
-
-#------------------------------------------------------------------------------#
-
-setMethod("getColPrim", signature(lp = "optObj"),
-
-    function(lp, j) {
-
-        out <- FALSE
-        switch(lp@solver,
-            # ----------------------- #
-            "glpk" = {
-                if (lp@method == "interior") {
-                    out <- glpkAPI::getColPrimIptGLPK(lp@oobj, j)
-                }
-                else {
-                    out <- glpkAPI::getColPrimGLPK(lp@oobj, j)
-                }
-            },
-            # ----------------------- #
-            "clp" = {
-                out <- clpAPI::getColPrimCLP(lp@oobj)[j]
-            },
-            # ----------------------- #
-            "lpSolveAPI" = {
-                out <- lpSolveAPI::get.variables(lp@oobj)[j]
-            },
-            # ----------------------- #
-            "cplex" = {
-                out <- cplexAPI::getProbVarCPLEX(lp@oobj@env, lp@oobj@lp, j, j)
-            },
-            # ----------------------- #
-            {
-                wrong_type_msg(lp)
-            }
-        )
-
-        return(out)
-    }
-)
-
-
-#------------------------------------------------------------------------------#
-
-setMethod("getNumNnz", signature(lp = "optObj"),
-
-    function(lp) {
-
-        out <- FALSE
-        switch(lp@solver,
-            # ----------------------- #
-            "glpk" = {
-                out <- glpkAPI::getNumNnzGLPK(lp@oobj)
-            },
-            # ----------------------- #
-            "clp" = {
-                out <- clpAPI::getNumNnzCLP(lp@oobj)
-            },
-            # ----------------------- #
-            "lpSolveAPI" = {
-                wrong_solver_msg(lp, "getNumNnz", printOut = TRUE)
-            },
-            # ----------------------- #
-            "cplex" = {
-                out <- cplexAPI::getNumNnzCPLEX(lp@oobj@env, lp@oobj@lp)
-            },
-            # ----------------------- #
-            {
-                wrong_type_msg(lp)
-            }
-        )
-
-        return(out)
-    }
-)
-
-
-#------------------------------------------------------------------------------#
-
-setMethod("writeProb", signature(lp = "optObj"),
-
-    function(lp, fmt = "lp", ...) {
-
-        out <- FALSE
-        switch(lp@solver,
-            # ----------------------- #
-            "glpk" = {
-                switch(fmt,
-                   "lp"  = {
-                       fl <- glpkAPI::writeLPGLPK(lp@oobj, ...)
-                   },
-                   "mps" = {
-                       fl <- glpkAPI::writeMPSGLPK(lp@oobj, ...)
-                   },
-                   {
-                       message("wrong format!")
-                   }
-                )
-                out <- ifelse(fl == 0, TRUE, fl)
-            },
-            # ----------------------- #
-            "clp" = {
-                out <- clpAPI::saveModelCLP(lp@oobj, ...)
-            },
-            # ----------------------- #
-            "lpSolveAPI" = {
-                out <- lpSolveAPI::write.lp(lp@oobj, type = fmt, ...)
-            },
-            # ----------------------- #
-            "cplex" = {
-                tp  <- ifelse(is.null(fmt), NULL, toupper(fmt))
-                fl  <- cplexAPI::writeProbCPLEX(lp@oobj@env, lp@oobj@lp,
-                                                ftype = tp, ...)
-                out <- ifelse(fl == 0, TRUE, fl)
-            },
-            # ----------------------- #
-            {
-                wrong_type_msg(lp)
-            }
-        )
-
-        return(out)
-    }
-)
-
-
-#------------------------------------------------------------------------------#
-
-setMethod("sensitivityAnalysis", signature(lp = "optObj"),
-
-    function(lp, ...) {
-
-        out <- FALSE
-        switch(lp@solver,
-            # ----------------------- #
-            "glpk" = {
-                out <- glpkAPI::printRangesGLPK(lp@oobj, ...)
-                if (out == 0) {
-                    message("wrote the file 'sar.txt'")
-                }
-                else {
-                    warning("sensitivity analysis failed")
-                }
-            },
-            # ----------------------- #
-            "clp" = {
-                wrong_solver_msg(lp, "sensitivityAnalysis", printOut = TRUE)
-            },
-            # ----------------------- #
-            "lpSolveAPI" = {
-                wrong_solver_msg(lp, "sensitivityAnalysis", printOut = TRUE)
-            },
-            # ----------------------- #
-            "cplex" = {
-                # number of columns and rows
-                nc <- cplexAPI::getNumColsCPLEX(lp@oobj@env, lp@oobj@lp)
-                nr <- cplexAPI::getNumRowsCPLEX(lp@oobj@env, lp@oobj@lp)
-        
-                out <- vector(mode = "list", length = 3)
-                names(out) <- c("bound", "obj", "rhs")
-                
-                out[["bound"]] <- cplexAPI::boundSaCPLEX(lp@oobj@env,
-                                                         lp@oobj@lp, 0, nc-1)
-                out[["obj"]]   <- cplexAPI::objSaCPLEX(lp@oobj@env,
-                                                       lp@oobj@lp, 0, nc-1)
-                out[["rhs"]]   <- cplexAPI::rhsSaCPLEX(lp@oobj@env,
-                                                       lp@oobj@lp, 0, nr-1)
-            },
-            # ----------------------- #
-            {
-                wrong_type_msg(lp)
-            }
-        )
-
-        return(out)
-    }
-)
 

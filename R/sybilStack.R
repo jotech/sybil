@@ -6,20 +6,20 @@
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
 #
-#  This file is part of SyBiL.
+#  This file is part of sybil.
 #
-#  SyBiL is free software: you can redistribute it and/or modify
+#  sybil is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
-#  SyBiL is distributed in the hope that it will be useful,
+#  sybil is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License
-#  along with SyBiL.  If not, see <http://www.gnu.org/licenses/>.
+#  along with sybil.  If not, see <http://www.gnu.org/licenses/>.
 
 
 #------------------------------------------------------------------------------#
@@ -37,10 +37,10 @@ stinit <- function(stname) {
 
 stclear <- function(stname) {
 
-    if (!(stname %in% names(.SYBILenv$sybilStack))) {
-        stop("stack ", sQuote(stname), " does not exist")
-    }
-
+#    if (!(stname %in% names(.SYBILenv$sybilStack))) {
+#        stop("stack ", sQuote(stname), " does not exist")
+#    }
+    stopifnot(stexists(stname))
     .SYBILenv$sybilStack[stname] <- NULL
 
 }
@@ -51,9 +51,7 @@ stclear <- function(stname) {
 
 stpush <- function(stname, value) {
 
-    if (!(stname %in% names(.SYBILenv$sybilStack))) {
-        stop("stack ", sQuote(stname), " does not exist")
-    }
+    stopifnot(stexists(stname))
 
     .SYBILenv$sybilStack[[stname]] <- append(.SYBILenv$sybilStack[[stname]],
                                  value,
@@ -66,9 +64,7 @@ stpush <- function(stname, value) {
 
 stpop <- function(stname) {
 
-    if (!(stname %in% names(.SYBILenv$sybilStack))) {
-        stop("stack ", sQuote(stname), " does not exist")
-    }
+    stopifnot(stexists(stname))
 
     lg <- length(.SYBILenv$sybilStack[[stname]])
     value <- .SYBILenv$sybilStack[[stname]][lg]
@@ -83,9 +79,7 @@ stpop <- function(stname) {
 
 stunshift <- function(stname, value) {
 
-    if (!(stname %in% names(.SYBILenv$sybilStack))) {
-        stop("stack ", sQuote(stname), " does not exist")
-    }
+    stopifnot(stexists(stname))
 
     .SYBILenv$sybilStack[[stname]] <- append(.SYBILenv$sybilStack[[stname]],
                                              value, after = 0)
@@ -97,9 +91,7 @@ stunshift <- function(stname, value) {
 
 stshift <- function(stname) {
 
-    if (!(stname %in% names(.SYBILenv$sybilStack))) {
-        stop("stack ", sQuote(stname), " does not exist")
-    }
+    stopifnot(stexists(stname))
 
     value <- .SYBILenv$sybilStack[[stname]][1]
     .SYBILenv$sybilStack[[stname]] <- .SYBILenv$sybilStack[[stname]][-1]
@@ -113,9 +105,7 @@ stshift <- function(stname) {
 
 stseek <- function(stname) {
 
-    if (!(stname %in% names(.SYBILenv$sybilStack))) {
-        stop("stack ", sQuote(stname), " does not exist")
-    }
+    stopifnot(stexists(stname))
 
     lg <- length(.SYBILenv$sybilStack[[stname]])
     value <- .SYBILenv$sybilStack[[stname]][lg]
@@ -129,9 +119,7 @@ stseek <- function(stname) {
 
 stfirst <- function(stname) {
 
-    if (!(stname %in% names(.SYBILenv$sybilStack))) {
-        stop("stack ", sQuote(stname), " does not exist")
-    }
+    stopifnot(stexists(stname))
 
     value <- .SYBILenv$sybilStack[[stname]][1]
     return(value)
@@ -144,9 +132,7 @@ stfirst <- function(stname) {
 
 stlist <- function(stname) {
 
-    if (!(stname %in% names(.SYBILenv$sybilStack))) {
-        stop("stack ", sQuote(stname), " does not exist")
-    }
+    stopifnot(stexists(stname))
 
     return(.SYBILenv$sybilStack[[stname]])
 
@@ -158,9 +144,7 @@ stlist <- function(stname) {
 
 stlength <- function(stname) {
 
-    if (!(stname %in% names(.SYBILenv$sybilStack))) {
-        stop("stack ", sQuote(stname), " does not exist")
-    }
+    stopifnot(stexists(stname))
 
     return(length(.SYBILenv$sybilStack[[stname]]))
 
@@ -172,13 +156,7 @@ stlength <- function(stname) {
 
 stexists <- function(stname) {
 
-    out <- FALSE
-
-    if (stname %in% names(.SYBILenv$sybilStack)) {
-        out <- TRUE
-    }
-
-    return(out)
+    return(stname %in% names(.SYBILenv$sybilStack))
 
 }
 

@@ -3,12 +3,7 @@
 \docType{class}
 
 \alias{optsol_fluxdel-class}
-\alias{optsol_fluxdel}
 
-\alias{react_id,optsol_fluxdel-method}
-\alias{react_id<-,optsol_fluxdel-method}
-\alias{allGenes,optsol_fluxdel-method}
-\alias{allGenes<-,optsol_fluxdel-method}
 \alias{chlb,optsol_fluxdel-method}
 \alias{chlb<-,optsol_fluxdel-method}
 \alias{chlb}
@@ -21,14 +16,14 @@
 \alias{dels<-,optsol_fluxdel-method}
 \alias{dels}
 \alias{dels<-}
-\alias{algorithm,optsol_fluxdel-method}
-\alias{algorithm<-,optsol_fluxdel-method}
-\alias{algorithm}
-\alias{algorithm<-}
-\alias{ind2id,optsol_fluxdel-method}
-\alias{ind2id}
+% \alias{ind2id,optsol_fluxdel-method}
+% \alias{ind2id}
 \alias{deleted,optsol_fluxdel-method}
 \alias{deleted}
+\alias{lethal,optsol_fluxdel-method}
+\alias{lethal}
+\alias{mod_obj,optsol_fluxdel-method}
+\alias{mod_obj}
 \alias{[,optsol_fluxdel,ANY,ANY,ANY-method}
 
 \encoding{utf8}
@@ -41,46 +36,12 @@
 }
 
 \section{Objects from the Class}{
-  Objects can be created by calls of the function \code{optsol_fluxdel}:
-
-  \code{test <- optsol_fluxdel(solver, nprob, lpdir, ncols, nrows, objf, fld, comb = 1)}.
-  \describe{
-    \item{\code{solver}:}{Object of class \code{"character"}
-      indicating the used solver.
-    }
-    \item{\code{nprob}:}{Object of class \code{"numeric"}
-      number of problems to solve.
-    }
-    \item{\code{lpdir}:}{Object of class \code{"character"}
-      direction of optimization.
-    }
-    \item{\code{ncols}:}{Object of class \code{"numeric"}
-      number of variables in the model.
-    }
-    \item{\code{nrows}:}{Object of class \code{"numeric"}
-      number of constraints in the model.
-    }
-    \item{\code{objf}:}{Object of class \code{"character"}
-      a character string describing the objective function.
-    }
-    \item{\code{fld}:}{Object of class \code{"logical"}
-      logical, if \code{TRUE}, memory for flux distributions will be allocated.
-    }
-    \item{\code{comb}:}{Object of class \code{"numeric"}
-      number of combinations to use for flux deletions. This will be the number
-      of columns in slot \code{dels}. Default: \code{1}.
-    }
-  }
+  Objects can be created by calls of the form
+  \code{new("optsol_fluxdel", ...)}.
 }
 
 \section{Slots}{
   \describe{
-    \item{\code{react_id}:}{Object of class \code{"character"}
-      containing the reaction id's.
-    }
-    \item{\code{allGenes}:}{Object of class \code{"character"}
-      containing the gene id's.
-    }
     \item{\code{chlb}:}{Object of class \code{"numeric"}
       containing the new (changed) values for the columns lower bounds.
     }
@@ -92,15 +53,17 @@
       the reaction id's of deleted reactions (fluxes) in the slot
       \code{react_id}.
     }
-    \item{\code{algorithm}:}{
-      Object of class \code{"character"} containing the used algorithm
-	  for metabolic network analysis.
+    \item{\code{mod_id}:}{Object of class \code{"character"}
+      containing the model id of the used model.
     }
     \item{\code{solver}:}{Object of class \code{"character"}
       indicating the used solver.
     }
     \item{\code{method}:}{Object of class \code{"character"}
       indicating the used method.
+    }
+    \item{\code{algorithm}:}{Object of class \code{"character"}
+      containing the name of the algorithm used for optimizations.
     }
     \item{\code{num_of_prob}:}{Object of class \code{"integer"}
       indicating the number of optimization problems.
@@ -123,8 +86,13 @@
     \item{\code{lp_dir}:}{Object of class \code{"character"}
       indicating the direction of optimization.
     }
-    \item{\code{obj_function}:}{Object of class \code{"character"}
-      containing the name of the objective function.
+    \item{\code{obj_coef}:}{Object of class \code{"numeric"}
+      containing the objective coefficients of the used model.
+    }
+    \item{\code{fldind}:}{Object of class \code{"integer"}
+      pointers to columns (variables) representing a flux (reaction) in the
+      original network. The variable \code{fldind[i]} in the problem object
+      represents reaction \code{i} in the original network. 
     }
     \item{\code{fluxdist}:}{Object of class \code{"fluxDistribution"}
       containing the solutons flux distributions.
@@ -133,8 +101,9 @@
 }
 
 \section{Extends}{
-  Class \code{"\linkS4class{optsol_simpleFBA}"}, directly.
-  Class \code{"\linkS4class{optsol}"}, by class "optsol_simpleFBA", distance 2.
+  Class \code{"\linkS4class{optsol_optimizeProb}"}, directly.
+  Class \code{"\linkS4class{optsol}"},
+  by class "optsol_optimizeProb", distance 2.
 }
 
 \section{Methods}{
@@ -175,10 +144,27 @@
     \item{\code{algorithm<-}:}{
       \code{signature(object = "optsol_fluxdel")} sets the \code{algorithm} slot.
     }
-    \item{\code{ind2id}:}{
-      \code{signature(object = "optsol_fluxdel")}(\code{slotN}): translates the
-      indices in \code{slotN} into corresponding gene or reaction id's. Possible
-      values for \code{slotN} are: \code{"dels"}.
+%     \item{\code{ind2id}:}{
+%       \code{signature(object = "optsol_fluxdel")}(\code{slotN}): translates the
+%       indices in \code{slotN} into corresponding gene or reaction id's. Possible
+%       values for \code{slotN} are: \code{"dels"}.
+%     }
+    \item{\code{mod_obj}:}{\code{signature(object = "optsol_fluxdel")}:
+      returns allways the cross-product of the objective coefficients in slot
+      \code{obj_coef} and the part of the flux distribution in slot
+      \code{fluxdist} containing the values representing fluxes in the entire
+      metabolic network (slot \code{fldind}). If slot \code{obj_coef} is
+      \code{NA}, the content of slot \code{lp_obj} is returned.
+       In contrast, method \code{lp_obj} allways returns the value of the
+       objective function of the used algorithm after optimization.
+    }
+    \item{\code{lethal}:}{
+      \code{signature(object = "optsol_fluxdel")}(\code{wt, tol}): returns
+      a logical vector of length \code{num_of_prob(object)}. Argument \code{wt}
+      is an optimal groth value, e.g. computed via FBA. If the absolute groth
+      ratio (\code{mod_obj(object)/wt}) of knock-out \code{i} is less than
+      \code{tol}, the deletion is considered as lethal.
+      If \code{lethal(object)[i]} is \code{TRUE}, deletion [i] is lethal.
     }
     \item{\code{deleted}:}{
       \code{signature(object = "optsol_fluxdel")}(\code{i}): gets the \code{i}th
@@ -197,10 +183,8 @@
 \seealso{
   \code{\link{checkOptSol}},
   \code{\linkS4class{optsol}},
-  \code{\linkS4class{optsol_genedel}},
-  \code{\linkS4class{optsol_doublegenedel}},
-  \code{\linkS4class{optsol_doublefluxdel}} and
-  \code{\linkS4class{optsol_simpleFBA}}
+  \code{\linkS4class{optsol_genedel}} and
+  \code{\linkS4class{optsol_optimizeProb}}
 }
       
 \examples{

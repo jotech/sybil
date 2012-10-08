@@ -6,20 +6,20 @@
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
 #
-#  This file is part of SyBiL.
+#  This file is part of sybil.
 #
-#  SyBiL is free software: you can redistribute it and/or modify
+#  sybil is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
-#  SyBiL is distributed in the hope that it will be useful,
+#  sybil is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License
-#  along with SyBiL.  If not, see <http://www.gnu.org/licenses/>.
+#  along with sybil.  If not, see <http://www.gnu.org/licenses/>.
 
 
 # modelorgClass
@@ -542,4 +542,178 @@ setMethod("show", signature(object = "modelorg"),
         cat("objective function:    ", printObjFunc(object), "\n")
     }
 )
+
+
+#------------------------------------------------------------------------------#
+
+setMethod("optimizeProb", signature(object = "modelorg"),
+    function(object,
+             gene = NA,
+             react = NA,
+             lb = NA,
+             ub = NA,
+             retOptSol = FALSE,
+             MoreArgs = list(),
+             ...) {
+
+
+        if (!any(is.na(gene))) {
+            react <- geneDel(object, gene, checkId = TRUE)
+            lb <- rep(lb[1], length(react))
+            ub <- rep(ub[1], length(react))
+        }
+
+        # check the argument react
+        # if object is of class "modelorg", react is given by the user
+        if (!any(is.na(react))) {
+            check <- checkReactId(object, react = react)
+            if (is(check, "reactId")) {
+                react <- react_pos(check)
+            }
+            else {
+                stop("check argument react")
+            }
+        }
+
+
+        # -------------------------------------------------------------- #
+        # run optimization
+        # -------------------------------------------------------------- #
+
+        lpmod <- sysBiolAlg(model = object, ...)
+        
+        MoreArgs[["object"]] <- lpmod
+        MoreArgs[["react"]]  <- react
+        MoreArgs[["lb"]]     <- lb
+        MoreArgs[["ub"]]     <- ub
+        
+        sol <- do.call("optimizeProb", args = MoreArgs)
+
+
+        # -------------------------------------------------------------- #
+        # store solution
+        # -------------------------------------------------------------- #
+
+        if (isTRUE(retOptSol)) {
+
+            # solution object
+            optsol <- new("optsol_optimizeProb",
+                          mod_id       = mod_id(object),
+                          solver       = solver(problem(lpmod)),
+                          method       = method(problem(lpmod)),
+                          algorithm    = algorithm(lpmod),
+                          num_of_prob  = 1L,
+                          lp_dir       = getObjDir(problem(lpmod)),
+                          lp_num_rows  = nr(lpmod),
+                          lp_num_cols  = nc(lpmod),
+                          lp_ok        = as.integer(sol$ok),
+                          lp_obj       = sol$obj,
+                          lp_stat      = as.integer(sol$stat),
+                          obj_coef     = obj_coef(object),
+                          fldind       = fldind(lpmod),
+                          fluxdist     = fluxDistribution(fluxes = sol$fluxes,
+                                                      nrow = length(sol$fluxes),
+                                                      ncol = 1L))
+ 
+            if (is(sol$preP, "ppProc")) {
+                preProc(optsol) <- sol$preP
+            }
+    
+            if (is(sol$postP, "ppProc")) {
+                postProc(optsol) <- sol$postP
+            }
+    
+            check <- validObject(optsol, test = TRUE)
+    
+            if (check != TRUE) {
+                warning(paste("Validity check failed:", check, sep = "\n    "),
+                        call. = FALSE
+                )
+            }
+    
+            checkOptSol(optsol, onlywarn = TRUE)
+        }
+        else {
+            optsol <- sol
+            optsol[["fldind"]] <- fldind(lpmod)
+        }
+
+        delProb(problem(lpmod))
+        remove(lpmod)
+        
+        return(optsol)
+
+    }
+)
+
+
+#------------------------------------------------------------------------------#
+
+setMethod("shrinkSMatrix", signature(model = "modelorg"),
+    function(model, i = NULL, j = NULL, names = NULL) {
+  	
+#         if (! any(is.null(i), is.numeric(i), is.character(i))) {
+#             stop("i has to be numeric, characer or NULL")
+#         }
+#         
+#         if (! any(is.null(j), is.numeric(j), is.character(j))) {
+#             stop("j has to be numeric, characer or NULL")
+#         }
+#         
+#         useNames <- ifelse(any(is.character(i), is.character(j)), TRUE, FALSE)
+# 
+#         m <- S(model)
+#         rows <- i
+#         cols <- j
+#         
+#         if(isTRUE(useNames)){
+#             rownames(m) <- met_id(model)
+#             colnames(m) <- react_id(model)
+#             
+#             if(is.character(i)){
+#                 if(any(! i %in% met_id(model))){
+#                     stop("invalid met_id")
+#                 }
+#             }
+#             if(is.character(j)){
+#                 if(any(! j %in% react_id(model))){
+#                     stop("invalid react_id")
+#                 }
+#             }
+#         }
+#     
+#         #checking of parameters should be done here
+#     
+#         #m <- as.matrix(m)
+#     
+#         if(!is.null(cols)){
+#             m <- m[, cols, drop=FALSE]
+#         }
+#         if(!is.null(rows)){
+#             m <- m[rows, , drop=FALSE]
+#         }
+#     
+#     
+#         m <- m[
+#         apply(m, 1, function(x){
+#                         any(x!=0)
+#                     }), , drop=FALSE]
+#     
+#         m <- m[,
+#         apply(m, 2, function(x){
+#                         any(x!=0)
+#                     }), drop=FALSE]
+#                     
+#         if(all(dim(m)==0)){
+#             return(NULL)
+#         }
+#         else{
+#             return(m)
+#         }
+              
+    }
+)
+
+
+
 

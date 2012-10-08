@@ -14,11 +14,11 @@
 \alias{stexists}
 
 \title{
-  A Data Type Providing Stack And Queue Functionality
+  A Data Type Providing Stack (LIFO) And Queue (FIFO) Functionality
 }
 
 \description{
-  These functions implement a simple stack or queue functionality.
+  These functions implement simple stack or queue functionality.
 }
 
 \usage{
@@ -37,10 +37,10 @@
 
 \arguments{
   \item{stname}{
-    A single character string, giving the name of the stack.
+    A single character string, giving the name of the stack or queue.
   }
   \item{value}{
-    Value to add to the stack.
+    Value to add to the stack or queue.
   }
 }
 

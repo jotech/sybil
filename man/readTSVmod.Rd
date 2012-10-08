@@ -28,6 +28,7 @@
              tol = SYBIL_SETTINGS("TOLERANCE"),
              fpath = SYBIL_SETTINGS("PATH_TO_MODEL"),
              def_bnd = SYBIL_SETTINGS("MAXIMUM"),
+             arrowlength = NULL,
              quoteChar = "",
              commentChar, ...)
 }
@@ -151,6 +152,20 @@
     A single numeric value. Absolute value for uppper and lower bounds for
     reaction bounds.\cr
     Default: \code{SYBIL_SETTINGS("MAXIMUM")}.
+  }
+  \item{arrowlength}{
+    A single numeric or character value or \code{NULL}. This argument controls
+    the number of \code{"-"} and \code{"="} used in reaction arrows in the
+    equation strings. If set to \code{NULL}, one or more symbols are used.
+    The regular expression used is \code{"<?[=-]+>"}.
+    If numeric, all reaction arrows must consist of exactly \code{arrowlength}
+    signs. The regular expression used is \code{"<?[=-]{arrowlength}>"}.
+    If character, \code{arrowlength} must be a regular expression and will be
+    used as \code{"<?[=-]arrowlength>"}. For example, if \code{arrowlength} is
+    \code{"{1,2}"} the regular expression is \code{"<?[=-]{1,2}>"}, meaning the
+    reaction arrow can consist of one or two signs. In any case, the completed
+    regular expression will allways used with argument \code{perl = TRUE}.\cr
+    Default: \code{NULL}.
   }
   \item{quoteChar}{
     Set of quoting characters used for the argument \code{quote} in

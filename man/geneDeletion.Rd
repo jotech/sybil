@@ -13,11 +13,7 @@
 }
 
 \usage{
-  geneDeletion(model, genes, combinations = 1,
-               lpdir = SYBIL_SETTINGS("OPT_DIRECTION"),
-               solver = SYBIL_SETTINGS("SOLVER"),
-               method = SYBIL_SETTINGS("METHOD"),
-               fld = FALSE, ...)
+  geneDeletion(model, genes, combinations = 1, ...)
 }
 
 \arguments{
@@ -33,26 +29,6 @@
     taken at a time while building all combinations of the elements in
     \code{genes} (see Details below).\cr
     Default: \code{1}.
-  }
-  \item{lpdir}{
-    Character value, direction of optimisation.  Can be set to \code{"min"} or
-    \code{"max"}.\cr
-    Default: \code{SYBIL_SETTINGS("OPT_DIRECTION")}.
-  }
-  \item{solver}{
-    Single character value.  The solver to use.  See
-    \code{\link{SYBIL_SETTINGS}} for possible values.\cr
-    Default: \code{SYBIL_SETTINGS("SOLVER")}.
-  }
-  \item{method}{
-    Single character value.  The optimization algorithm to use.  Possible values
-    depend on the setting in \code{solver}.  See \code{\link{SYBIL_SETTINGS}}
-    for possible values.\cr
-    Default: \code{SYBIL_SETTINGS("METHOD")}.
-  }
-  \item{fld}{
-    Boolean.  Save the resulting flux distribution.\cr
-    Default: \code{FALSE}.
   }
   \item{\dots}{
     Further arguments passed to \code{\link{optimizer}}.
@@ -74,17 +50,16 @@
 }
 
 \value{
-  An object of class \code{\link{optsol_genedel}}. Its first element will
-  allways be a wild type solution, with no gene deleted.
+  An object of class \code{\link[=optsol_genedel-class]{optsol_genedel}}.
 }
 
 \author{Gabriel Gelius-Dietrich}
 
 \seealso{
   \code{\linkS4class{modelorg}}, \code{\linkS4class{optsol}},
-  \code{\linkS4class{optsol_genedel}}, \code{\link{checkOptSol}},
-  \code{\link{oneGeneDel}}, \code{\link{doubleGeneDel}},
-  \code{\link{optimizer}}, \code{\link{simpleFBA}},
+  \code{\link[=optsol_genedel-class]{optsol_genedel}},
+  \code{\link{checkOptSol}}, \code{\link{oneGeneDel}},
+  \code{\link{optimizer}}, \code{\link{optimizeProb}},
   \code{\link{combn}} and \code{\link{SYBIL_SETTINGS}}.
 }
 

@@ -1,5 +1,0 @@
-%\VignetteIndexEntry{simpleFBA}
-%\VignettePackage{SyBiL}
-\documentclass{article}
-\begin{document}
-\end{document}

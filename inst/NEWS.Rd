@@ -1,10 +1,84 @@
-%% SyBiL Version History
+%% sybil Version History
 
 \name{NEWS}
-\title{SyBiL News}
+\title{sybil News}
 \encoding{UTF-8}
 
 \newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
+
+% ---------------------------------------------------------------------------- %
+\section{Changes in version 1.1.1 2012-10-08}{
+  \itemize{
+    \item fixed file \file{DESCRIPTION}
+  }
+}
+
+% ---------------------------------------------------------------------------- %
+\section{Changes in version 1.1.0 2012-10-08}{
+  \itemize{
+    \item some performance improvements in function \code{fluxVar}
+    \item new function \code{modelorg2ExPA}, which writes input files for
+          \href{http://gcrg.ucsd.edu/Downloads/ExtremePathwayAnalysis}{ExPA}
+    \item some very minor improvements in sybilStack (stack [LIFO] and
+          queue [FIFO])
+    \item solver names \code{glpk}, \code{cplex} and \code{clp} are deprecated,
+          use \code{glpkAPI}, \code{cplexAPI} and \code{clpAPI} instead
+    \item classes \code{optObj_glpk}, \code{optObj_cplex} and \code{optObj_clp}
+          are renamed to \code{optObj_glpkAPI}, \code{optObj_cplexAPI} and
+          \code{optObj_clpAPI}
+    \item fixed a small bug in \code{SYBIL_SETTINGS} appearing if parameters
+          were set several times
+    \item argument \code{solverParm} can be \code{list} or \code{data.frame}
+    \item argument \code{fmt} to the generic \code{writeProb} is now \code{ff}  
+    \item added support for mixed interger optimization problems with
+          \pkg{glpkAPI} and \pkg{cplexAPI}
+    \item added support for quadratic optimization problems with \pkg{cplexAPI}
+    \item added methods \code{changeMatrixRow}, \code{loadLPprob} and
+          \code{loadQobj} to class \code{optObj}
+    \item \pkg{cplexAPI} must be version 1.2.3 or higher, if used
+    \item added function \code{addSolver} in order to make additional solver
+          packages available
+    \item added argument \code{arrowlength} to function \code{readTSVmod}
+    \item added arguments \code{probType} and \code{loadPackage} to function
+          \code{checkDefaultMethod}
+    \item class \code{optsol_doublefluxdel} and class
+          \code{optsol_doublegenedel} are not available anymore, class
+          \code{optsol_fluxdel} and class \code{optsol_genedel} are used instead
+    \item added new method \code{mod_obj} to class \code{optsol\_fluxdel}, which
+          returns
+          \eqn{\mbox{\boldmath$c$\unboldmath}^{\mathrm{T}}\mbox{\boldmath$v$\unboldmath}}{c^T v}
+          with \eqn{\mbox{\boldmath$c$\unboldmath}}{c} being the vector of
+          objective coefficients in the model (objecto of class \code{modelorg})
+          and \eqn{\mbox{\boldmath$v$\unboldmath}}{v} being the flux
+          distribution as a result of the optimization. In contrast, method
+          \code{lp_obj} allways returns the value of the objective function
+          of the used algorithm after optimization.
+    \item added functions \code{addAlgorithm}, \code{checkAlgorithm} and
+          \code{getsybilenv}
+    \item added a new class \code{sysBiolAlg} including a general constructor
+          function \code{sysBiolAlg} and subclasses \code{sysBiolAlg_fba},
+          \code{sysBiolAlg_fv}, \code{sysBiolAlg_lmoma}, \code{sysBiolAlg_moma},
+          \code{sysBiolAlg_mtf} and \code{sysBiolAlg_room}. These classes
+          contain instances of class \code{optObj}, prepared for specific
+          algorithms like ROOM or MOMA
+    \item support for algorithms MOMA and ROOM in class \code{sysBiolAlg}
+    \item added method \code{optimizeProb} as a replacement for function
+          \code{simpleFBA}: unused argument \code{checkIds} is removed, new
+          arguments \code{gene} and \code{MoreArgs} were added.
+    \item added function \code{promptSysBiolAlg} which generates a skeletal
+          structure for new classes inhereting from \code{sysBiolAlg}
+    \item functions \code{prepProbObj} and \code{simpleFBA} are deprecated and
+          will be removed soon, use \code{sysBiolAlg} and \code{optimizeProb}
+          instead
+    \item methods \code{loadMatrix}, \code{loadProblemData},
+          \code{loadProblemDataLM} and \code{loadProblemDataMTF} are deprecated
+          and will be removed soon, use \code{loadLPprob} instead
+    \item class \code{optsol} makes now use of the package \pkg{lattice} to
+          plot histograms (use \code{histogram()} instead of \code{hist()})
+    \item updated package vignette
+  }
+}
+
 
 % ---------------------------------------------------------------------------- %
 \section{Changes in version 1.0.2 2012-04-20}{
@@ -113,12 +187,12 @@
     \item removed arguments \code{resolve} and \code{resolveParm} from
           \code{optimizer()}
 
-    \item removed \pkg{SyBiL} parameters \code{LP_ALT_METHOD} and \cr
+    \item removed \pkg{sybil} parameters \code{LP_ALT_METHOD} and \cr
           \code{SOLVER_ALT_CTRL_PARAM} from \code{SYBIL_SETTINGS()}
 
-    \item renamed \pkg{SyBiL} parameter \code{LP_SOLVER to SOLVER}
+    \item renamed \pkg{sybil} parameter \code{LP_SOLVER to SOLVER}
 
-    \item renamed \pkg{SyBiL} parameter \code{LP_METHOD to METHOD}
+    \item renamed \pkg{sybil} parameter \code{LP_METHOD to METHOD}
 
     \item moved methods \code{length} and \code{hist} from class
           \code{optsol_fluxdel} to class \code{optsol}
@@ -335,7 +409,7 @@
 \section{Changes in version 0.4.0 2011-03-01}{
   \itemize{
     \item SBML compatibility is moved to the package \pkg{sybilSBML}, making
-          \pkg{SyBiL} independend from rsbml. The new package \pkg{sybilSBML}
+          \pkg{sybil} independend from rsbml. The new package \pkg{sybilSBML}
           requires a working \pkg{rsbml} installation (available from
           \href{http://www.bioconductor.org/}{Bioconductor}).
 
@@ -359,7 +433,7 @@
 \section{Changes in version 0.3.5 2010-12-15}{
   \itemize{
     \item added argument \code{solverParm} in \code{fluxVar()}, argument
-          \code{...} is passed to \code{simpleFBA()} now
+          \code{\dots} is passed to \code{simpleFBA()} now
 
     \item cleaning of class \code{optObj}:
     \itemize{
@@ -641,8 +715,8 @@ simpleFBA(<model>, solver = "cplex",
           building the new problem out of those. That may cause a lot IO.}
       }
     \item new arguments to \code{optimizer()} [can be passed to
-          \code{optimizer()} by argument \code{...} in e.g. \code{oneGeneDel()}
-          or \code{doubleGeneDel()}]:
+          \code{optimizer()} by argument \code{\dots} in e.g.
+          \code{oneGeneDel()} or \code{doubleGeneDel()}]:
       \describe{
         \item{rebuildModel}{(default: \code{FALSE}) boolean. If set to
           \code{TRUE}, the problem object will be recreated for every

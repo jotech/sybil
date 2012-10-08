@@ -8,10 +8,15 @@
 % ???
 \alias{object}
 
-\title{Internal SyBiL Functions}
+% !!!!!!!!!!
+\alias{shrinkSMatrix}
+\alias{shrinkSMatrix,modelorg-method}
+
+
+\title{Internal sybil Functions}
 
 \description{
-  Internal SyBiL functions
+  Internal sybil functions
 }
 
 \details{

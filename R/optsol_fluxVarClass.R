@@ -6,20 +6,20 @@
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
 #  
-#  This file is part of SyBiL.
+#  This file is part of sybil.
 #
-#  SyBiL is free software: you can redistribute it and/or modify
+#  sybil is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
-#  SyBiL is distributed in the hope that it will be useful,
+#  sybil is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License
-#  along with SyBiL.  If not, see <http://www.gnu.org/licenses/>.
+#  along with sybil.  If not, see <http://www.gnu.org/licenses/>.
 
 
 # optsol_fluxVarClass
@@ -33,51 +33,8 @@ setClass("optsol_fluxVar",
          representation(
               react    = "reactId"    # reactions to be analyzed
          ),
-         contains = "optsol_simpleFBA"
+         contains = "optsol_optimizeProb"
 )
-
-
-#------------------------------------------------------------------------------#
-#                              user constructor                                #
-#------------------------------------------------------------------------------#
-
-optsol_fluxVar <- function(solver, method, nprob, lpdir, ncols, nrows, objf, fld, rc) {
-    if (missing(solver) ||
-        missing(method) ||
-        missing(nprob)  ||
-        missing(lpdir)  ||
-        missing(ncols)  ||
-        missing(nrows)  ||
-        missing(objf)   ||
-        missing(fld)    ||
-        missing(rc)
-       ) {
-        stop("Not enough arguments for creating an object of class optsol_fluxVar!")
-    }
-
-    if (fld == TRUE) {
-        fldist <- fluxDistribution(0, ncols, nprob)
-    }
-    else {
-        fldist <- fluxDistribution(NA)
-    }
-
-    new("optsol_fluxVar",
-        solver       = as.character(solver),
-        method       = as.character(method),
-        num_of_prob  = as.integer(nprob),
-        lp_num_cols  = as.integer(ncols),
-        lp_num_rows  = as.integer(nrows),
-        lp_obj       = numeric(nprob),
-        lp_ok        = integer(nprob),
-        lp_stat      = integer(nprob),
-        lp_dir       = as.character(lpdir),
-        obj_function = as.character(objf),
-        fluxdist     = fldist,
-        react        = rc
-       )
-
-}
 
 
 #------------------------------------------------------------------------------#
@@ -128,8 +85,18 @@ setMethod("plotRangeVar", signature(object = "optsol_fluxVar"),
 
 setMethod("minSol", signature(object = "optsol_fluxVar"),
           function(object, slot) {
-              odds     <- seq(1, num_of_prob(object), 2)
-
+              
+              np <- num_of_prob(object)
+              
+              if (np > 1) {
+                  ms <- 1 : floor(np/2)
+              }
+              else {
+                  stop("not enough optimization problems")
+              }
+              
+              #ms <- seq(1, num_of_prob(object), 2)
+              
               command  <- paste("is(",
                                 deparse(substitute(slot)),
                                 "(",
@@ -141,13 +108,13 @@ setMethod("minSol", signature(object = "optsol_fluxVar"),
                   command <- paste(deparse(substitute(slot)),
                                    "(",
                                    deparse(substitute(object)),
-                                   ")[odds]", sep = "")
+                                   ")[ms]", sep = "")
               }
               else {
                   command <- paste(deparse(substitute(slot)),
                                    "(",
                                    deparse(substitute(object)),
-                                   ")[,odds]", sep = "")
+                                   ")[,ms]", sep = "")
               }
               minimalSolutions <- eval(parse(text = command))
               return(minimalSolutions)
@@ -157,8 +124,18 @@ setMethod("minSol", signature(object = "optsol_fluxVar"),
 
 setMethod("maxSol", signature(object = "optsol_fluxVar"),
           function(object, slot) {
-              evans    <- seq(2, num_of_prob(object), 2)
 
+              np <- num_of_prob(object)
+              
+              if (np > 1) {
+                  ms <- ceiling((np/2+1) : np) 
+              }
+              else {
+                  stop("not enough optimization problems")
+              }
+
+              #ms <- seq(2, num_of_prob(object), 2)
+              
               command  <- paste("is(",
                                 deparse(substitute(slot)),
                                 "(",
@@ -170,13 +147,13 @@ setMethod("maxSol", signature(object = "optsol_fluxVar"),
                   command <- paste(deparse(substitute(slot)),
                                    "(",
                                    deparse(substitute(object)),
-                                   ")[evans]", sep = "")
+                                   ")[ms]", sep = "")
               }
               else {
                   command <- paste(deparse(substitute(slot)),
                                    "(",
                                    deparse(substitute(object)),
-                                   ")[,evans]", sep = "")
+                                   ")[,ms]", sep = "")
               }
               maximalSolutions <- eval(parse(text = command))
               return(maximalSolutions)
@@ -321,13 +298,15 @@ setMethod("plot", signature(x = "optsol_fluxVar", "missing"),
                   pchupper <- pch
               }
 
-              num_dots <- num_of_prob(x)/2
+              np <- num_of_prob(x)
+              num_dots <- np/2
               
               xdat <- rep(1:num_dots, 2)
-              minfl <- lp_obj(x)[c(seq(1, num_of_prob(x), 2))]
-              maxfl <- lp_obj(x)[c(seq(2, num_of_prob(x), 2))]
-             
-              
+              #minfl <- lp_obj(x)[c(seq(1, num_of_prob(x), 2))]
+              #maxfl <- lp_obj(x)[c(seq(2, num_of_prob(x), 2))]
+              minfl <- lp_obj(x)[1:(np/2)]
+              maxfl <- lp_obj(x)[(np/2+1):np]
+
               plot(xdat, c(minfl, maxfl), xlab = xlab, ylab = ylab, ylim = ylim,
                    col = c(collower, colupper),
                    pch = c(pchlower, pchupper), ...)

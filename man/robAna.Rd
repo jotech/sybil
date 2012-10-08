@@ -15,11 +15,7 @@
   robAna(model,
          ctrlreact,
          numP = 20,
-         lpdir = SYBIL_SETTINGS("OPT_DIRECTION"),
-         solver = SYBIL_SETTINGS("SOLVER"),
-         method = SYBIL_SETTINGS("METHOD"),
-         solverParm = SYBIL_SETTINGS("SOLVER_CTRL_PARM"),
-         fld = FALSE, verboseMode = 2, ...)
+         verboseMode = 2, fld = FALSE, ...)
 }
 
 \arguments{
@@ -33,26 +29,6 @@
   \item{numP}{
     The number of points to analyse.
   }
-  \item{lpdir}{
-    Character value, direction of optimisation.  Can be set to \code{"min"} or
-    \code{"max"}.\cr
-    Default: \code{SYBIL_SETTINGS("OPT_DIRECTION")}.
-  }
-  \item{solver}{
-    Single character value.  The solver to use.  See
-    \code{\link{SYBIL_SETTINGS}} for possible values.\cr
-    Default: \code{SYBIL_SETTINGS("SOLVER")}.
-  }
-  \item{method}{
-    Single character value.  The optimization algorithm to use.  Possible values
-    depend on the setting in \code{solver}.  See \code{\link{SYBIL_SETTINGS}}
-    for possible values.\cr
-    Default: \code{SYBIL_SETTINGS("METHOD")}.
-  }
-  \item{solverParm}{
-    A data frame containing parameters for the specified solver.\cr
-    Default: SYBIL_SETTINGS("SOLVER_CTRL_PARM").
-  }
   \item{fld}{
     Boolean.  Save the resulting flux distribution.\cr
     Default: \code{FALSE}
@@ -65,7 +41,7 @@
     Default: \code{2}.
   }
   \item{\dots}{
-    Further arguments passed to \code{\link{simpleFBA}}.
+    Further arguments passed to \code{\link[=sysBiolAlg_fba-class]{sysBiolAlg}}.
   }
 }
 
@@ -95,17 +71,18 @@
   by \eqn{n}. The parameter \eqn{c_k} is varied \code{numP} times in the range
   of \eqn{v_{j,\mathrm{min}}}{v_i,min} to \eqn{v_{j,\mathrm{max}}}{v_i,max}.
   The result of the optimization is returned as object of class
-  \code{\linkS4class{optsol_robAna}} containing the objective value for each
-  datapoint.
+  \code{\link[=optsol_robAna-class]{optsol_robAna}} containing the objective
+  value for each datapoint.
   
   The extreme points of the range for \code{ctrlreact} are calculated via flux
-  balance analysis (see also \code{\link{simpleFBA}}) with the objective
+  balance analysis (see also
+  \code{\link[=sysBiolAlg_fba-class]{sysBiolAlg_fba}}) with the objective
   function being minimization and maximization of the flux through
   \code{ctrlreact}.
 }
 
 \value{
-  An object of class \code{\linkS4class{optsol_robAna}}.
+  An object of class \code{\link[=optsol_robAna-class]{optsol_robAna}}.
 }
 
 \references{

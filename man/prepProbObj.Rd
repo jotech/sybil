@@ -7,7 +7,7 @@
 
 \description{
   The function \code{prepProbObj} creates an instance of class
-  \code{\linkS4class{optObj}} with respect to the specified
+  \code{\link[=optObj-class]{optObj}} with respect to the specified
   solver.
 }
 
@@ -63,7 +63,7 @@
   }
   \item{scaling}{
     Scaling options used to scale the constraint matrix. If set to NA, no
-    scaling will be performed (see \code{\linkS4class{optObj}}).\cr
+    scaling will be performed (see \code{\link[=optObj-class]{optObj}}).\cr
     Default: \code{FALSE}.
   }
   \item{solver}{
@@ -78,7 +78,7 @@
     Default: \code{SYBIL_SETTINGS("METHOD")}.
   }
   \item{lpdir}{
-    Character value, direction of optimisation.  Can be set to \code{"min"} or
+    Character value, direction of optimization.  Can be set to \code{"min"} or
     \code{"max"}.\cr
     Default: \code{SYBIL_SETTINGS("OPT_DIRECTION")}.
   }
@@ -90,7 +90,7 @@
 
 \details{
   The function \code{prepProbObj} creates an instance of class
-  \code{\linkS4class{optObj}} with respect to the specified
+  \code{\link[=optObj-class]{optObj}} with respect to the specified
   solver and desired algorithm. The object type (slot oobj) is
   determined by the argument solver. The properties of the
   problem itself are dependent on the specified algorithm
@@ -105,7 +105,7 @@
 }
 
 \value{
-  An object of class \code{\linkS4class{optObj}}, or FALSE.
+  An object of class \code{\link[=optObj-class]{optObj}}, or FALSE.
 }
 
 \references{
@@ -123,7 +123,7 @@
 
 \author{Gabriel Gelius-Dietrich}
 
-\seealso{\code{\linkS4class{optObj}}, \code{\link{optimizer}},
+\seealso{\code{\link[=optObj-class]{optObj}}, \code{\link{optimizer}},
          \code{\link{simpleFBA}} and \code{\link{SYBIL_SETTINGS}}.
 }
 

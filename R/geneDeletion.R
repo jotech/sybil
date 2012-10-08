@@ -6,20 +6,20 @@
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
 #  
-#  This file is part of SyBiL.
+#  This file is part of sybil.
 #
-#  SyBiL is free software: you can redistribute it and/or modify
+#  sybil is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
-#  SyBiL is distributed in the hope that it will be useful,
+#  sybil is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License
-#  along with SyBiL.  If not, see <http://www.gnu.org/licenses/>.
+#  along with sybil.  If not, see <http://www.gnu.org/licenses/>.
 
 
 ################################################
@@ -33,11 +33,7 @@
 # and doubleGeneDeletion() contained in the COBRA Toolbox.
 
 
-geneDeletion <- function(model, genes, combinations = 1,
-                         lpdir = SYBIL_SETTINGS("OPT_DIRECTION"),
-                         solver = SYBIL_SETTINGS("SOLVER"),
-                         method = SYBIL_SETTINGS("METHOD"),
-                         fld = FALSE, ...) {
+geneDeletion <- function(model, genes, combinations = 1, ...) {
 
     if (!is(model, "modelorg")) {
         stop("needs an object of class modelorg!")
@@ -83,24 +79,10 @@ geneDeletion <- function(model, genes, combinations = 1,
 #                               run optimization                               #
 #------------------------------------------------------------------------------#
 
-    # new object for the solution
-    optsol <- optsol_genedel(solver  = solver,
-                             nprob   = num_opt,
-                             lpdir   = lpdir,
-                             nrows   = met_num(model),
-                             ncols   = react_num(model),
-                             objf    = printObjFunc(model),
-                             fld     = fld,
-                             comb    = nrow(delGenes))
-
-    react_id(optsol) <- react_id(model)
-    allGenes(optsol) <- allGenes(model)
-    method(optsol)   <- method
-  
-    # indices of genes to delete
-    dels(optsol)[-1, ] <- t(delGenes)
-
-    optsol <- optimizer(model = model, optsol = optsol, ...)
+    optsol <- optimizer(model = model,
+                        delete = t(delGenes),
+                        geneFlag = TRUE,
+                        ...)
 
     return(optsol)
 

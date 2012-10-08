@@ -20,7 +20,8 @@
     An object of class \code{modelorg}.
   }
   \item{genes}{
-    A vector of character strings of gene id's used in \code{model}.
+    A vector of character strings of gene id's used in \code{model}, or an
+    integer vector with indices to gene id's in \code{\link{allGenes}(model)}.
   }
   \item{checkId}{
     Boolean. If set to \code{TRUE}, argument \code{genes} will be checked wether

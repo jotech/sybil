@@ -8,6 +8,14 @@
 \alias{checkStat,optsol-method}
 \alias{checkStat}
 
+\alias{algorithm,optsol-method}
+\alias{algorithm}
+\alias{algorithm<-,optsol-method}
+\alias{algorithm<-}
+\alias{fldind,optsol-method}
+\alias{fldind}
+\alias{fldind<-,optsol-method}
+\alias{fldind<-}
 \alias{fluxdist,optsol-method}
 \alias{fluxdist}
 \alias{fluxdist<-,optsol-method}
@@ -44,16 +52,16 @@
 \alias{method}
 \alias{method<-,optsol-method}
 \alias{method<-}
+\alias{mod_id,optsol-method}
+\alias{mod_id<-,optsol-method}
 \alias{nfluxes,optsol-method}
 \alias{nfluxes}
 \alias{num_of_prob,optsol-method}
 \alias{num_of_prob}
 \alias{num_of_prob<-,optsol-method}
 \alias{num_of_prob<-}
-\alias{obj_function,optsol-method}
-\alias{obj_function}
-\alias{obj_function<-,optsol-method}
-\alias{obj_function<-}
+\alias{obj_coef,optsol-method}
+\alias{obj_coef<-,optsol-method}
 \alias{react_id,optsol-method}
 \alias{react_id<-,optsol-method}
 \alias{show,optsol-method}
@@ -62,36 +70,36 @@
 \alias{solver<-,optsol-method}
 \alias{solver<-}
 \alias{length,optsol-method}
-\alias{hist,optsol-method}
+\alias{histogram,optsol-method}
 
 \encoding{utf8}
 
 \title{Class optsol}
 
 \description{
-  Structure of the class \code{optsol}. This class is extended by
-  other classes and will not be useed as is. Objects of class
-  \code{optsol} are used as "base class".
+  The class \code{optsol} provides data structures to store and access the
+  results of optimizations. This class is extended by other classes and will
+  not be useed as is. The representation of class \code{optsol} is used as
+  superclass.
 }
 
 \section{Objects from the Class}{
-  Objects can be created by calls of the function \code{optsol}:
-
-  \code{test <- optsol(solver)}.
-  \describe{
-    \item{\code{solver}:}{Object of class \code{"character"}
-      indicating the used solver.
-    }
-  }
+  A virtual Class: No objects may be created from it.
 }
 
 \section{Slots}{
   \describe{
+    \item{\code{mod_id}:}{Object of class \code{"character"}
+      containing the model id of the used model.
+    }
     \item{\code{solver}:}{Object of class \code{"character"}
       indicating the used solver.
     }
     \item{\code{method}:}{Object of class \code{"character"}
       indicating the used method.
+    }
+    \item{\code{algorithm}:}{Object of class \code{"character"}
+      containing the name of the algorithm used for optimizations.
     }
     \item{\code{num_of_prob}:}{Object of class \code{"integer"}
       indicating the number of optimization problems.
@@ -103,7 +111,12 @@
       indicating the number of rows.
     }
     \item{\code{lp_obj}:}{Object of class \code{"numeric"}
-      containing the values of the objective function.
+      containing the optimal values of the objective function after
+      optimization. If no flux distribution is available, slot \code{lp_obj}
+      contains the cross-product of the objective coefficients in slot
+      \code{obj_coef} and the part of the flux distribution in slot
+      \code{fluxdist} containing the values representing fluxes in the entire
+      metabolic network (slot \code{fldind}).
     }
     \item{\code{lp_ok}:}{Object of class \code{"integer"}
       containing the exit code of the optimization.
@@ -114,8 +127,13 @@
     \item{\code{lp_dir}:}{Object of class \code{"character"}
       indicating the direction of optimization.
     }
-    \item{\code{obj_function}:}{Object of class \code{"character"}
-      containing the name of the objective function.
+    \item{\code{obj_coef}:}{Object of class \code{"numeric"}
+      containing the objective coefficients of the used model.
+    }
+    \item{\code{fldind}:}{Object of class \code{"integer"}
+      pointers to columns (variables) representing a flux (reaction) in the
+      original network. The variable \code{fldind[i]} in the problem object
+      represents reaction \code{i} in the original network. 
     }
     \item{\code{fluxdist}:}{Object of class \code{"fluxDistribution"}
       containing the solutons flux distributions.
@@ -125,14 +143,20 @@
 
 \section{Methods}{
   \describe{
-    \item{\code{allGenes<-}:}{\code{signature(object = "optsol")}:
-      sets the \code{allGenes} slot.
+    \item{\code{algorithm<-}:}{\code{signature(object = "optsol")}:
+      sets the \code{algorithm} slot.
     }
-    \item{\code{allGenes}:}{\code{signature(object = "optsol")}:
-      gets the \code{allGenes} slot.
+    \item{\code{algorithm}:}{\code{signature(object = "optsol")}:
+      gets the \code{algorithm} slot.
     }
     \item{\code{checkStat}:}{\code{signature(object = "optsol")}:
       returns the indices of problems with a non optimal solution status.
+    }
+    \item{\code{fldind<-}:}{\code{signature(object = "optsol")}:
+      sets the \code{fldind} slot.
+    }
+    \item{\code{fldind}:}{\code{signature(object = "optsol")}:
+      gets the \code{fldind} slot.
     }
     \item{\code{fluxdist<-}:}{\code{signature(object = "optsol")}:
       sets the \code{fluxdist} slot.
@@ -145,6 +169,13 @@
     }
     \item{\code{fluxes}:}{\code{signature(object = "optsol")}:
       gets the \code{fluxes} slot of slot \code{fluxdist}.
+    }
+    \item{\code{histogram}:}{
+      \code{signature(x = "optsol")}: plots a histogram of the
+      values of the objective function in optimal state.
+    }
+    \item{\code{length}:}{\code{signature(object = "optsol")}:
+      returns the number of optimizations.
     }
     \item{\code{lp_dir<-}:}{\code{signature(object = "optsol")}:
       sets the \code{lp_dir} slot.
@@ -188,6 +219,12 @@
     \item{\code{method}:}{\code{signature(object = "optsol")}:
       gets the \code{method} slot.
     }
+    \item{\code{mod_id<-}:}{\code{signature(object = "optsol")}:
+      sets the \code{mod_id} slot.
+    }
+    \item{\code{mod_id}:}{\code{signature(object = "optsol")}:
+      gets the \code{mod_id} slot.
+    }
     \item{\code{nfluxes}:}{\code{signature(object = "optsol")}:
       gets the number of flux distributions.
     }
@@ -197,11 +234,11 @@
     \item{\code{num_of_prob}:}{\code{signature(object = "optsol")}:
       gets the \code{num_of_prob} slot.
     }
-    \item{\code{obj_function<-}:}{\code{signature(object = "optsol")}:
-      sets the \code{obj_function} slot.
+    \item{\code{obj_coef<-}:}{\code{signature(object = "optsol")}:
+      sets the \code{obj_coef} slot.
     }
-    \item{\code{obj_function}:}{\code{signature(object = "optsol")}:
-      gets the \code{obj_function} slot.
+    \item{\code{obj_coef}:}{\code{signature(object = "optsol")}:
+      gets the \code{obj_coef} slot.
     }
     \item{\code{react_id<-}:}{\code{signature(object = "optsol")}:
       sets the \code{react_id} slot.
@@ -218,13 +255,6 @@
     \item{\code{solver}:}{\code{signature(object = "optsol")}:
       gets the \code{solver} slot.
     }
-    \item{\code{length}:}{\code{signature(object = "optsol")}:
-      returns the number of optimizations.
-    }
-    \item{\code{hist}:}{
-      \code{signature(x = "optsol")}: plots a histogram of the
-      values of the objective function in optimal state.
-    }
   }
 }
 
@@ -232,11 +262,9 @@
 
 \seealso{
   \code{\link{checkOptSol}},
-  \code{\linkS4class{optsol_simpleFBA}}
+  \code{\linkS4class{optsol_optimizeProb}}
   \code{\linkS4class{optsol_fluxdel}},
   \code{\linkS4class{optsol_genedel}},
-  \code{\linkS4class{optsol_doublegenedel}},
-  \code{\linkS4class{optsol_doublefluxdel}},
   \code{\linkS4class{optsol_blockedReact}},
   \code{\linkS4class{optsol_robAna}} and
   \code{\linkS4class{optsol_fluxVar}}

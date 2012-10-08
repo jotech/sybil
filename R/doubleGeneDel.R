@@ -6,20 +6,20 @@
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
 #  
-#  This file is part of SyBiL.
+#  This file is part of sybil.
 #
-#  SyBiL is free software: you can redistribute it and/or modify
+#  sybil is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
-#  SyBiL is distributed in the hope that it will be useful,
+#  sybil is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License
-#  along with SyBiL.  If not, see <http://www.gnu.org/licenses/>.
+#  along with sybil.  If not, see <http://www.gnu.org/licenses/>.
 
 
 ################################################
@@ -33,11 +33,8 @@
 # doubleGeneDeletion() contained in the COBRA Toolbox.
 
 
-doubleGeneDel <- function(model, geneList1, geneList2, allComb = FALSE,
-                          lpdir = SYBIL_SETTINGS("OPT_DIRECTION"),
-                          solver = SYBIL_SETTINGS("SOLVER"),
-                          method = SYBIL_SETTINGS("METHOD"),
-                          fld = FALSE, exLethal = TRUE,
+doubleGeneDel <- function(model, geneList1, geneList2,
+                          allComb = FALSE, exLethal = TRUE,
                           tol = SYBIL_SETTINGS("TOLERANCE"), ...) {
 
     if (!is(model, "modelorg")) {
@@ -96,24 +93,26 @@ doubleGeneDel <- function(model, geneList1, geneList2, allComb = FALSE,
     
         # all different genes from list1 and list2
         unGenes <- sort(unique(c(geneList1, geneList2)))
-        
-        unSol <- oneGeneDel(model,
-                            geneList = unGenes,
-                            lpdir = lpdir,
-                            solver = solver,
-                            method = method,
-                            fld = FALSE, ...
-                           )
 
+        ca <- match.call()
+        if ("solver" %in% names(ca)) {
+            slv <- as.character(ca["solver"])
+        }
+        else {
+            slv <- SYBIL_SETTINGS("SOLVER")
+        }
 
-        grRatio <- lp_obj(unSol)[-1]/lp_obj(unSol)[1]
-    
+        wtobj <- optimizeProb(model, alg = "fba", solver = slv, lpdir = "max")
+
+        unSol <- oneGeneDel(model, geneList = unGenes, solver = slv,
+                            lpdir = "max", fld = "none", alg = "fba")
+
         # solution id of lethal genes
-        letid <- which(grRatio < tol)
+        letid <- lethal(unSol, wtobj$obj)
 
         # check wether some of the 'essential' genes result in
         # an unsuccessfull solution
-        statNok <- checkStat(unSol[letid+1])
+        statNok <- checkStat(unSol[letid])
 
         lethal <- letid
         #lethal <- letid[-statNok]
@@ -160,11 +159,14 @@ doubleGeneDel <- function(model, geneList1, geneList2, allComb = FALSE,
 
     if (isTRUE(allComb)) {
   
-        # Compute boolean matrix with TRUE in the upper triangonal (the maximum number of comparisons)
-        tmpMAT <- upper.tri(matrix(nrow = num_genes, ncol = num_genes), diag = FALSE)
+        # Compute boolean matrix with TRUE in the upper triangonal
+        # (the maximum number of comparisons)
+        tmpMAT <- upper.tri(matrix(nrow = num_genes,
+                                   ncol = num_genes), diag = FALSE)
 
-        # The next step is, to compute the differences between the two fields. If an element of react1 is
-        # not in react2, we have to set the corresponding row to TRUE and vice versa.
+        # The next step is, to compute the differences between the two fields.
+        # If an element of react1 is not in react2, we have to set the
+        # corresponding row to TRUE and vice versa.
         tmpDIFF <- setdiff(geneList2, geneList1)
         #print(tmpDIFF)
     
@@ -215,39 +217,13 @@ doubleGeneDel <- function(model, geneList1, geneList2, allComb = FALSE,
 #                               run optimization                               #
 #------------------------------------------------------------------------------#
   
-    # new object for the solution
-    optsol <- optsol_doublegenedel(solver  = solver,
-                                   nprob   = num_opt,
-                                   lpdir   = lpdir,
-                                   nrows   = met_num(model),
-                                   ncols   = react_num(model),
-                                   delrows = nrow(tmpMAT),
-                                   delcols = ncol(tmpMAT),
-                                   objf    = printObjFunc(model),
-                                   fld     = fld
-                                  )
-
-
     deletions <- which(tmpMAT == TRUE, arr.ind = TRUE)
-
-    react_id(optsol) <- react_id(model)
-    allGenes(optsol) <- allGenes(model)
-    method(optsol) <- method
-  
-    # indices of genes to delete
-    dels(optsol)[-1,] <- cbind(geneList1[deletions[,"row"]],
-                               geneList2[deletions[,"col"]])
     
-    #print(geneList1[deletions[,"row"]])
-    #print(geneList2[deletions[,"col"]])
-    #print(geneList11)
-    #print(geneList22)
-    
-    delmat(optsol) <- tmpMAT
-
-    lethal(optsol) <- lethalGeneIds
-
-    optsol <- optimizer(model = model, optsol = optsol, ...)
+    optsol <- optimizer(model = model,
+                        delete = cbind(geneList1[deletions[,"row"]],
+                                       geneList2[deletions[,"col"]]),
+                        geneFlag = TRUE,
+                        ...)
 
     return(optsol)
 

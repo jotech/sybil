@@ -8,7 +8,7 @@
 \docType{package}
 
 \title{
-  SyBiL -- Systems Biology Library
+  sybil -- Efficient Constrained Based Modelling in R
 }
 
 \description{
@@ -19,7 +19,7 @@
 
 \details{
 
-  The package SyBiL is designed to read csv files. This is done by
+  The package sybil is designed to read csv files. This is done by
   the function \code{\link{readTSVmod}}. This function returns
   an object of the class \code{\linkS4class{modelorg}}.
 
@@ -30,14 +30,14 @@ model <- readTSVmod(prefix = "Ec_core",
                     fpath = mpath, quote = "\"")
   }
   Perform flux balance analysis (FBA):\cr
-  \code{ec_f <- simpleFBA(model)}
+  \code{ec_f <- optimizeProb(model)}
 
   Perform single gene deletion analysis:\cr
   \code{ec_g <- oneGeneDel(model)}
 
   Plot the values of the objective function after optimization in a
-  histogramm:\cr
-  \code{hist(ec_g)}
+  histogram:\cr
+  \code{histogram(ec_g)}
 
   Perform flux variability analysis:\cr
   \code{ec_v <- fluxVar(model)}
@@ -81,7 +81,7 @@ model <- readTSVmod(prefix = "Ec_core",
 \examples{
   data(Ec_core)
   Ec_ofd <- oneGeneDel(Ec_core)
-  hist(Ec_ofd)
+  histogram(Ec_ofd)
 }
 
 \keyword{package}

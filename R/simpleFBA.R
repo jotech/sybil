@@ -6,20 +6,20 @@
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
 #
-#  This file is part of SyBiL.
+#  This file is part of sybil.
 #
-#  SyBiL is free software: you can redistribute it and/or modify
+#  sybil is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
-#  SyBiL is distributed in the hope that it will be useful,
+#  sybil is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License
-#  along with SyBiL.  If not, see <http://www.gnu.org/licenses/>.
+#  along with sybil.  If not, see <http://www.gnu.org/licenses/>.
 
 
 # ---------------------------------------------------------------------------- #
@@ -34,6 +34,7 @@ simpleFBA <- function(model,
                       react = NA,
                       lb = NA,
                       ub = NA,
+                      gene = NA,
                       lpdir = SYBIL_SETTINGS("OPT_DIRECTION"),
                       minTotalFlux = FALSE,
                       minDist = FALSE,
@@ -42,13 +43,20 @@ simpleFBA <- function(model,
                       method = SYBIL_SETTINGS("METHOD"),
                       fld = FALSE,
                       retOptSol = FALSE,
-                      checkIds = TRUE,
                       prCmd = NA, poCmd = NA, prCil = NA, poCil = NA,
                       ...
                      ) {
 
+    .Deprecated("optimizeProb")
+
     if ((!is(model, "modelorg")) && (!is(model, "optObj"))) {
         stop("needs an object of class modelorg or optObj!")
+    }
+
+    if ( (is(model, "modelorg")) && (!any(is.na(gene))) ) {
+        react <- geneDel(model, gene, checkId = TRUE)
+        lb <- rep(lb[1], length(react))
+        ub <- rep(ub[1], length(react))
     }
 
     # check the argument react
@@ -158,7 +166,6 @@ simpleFBA <- function(model,
 
             # change bounds of fluxes in react
             check <- changeColsBnds(lpmod, react, lb, ub)
-            #model <- changeBounds(model, react, lb, ub, checkIds = checkIds)
         }
 
         # do some kind of preprocessing
@@ -168,7 +175,7 @@ simpleFBA <- function(model,
 
         # optimization
         lp_ok     <- solveLp(lpmod)
-        #if (solver == "cplex") {
+        #if (solver == "cplexAPI") {
         #    a <- getdblQualCPLEX(lpmod@oobj$env, lpmod@oobj$lp, CPX_KAPPA)
         #    print(a)
         #}
@@ -258,7 +265,6 @@ simpleFBA <- function(model,
 
             # change bounds of fluxes in react
             check <- changeColsBnds(lpmod, react, lb, ub)
-            #model <- changeBounds(model, react, lb, ub, checkIds = checkIds)
         }
 
         # do some kind of preprocessing
@@ -350,7 +356,6 @@ simpleFBA <- function(model,
 
             # change bounds of fluxes in react
             check <- changeColsBnds(lpmod, react, lb, ub)
-            #model <- changeBounds(model, react, lb, ub, checkIds = checkIds)
         }
 
         # do some kind of preprocessing
@@ -396,24 +401,43 @@ simpleFBA <- function(model,
 
     if (isTRUE(retOptSol)) {
 
-        # solution object
-        optsol <- optsol_simpleFBA(solver = solver,
-                                   nprob  = 1,
-                                   lpdir  = lpdir,
-                                   ncols  = react_num(model),
-                                   nrows  = met_num(model),
-                                   objf   = printObjFunc(model),
-                                   fld    = fld
-                                  )
+            # solution object
+            optsol <- new("optsol_optimizeProb",
+                          mod_id       = mod_id(model),
+                          solver       = solver,
+                          method       = method,
+                          algorithm    = "",
+                          num_of_prob  = 1L,
+                          lp_dir       = lpdir,
+                          lp_num_rows  = met_num(model),
+                          lp_num_cols  = react_num(model),
+                          lp_ok        = as.integer(lp_ok),
+                          lp_obj       = lp_obj,
+                          lp_stat      = as.integer(lp_stat),
+                          obj_coef     = obj_coef(model),
+                          fldind       = as.integer(NA),
+                          fluxdist     = fluxDistribution(fluxes = lp_fluxes,
+                                                      nrow = length(lp_fluxes),
+                                                      ncol = 1L))
 
-        lp_ok(optsol)   <- lp_ok
-        lp_obj(optsol)  <- lp_obj
-        lp_stat(optsol) <- lp_stat
-        if (!all(is.na(lp_fluxes))) {
-            fluxes(optsol)[,1] <- lp_fluxes
-        }
-
-        method(optsol) <- method
+#        # solution object
+#        optsol <- optsol_simpleFBA(solver = solver,
+#                                   nprob  = 1,
+#                                   lpdir  = lpdir,
+#                                   ncols  = react_num(model),
+#                                   nrows  = met_num(model),
+#                                   objf   = printObjFunc(model),
+#                                   fld    = fld
+#                                  )
+#
+#        lp_ok(optsol)   <- lp_ok
+#        lp_obj(optsol)  <- lp_obj
+#        lp_stat(optsol) <- lp_stat
+#        if (!all(is.na(lp_fluxes))) {
+#            fluxes(optsol)[,1] <- lp_fluxes
+#        }
+#
+#        method(optsol) <- method
 
         if (is(preP, "ppProc")) {
             preProc(optsol) <- preP
