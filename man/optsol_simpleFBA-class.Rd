@@ -1,42 +1,63 @@
-\name{optsol_optimizeProb-class}
-
-\Rdversion{1.1}
-\encoding{utf8}
+\name{optsol_simpleFBA-class}
 
 \docType{class}
 
-\alias{optsol_optimizeProb-class}
-\alias{postProc,optsol_optimizeProb-method}
-\alias{postProc<-,optsol_optimizeProb-method}
-\alias{preProc,optsol_optimizeProb-method}
-\alias{preProc<-,optsol_optimizeProb-method}
-\alias{preProc}
-\alias{preProc<-}
-\alias{postProc}
-\alias{postProc<-}
+\alias{optsol_simpleFBA-class}
+\alias{optsol_simpleFBA}
+\alias{preProc,optsol_simpleFBA-method}
+\alias{preProc<-,optsol_simpleFBA-method}
+\alias{postProc,optsol_simpleFBA-method}
+\alias{postProc<-,optsol_simpleFBA-method}
 
-\title{Class \code{"optsol_optimizeProb"}}
+\encoding{utf8}
+
+\title{Class \code{"optsol_simpleFBA"}}
 
 \description{
-  Structure of the class \code{"optsol_optimizeProb"}. Objects of that class are
-  returned by the function \code{\link{optimizeProb}} with the argument
-  \code{retOptSol} set to \code{TRUE}.
+  Structure of the class \code{"optsol_simpleFBA"}. Objects of that class are
+  returned by the function \code{\link{simpleFBA}} with the argument
+  \code{retOptSol} set to \code{TRUE}. The class \code{"optsol_simpleFBA"} is
+  deprecated, use class \code{"optsol_optimizeProb"} instead.
 }
-
+ 
 \section{Objects from the Class}{
-  Objects can be created by calls of the form
-  \code{new("optsol_optimizeProb", ...)}.
+  Objects can be created by calls of the function \code{optsol_simpleFBA}:
+
+  \code{test <- optsol_simpleFBA(solver, nprob, lpdir, ncols, nrows, objf, fld)}.
+  \describe{
+    \item{\code{solver}:}{Object of class \code{"character"}
+      indicating the used solver.
+    }
+    \item{\code{nprob}:}{Object of class \code{"numeric"}
+      number of problems to solve.
+    }
+    \item{\code{lpdir}:}{Object of class \code{"character"}
+      direction of optimization.
+    }
+    \item{\code{ncols}:}{Object of class \code{"numeric"}
+      number of variables in the model.
+    }
+    \item{\code{nrows}:}{Object of class \code{"numeric"}
+      number of constraints in the model.
+    }
+    \item{\code{objf}:}{Object of class \code{"character"}
+      a character string describing the objective function.
+    }
+    \item{\code{fld}:}{Object of class \code{"logical"}
+      logical, if \code{TRUE}, memory for flux distributions will be allocated.
+    }
+  }
 }
 
 \section{Slots}{
   \describe{
     \item{\code{preProc}:}{Object of class \code{"ppProc"}
       containing the results of pre-processing.
-      See also \code{\link{optimizeProb}}.
+      See also \code{\link{simpleFBA}}.
     }
     \item{\code{postProc}:}{Object of class \code{"ppProc"}
       containing the results of post-processing.
-      See also \code{\link{optimizeProb}}.
+      See also \code{\link{simpleFBA}}.
     }
     \item{\code{mod_id}:}{Object of class \code{"character"}
       containing the model id of the used model.
@@ -60,7 +81,12 @@
       indicating the number of rows.
     }
     \item{\code{lp_obj}:}{Object of class \code{"numeric"}
-      containing the values of the objective function.
+      containing the optimal values of the objective function after
+      optimization. If no flux distribution is available, slot \code{lp_obj}
+      contains the cross-product of the objective coefficients in slot
+      \code{obj_coef} and the part of the flux distribution in slot
+      \code{fluxdist} containing the values representing fluxes in the entire
+      metabolic network (slot \code{fldind}).
     }
     \item{\code{lp_ok}:}{Object of class \code{"integer"}
       containing the exit code of the optimization.
@@ -85,25 +111,26 @@
     }
   }
 }
-\section{Extends}{
-  Class \code{"\linkS4class{optsol}"}, directly.
-}
 
 \section{Methods}{
   \describe{
-    \item{\code{preProc}:}{\code{signature(object = "optsol_optimizeProb")}:
+    \item{\code{preProc}:}{\code{signature(object = "optsol_simpleFBA")}:
       gets the \code{preProc} slot.
     }
-    \item{\code{preProc<-}:}{\code{signature(object = "optsol_optimizeProb")}:
+    \item{\code{preProc<-}:}{\code{signature(object = "optsol_simpleFBA")}:
       sets the \code{preProc} slot.
     }
-    \item{\code{postProc}:}{\code{signature(object = "optsol_optimizeProb")}:
+    \item{\code{postProc}:}{\code{signature(object = "optsol_simpleFBA")}:
       gets the \code{postProc} slot.
     }
-    \item{\code{postProc<-}:}{\code{signature(object = "optsol_optimizeProb")}:
+    \item{\code{postProc<-}:}{\code{signature(object = "optsol_simpleFBA")}:
       sets the \code{postProc} slot.
     }
   }
+}
+
+\section{Extends}{
+  Class \code{"\linkS4class{optsol}"}, directly.
 }
 
 \author{Gabriel Gelius-Dietrich}
@@ -111,13 +138,12 @@
 \seealso{
   \code{\link{checkOptSol}},
   \code{\linkS4class{optsol}},
-  \code{\linkS4class{optsol_genedel}} and
+  \code{\linkS4class{optsol_genedel}}, and
   \code{\linkS4class{optsol_fluxdel}}
 }
 
-
 \examples{
-  showClass("optsol_optimizeProb")
+  showClass("optsol_simpleFBA")
 }
 
 \keyword{classes}

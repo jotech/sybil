@@ -1,8 +1,8 @@
 Package: sybil
 Type: Package
 Title: sybil - Efficient Constrained Based Modelling in R
-Version: 1.1.1
-Date: 2012-10-08
+Version: 1.1.2
+Date: 2012-10-10
 Authors@R: c(person("Gabriel", "Gelius-Dietrich", role = c("aut",
         "cre"), email = "geliudie@uni-duesseldorf.de"), person(c("C.",
         "Jonathan"), "Fritzemeier", role = "ctb"), person("Rajen",
@@ -26,10 +26,11 @@ Collate: generics.R validmodelorg.R validoptsol.R validreactId.R
         optObj_cplexAPIClass.R optObj_glpkAPIClass.R
         optObj_lpSolveAPIClass.R sybilErrorClass.R ppProcClass.R
         fluxDistributionClass.R reactIdClass.R optsolClass.R
-        optsol_blockedReactClass.R optsol_optimizeProbClass.R
-        optsol_fluxVarClass.R optsol_fluxdelClass.R
-        optsol_robAnaClass.R optsol_genedelClass.R checksolClass.R
-        sysBiolAlgClass.R sysBiolAlg_fbaClass.R sysBiolAlg_fvClass.R
+        optsol_simpleFBAClass.R optsol_blockedReactClass.R
+        optsol_optimizeProbClass.R optsol_fluxVarClass.R
+        optsol_fluxdelClass.R optsol_robAnaClass.R
+        optsol_genedelClass.R checksolClass.R sysBiolAlgClass.R
+        sysBiolAlg_fbaClass.R sysBiolAlg_fvClass.R
         sysBiolAlg_lmomaClass.R sysBiolAlg_momaClass.R
         sysBiolAlg_mtfClass.R sysBiolAlg_roomClass.R sybilLogClass.R
         addAlgorithm.R addExchReact.R addReact.R addSolver.R
@@ -48,10 +49,10 @@ Collate: generics.R validmodelorg.R validoptsol.R validreactId.R
         printObjFunc.R progress.R promptSysBiolAlg.R readTEXTmod.R
         readTSVmod.R reassignFwBwMatch.R rmReact.R robAna.R settings.R
         simpleFBA.R singletonMetabolite.R sybilStack.R ypd.R zzz.R
-Packaged: 2012-10-08 14:08:28 UTC; gabriel
+Packaged: 2012-10-10 09:25:46 UTC; gabriel
 Author: Gabriel Gelius-Dietrich [aut, cre], C. Jonathan Fritzemeier
         [ctb], Rajen Piernikarczyk [ctb], Marc Andre Daxer [ctb],
         Benjamin Braasch [ctb], Abdelmoneim Desouki [ctb]
 Maintainer: Gabriel Gelius-Dietrich <geliudie@uni-duesseldorf.de>
 Repository: CRAN
-Date/Publication: 2012-10-08 14:34:24
+Date/Publication: 2012-10-10 10:50:43

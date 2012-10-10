@@ -8,12 +8,12 @@
 #  
 #  This file is part of sybil.
 #
-#  sybil is free software: you can redistribute it and/or modify
+#  Sybil is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
-#  sybil is distributed in the hope that it will be useful,
+#  Sybil is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
@@ -91,21 +91,6 @@ setReplaceMethod("dels", signature = (object = "optsol_fluxdel"),
 #------------------------------------------------------------------------------#
 #                               other methods                                  #
 #------------------------------------------------------------------------------#
-
-# mod_obj
-setMethod("mod_obj", signature(object = "optsol_fluxdel"),
-          function(object) {
-              if (any(is.na(fldind(object)))) {
-                  val <- lp_obj(object)
-              }
-              else {
-                  val <- crossprod(obj_coef(object),
-                                   fluxes(object)[fldind(object),])[1L, ]
-              }
-              return(val)
-          }
-)
-
 
 # lethal
 setMethod("lethal", signature(object = "optsol_fluxdel"),

@@ -84,7 +84,8 @@
       indicating the direction of optimization.
     }
     \item{\code{obj_coef}:}{Object of class \code{"numeric"}
-      containing the objective coefficients of the used model.
+      containing the objective coefficients of the used model. These are not
+      necessarily the objective coefficients of the used algorithm. 
     }
     \item{\code{fldind}:}{Object of class \code{"integer"}
       pointers to columns (variables) representing a flux (reaction) in the

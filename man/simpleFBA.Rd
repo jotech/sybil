@@ -335,7 +335,7 @@
 \dontrun{
 ## The examples here require the package glpkAPI to be
 ## installed. If that package is not available, you have to set
-## the argument 'solver' (the default is: solver = "glpk").
+## the argument 'solver' (the default is: solver = "glpkAPI").
 
 ## load the example data set
 data(Ec_core)
@@ -360,10 +360,10 @@ simpleFBA(Ec_core, poCmd = list(c("writeProb", "LP_PROB",
                                   "'lp'", "'Ec_core.lp'"))
 )
 
-## do FBA, use "cplex" as lp solver. Get all upper bounds before
+## do FBA, use "cplexAPI" as lp solver. Get all upper bounds before
 ## solving the problem. After solving, perform a sensitivity
 ## analysis and retrieve the reduced costs
-simpleFBA(Ec_core, solver = "cplex",
+simpleFBA(Ec_core, solver = "cplexAPI",
                prCmd = list(c("getColsUppBnds", "LP_PROB", "1:77")),
                poCmd = list("sensitivityAnalysis",
                             c("getDjCPLEX",

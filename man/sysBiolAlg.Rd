@@ -69,7 +69,7 @@
 \dontrun{
 ## The examples here require the package glpkAPI to be
 ## installed. If that package is not available, you have to set
-## the argument 'solver' (the default is: solver = "glpk").
+## the argument 'solver' (the default is: solver = SYBIL_SETTINGS("SOLVER")).
 
 data(Ec_core)
 

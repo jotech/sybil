@@ -8,12 +8,12 @@
 #
 #  This file is part of sybil.
 #
-#  sybil is free software: you can redistribute it and/or modify
+#  Sybil is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
-#  sybil is distributed in the hope that it will be useful,
+#  Sybil is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
@@ -41,7 +41,7 @@ setClass("optsol",
         lp_obj       = "numeric",          # solution of the objective function
         lp_ok        = "integer",          # exit status of the lp solver
         lp_stat      = "integer",          # solution status
-        lp_dir       = "character",        # direction
+        lp_dir       = "character",        # direction of optimization(s)
         obj_coef     = "numeric",          # objective coefficients in model
         fldind       = "integer",          # indices of fluxes
         fluxdist     = "fluxDistribution"  # the flux distribution
@@ -296,6 +296,22 @@ setReplaceMethod("fluxes", signature = (object = "optsol"),
 #------------------------------------------------------------------------------#
 #                               other methods                                  #
 #------------------------------------------------------------------------------#
+
+# mod_obj
+setMethod("mod_obj", signature(object = "optsol"),
+          function(object) {
+              if ( (is.na(fldind(object)[1L])) ||
+                   (is.na(fluxes(object)[1L, 1L])) ) {
+                  val <- lp_obj(object)
+              }
+              else {
+                  val <- crossprod(obj_coef(object),
+                                   fluxes(object)[fldind(object), ])[1L, ]
+              }
+              return(val)
+          }
+)
+
 
 # number of fluxes
 setMethod("nfluxes", signature(object = "optsol"),

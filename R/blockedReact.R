@@ -8,12 +8,12 @@
 #  
 #  This file is part of sybil.
 #
-#  sybil is free software: you can redistribute it and/or modify
+#  Sybil is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
-#  sybil is distributed in the hope that it will be useful,
+#  Sybil is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
@@ -78,6 +78,7 @@ blockedReact <- function(model,
         }
     }
     
+    obj_mod <- obj_coef(model)
     obj_coef(model) <- as.integer(rep(0, react_num(model)))
 
 	lpmod <- sysBiolAlg(model, algorithm = "fv", tol = tol, ...)
@@ -196,7 +197,7 @@ blockedReact <- function(model,
             lp_ok        = as.integer(ok),
             lp_stat      = as.integer(stat),
             lp_dir       = getObjDir(problem(lpmod)),
-            obj_coef     = obj_coef(model),
+            obj_coef     = obj_mod,
             fldind       = fldind(lpmod),
             fluxdist     = fluxDistribution(flux),
     

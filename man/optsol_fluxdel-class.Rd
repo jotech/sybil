@@ -22,8 +22,6 @@
 \alias{deleted}
 \alias{lethal,optsol_fluxdel-method}
 \alias{lethal}
-\alias{mod_obj,optsol_fluxdel-method}
-\alias{mod_obj}
 \alias{[,optsol_fluxdel,ANY,ANY,ANY-method}
 
 \encoding{utf8}
@@ -87,7 +85,8 @@
       indicating the direction of optimization.
     }
     \item{\code{obj_coef}:}{Object of class \code{"numeric"}
-      containing the objective coefficients of the used model.
+      containing the objective coefficients of the used model. These are not
+      necessarily the objective coefficients of the used algorithm. 
     }
     \item{\code{fldind}:}{Object of class \code{"integer"}
       pointers to columns (variables) representing a flux (reaction) in the
@@ -149,15 +148,6 @@
 %       indices in \code{slotN} into corresponding gene or reaction id's. Possible
 %       values for \code{slotN} are: \code{"dels"}.
 %     }
-    \item{\code{mod_obj}:}{\code{signature(object = "optsol_fluxdel")}:
-      returns allways the cross-product of the objective coefficients in slot
-      \code{obj_coef} and the part of the flux distribution in slot
-      \code{fluxdist} containing the values representing fluxes in the entire
-      metabolic network (slot \code{fldind}). If slot \code{obj_coef} is
-      \code{NA}, the content of slot \code{lp_obj} is returned.
-       In contrast, method \code{lp_obj} allways returns the value of the
-       objective function of the used algorithm after optimization.
-    }
     \item{\code{lethal}:}{
       \code{signature(object = "optsol_fluxdel")}(\code{wt, tol}): returns
       a logical vector of length \code{num_of_prob(object)}. Argument \code{wt}

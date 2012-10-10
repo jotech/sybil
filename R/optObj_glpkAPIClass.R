@@ -8,12 +8,12 @@
 #  
 #  This file is part of sybil.
 #
-#  sybil is free software: you can redistribute it and/or modify
+#  Sybil is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
-#  sybil is distributed in the hope that it will be useful,
+#  Sybil is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
@@ -73,7 +73,7 @@ setMethod("backupProb", signature(lp = "optObj_glpkAPI"),
 
         # create new optObj object
         if (!identical(np, FALSE)) {
-            out <- new("optObj_glpk", lp@solver, lp@method, lp@probType)
+            out <- new("optObj_glpkAPI", lp@solver, lp@method, lp@probType)
             out@oobj <- np
         }
 

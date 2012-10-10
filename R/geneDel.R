@@ -8,12 +8,12 @@
 #  
 #  This file is part of sybil.
 #
-#  sybil is free software: you can redistribute it and/or modify
+#  Sybil is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
-#  sybil is distributed in the hope that it will be useful,
+#  Sybil is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
@@ -123,7 +123,7 @@ geneDel <- function(model, genes, checkId = FALSE) {
       #
       #}
 
-      #if (solver == "glpk") {
+      #if (solver == "glpkAPI") {
       #     model <- changeBounds(lpmodel, reactInd[constReact], solver = solver)
       #}
 

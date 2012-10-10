@@ -8,12 +8,12 @@
 #
 #  This file is part of sybil.
 #
-#  sybil is free software: you can redistribute it and/or modify
+#  Sybil is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
-#  sybil is distributed in the hope that it will be useful,
+#  Sybil is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
@@ -75,7 +75,8 @@ checkDefaultMethod <- function(solver, method, probType, loadPackage = TRUE) {
         if (is.na(val_solver_ind)) {
             val_solver_ind <- 1L
             warning("solver ", sQuote(solverAPI),
-                    " not found, using default: ", sQuote(val_solver))
+                    " not found, using default: ",
+                    sQuote(.SYBILenv$solvers[val_solver_ind]))
         }
     }
 

@@ -90,7 +90,7 @@
     \item{\code{loadMatrix}}{\code{signature(lp = "optObj")}(\code{lp, \dots}):
       loads the contraint matrix to the problem object.
       
-      Further arguments required for glpk:
+      Further arguments required for GLPK:
       \code{ne}: number of non zero elements, \code{ia}: row indices of the
       non zero elements, \code{ja}: column indices or the non zero elements,
       \code{ar}: the non zero elements. \code{ia}, \code{ja} and \code{ar}

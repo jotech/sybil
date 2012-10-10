@@ -54,6 +54,8 @@
 \alias{method<-}
 \alias{mod_id,optsol-method}
 \alias{mod_id<-,optsol-method}
+\alias{mod_obj,optsol-method}
+\alias{mod_obj}
 \alias{nfluxes,optsol-method}
 \alias{nfluxes}
 \alias{num_of_prob,optsol-method}
@@ -128,7 +130,8 @@
       indicating the direction of optimization.
     }
     \item{\code{obj_coef}:}{Object of class \code{"numeric"}
-      containing the objective coefficients of the used model.
+      containing the objective coefficients of the used model. These are not
+      necessarily the objective coefficients of the used algorithm. 
     }
     \item{\code{fldind}:}{Object of class \code{"integer"}
       pointers to columns (variables) representing a flux (reaction) in the
@@ -224,6 +227,15 @@
     }
     \item{\code{mod_id}:}{\code{signature(object = "optsol")}:
       gets the \code{mod_id} slot.
+    }
+    \item{\code{mod_obj}:}{\code{signature(object = "optsol_fluxdel")}:
+      returns allways the cross-product of the objective coefficients in slot
+      \code{obj_coef} and the part of the flux distribution in slot
+      \code{fluxdist} containing the values representing fluxes in the entire
+      metabolic network (slot \code{fldind}). If slot \code{obj_coef} is
+      \code{NA}, the content of slot \code{lp_obj} is returned.
+       In contrast, method \code{lp_obj} allways returns the value of the
+       objective function of the used algorithm after optimization.
     }
     \item{\code{nfluxes}:}{\code{signature(object = "optsol")}:
       gets the number of flux distributions.

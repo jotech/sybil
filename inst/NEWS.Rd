@@ -7,6 +7,18 @@
 \newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 
 % ---------------------------------------------------------------------------- %
+\section{Changes in version 1.1.2 2012-10-10}{
+  \itemize{
+    \item fixed a bug in backupProb methods
+    \item fixed a small bug in checkDefaultMethod
+    \item moved method \code{mod_obj} from class \code{optsol_fluxdel} to the
+          base class \code{optsol}
+    \item added deprecated class \code{optsol_simpleFBA} for compatibility
+          with other packages using \pkg{sybil}
+  }
+}
+
+% ---------------------------------------------------------------------------- %
 \section{Changes in version 1.1.1 2012-10-08}{
   \itemize{
     \item fixed file \file{DESCRIPTION}

@@ -273,7 +273,7 @@
 \dontrun{
 ## The examples here require the package glpkAPI to be
 ## installed. If that package is not available, you have to set
-## the argument 'solver' (the default is: solver = "glpk").
+## the argument 'solver' (the default is: solver = SYBIL_SETTINGS("SOLVER")).
 
 ## load the example data set
 data(Ec_core)
@@ -296,9 +296,9 @@ optimizeProb(Ec_core, MoreArgs = list(poCmd = list("sensitivityAnalysis")))
 ## do FBA, write the problem object to file in lp-format
 optimizeProb(Ec_core,
              MoreArgs = list(poCmd = list(c("writeProb", "LP_PROB",
-                                            "'lp'", "'Ec_core.lp'"))))
+                                            "'Ec_core.lp'", "'lp'"))))
 
-## do FBA, use "cplex" as lp solver. Get all upper bounds before
+## do FBA, use "cplexAPI" as lp solver. Get all upper bounds before
 ## solving the problem. After solving, perform a sensitivity
 ## analysis and retrieve the reduced costs
 optimizeProb(Ec_core, solver = "cplexAPI", MoreArgs = list(
