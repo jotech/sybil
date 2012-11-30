@@ -167,8 +167,10 @@ setMethod(f = "initialize",
                   # rows
                   # ---------------------------------------------
 
-                  rlower <- c(rhs(model), wl, wu)
-                  rupper <- c(rhs(model), rep(absMAX, nc), wu)
+                  #rlower <- c(rhs(model), wl, wu)
+                  #rupper <- c(rhs(model), rep(absMAX, nc), wu)
+                  rlower <- c(rep(0, nr), wl, wu)
+                  rupper <- c(rep(0, nr), rep(absMAX, nc), wu)
                   rtype  <- c(rep("E", nr), rep("L", nc), rep("U", nc))
 
 
@@ -184,7 +186,7 @@ setMethod(f = "initialize",
                   # ---------------------------------------------
 
                   .Object <- callNextMethod(.Object,
-                                            alg        = "room",
+                                            sbalg      = "room",
                                             pType      = pt,
                                             scaling    = scaling,
                                             fi         = fi,
@@ -262,47 +264,29 @@ setMethod(f = "initialize",
 
 setMethod("optimizeProb", signature(object = "sysBiolAlg_room"),
     function(object,
-             react = NA,
-             lb = NA,
-             ub = NA,
+             react = NULL,
+             lb = NULL,
+             ub = NULL,
              prCmd = NA, poCmd = NA,
              prCil = NA, poCil = NA) {
 
 
         # check the argument react
-        if (any(is.na(react))) {
+        if (is.null(react)) {
             del <- FALSE
         }
         else {
-            if (is(react, "numeric")) {
+            stopifnot(is(react, "numeric"))
+    
+            if ( (is.null(lb)) || (is.null(ub)) ) {
+                del <- FALSE
+            }
+            else {
                 del <- TRUE
-            }
-            else {
-                stop("argument 'react' must be numeric")
-            }
-    
-            if (any(is.na(lb))) {
-                lb <- rep(0, length(react))
-            }
-            else {
-                if (!is(lb, "numeric")) {
-                    stop("argument lb must be numeric")
-                }
-                if (length(lb) != length(react)) {
-                    stop("argument react and lb must have same length")
-                }
-            }
-    
-            if (any(is.na(ub))) {
-                ub <- rep(0, length(react))
-            }
-            else {
-                if (!is(ub, "numeric")) {
-                    stop("argument ub must be numeric")
-                }
-                if (length(ub) != length(react)) {
-                    stop("argument react and ub must have same length")
-                }
+                stopifnot(is(lb, "numeric"),
+                          is(ub, "numeric"),
+                          length(lb) == length(react),
+                          length(ub) == length(react))
             }
         }
 

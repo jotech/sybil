@@ -117,7 +117,6 @@ addReact <- function(model,
         newmet_comp     <- met_comp(model)
         newmet_single   <- met_single(model)
         newmet_de       <- met_de(model)
-        newrhs          <- rhs(model)
 
         newreact_num    <- react_num(model)
         newreact_rev    <- react_rev(model)
@@ -173,9 +172,6 @@ addReact <- function(model,
             # singleton and dead end metabolites (not checked!)
             newmet_single <- append(met_single(model), rep(NA, nNewRows))
             newmet_de     <- append(met_de(model),     rep(NA, nNewRows))
-
-            # right hand side
-            newrhs <- append(rhs(model), rep(0, nNewRows))
 
             # new rows in stoichiometric matrix
             newRows <- Matrix::Matrix(0,
@@ -313,7 +309,6 @@ addReact <- function(model,
         met_comp(mod_out)     <- as.integer(newmet_comp)
         met_single(mod_out)   <- newmet_single
         met_de(mod_out)       <- newmet_de
-        rhs(mod_out)          <- newrhs
 
         react_num(mod_out)    <- as.integer(newreact_num)
         react_rev(mod_out)    <- newreact_rev

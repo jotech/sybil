@@ -83,9 +83,24 @@ setMethod("plotRangeVar", signature(object = "optsol_fluxVar"),
 )
 
 
+setMethod("blReact", signature(object = "optsol_fluxVar"),
+          function(object, tol = SYBIL_SETTINGS("TOLERANCE")) {
+              
+              bl <- abs(minSol(object, "mod_obj")) < tol &
+                    abs(maxSol(object, "mod_obj")) < tol
+              
+              return(bl)
+          }
+)
+
+
 setMethod("minSol", signature(object = "optsol_fluxVar"),
           function(object, slot) {
-              
+
+              if (missing(slot)) {
+                  stop("argument 'slot' is missing")
+              }
+
               np <- num_of_prob(object)
               
               if (np > 1) {
@@ -124,6 +139,10 @@ setMethod("minSol", signature(object = "optsol_fluxVar"),
 
 setMethod("maxSol", signature(object = "optsol_fluxVar"),
           function(object, slot) {
+
+              if (missing(slot)) {
+                  stop("argument 'slot' is missing")
+              }
 
               np <- num_of_prob(object)
               
@@ -258,11 +277,11 @@ setMethod("maxSol", signature(object = "optsol_fluxVar"),
 #)
 
 
-setMethod("plot", signature(x = "optsol_fluxVar", "missing"),
+setMethod("plot", signature(x = "optsol_fluxVar", y = "missing"),
           function(x, y,
                    ylim,
-                   xlab = "",
-                   ylab = "Value",
+                   xlab = "reaction no.",
+                   ylab = "flux rate",
                    pch = 20,
                    col = "black",
                    collower, colupper, pchupper, pchlower,

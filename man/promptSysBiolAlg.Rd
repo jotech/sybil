@@ -7,7 +7,7 @@
 
 \description{
   Generates a skeletal strukture of new subclasses of class
-  \code{\link[=sysBiolAlg-class]{sysBiolAlg}}, in particular for the
+  \code{\linkS4class{sysBiolAlg}}, in particular for the
   constructor method \code{\link{initialize}}.
 }
 
@@ -49,13 +49,13 @@
   \code{prefix_algorithm}. The filename will be: \code{prefix_algorithmClass.R}.
   
   The class definition in the new file will extend class
-  \code{\link[=sysBiolAlg-class]{sysBiolAlg}} directly and will not add any
+  \code{\linkS4class{sysBiolAlg}} directly and will not add any
   slots. Additionally a skeletal structure for method \code{\link{initialize}}
   will be generated. In this method, the user should create all arguments to
   the \code{initialize} method described in the base class
-  \code{\link[=sysBiolAlg-class]{sysBiolAlg}} and put them all to
+  \code{\linkS4class{sysBiolAlg}} and put them all to
   \code{\link{callNextMethod}}. Or, alternatively, generate an instance of
-  class \code{\link[=optObj-class]{optObj}} \dQuote{by hand}.
+  class \code{\linkS4class{optObj}} \dQuote{by hand}.
 }
 
 \value{
@@ -67,7 +67,7 @@
 }
 
 \seealso{
-  \code{\link[=sysBiolAlg-class]{sysBiolAlg}}
+  \code{\linkS4class{sysBiolAlg}}
 }
 
 \keyword{ IO }

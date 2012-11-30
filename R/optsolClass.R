@@ -32,6 +32,7 @@
 setClass("optsol",
     representation(
         mod_id       = "character",        # model id of the original model
+        mod_key      = "character",        # model key of the original model
         solver       = "character",        # the used lp solver
         method       = "character",        # the used method
         algorithm    = "character",        # the used algorithm
@@ -41,8 +42,9 @@ setClass("optsol",
         lp_obj       = "numeric",          # solution of the objective function
         lp_ok        = "integer",          # exit status of the lp solver
         lp_stat      = "integer",          # solution status
-        lp_dir       = "character",        # direction of optimization(s)
+        lp_dir       = "factor",           # direction of optimization(s)
         obj_coef     = "numeric",          # objective coefficients in model
+        obj_func     = "character",        # objective function (printObjFunc)
         fldind       = "integer",          # indices of fluxes
         fluxdist     = "fluxDistribution"  # the flux distribution
     ),
@@ -78,6 +80,21 @@ setMethod("mod_id", signature(object = "optsol"),
 setReplaceMethod("mod_id", signature = (object = "optsol"),
                  function(object, value) {
                      object@mod_id <- value
+                     return(object)
+                 }
+)
+
+
+# mod_key
+setMethod("mod_key", signature(object = "optsol"),
+          function(object) {
+              return(object@mod_key)
+          }
+)
+
+setReplaceMethod("mod_key", signature = (object = "optsol"),
+                 function(object, value) {
+                     object@mod_key <- value
                      return(object)
                  }
 )
@@ -180,9 +197,36 @@ setMethod("lp_dir", signature(object = "optsol"),
           }
 )
 
-setReplaceMethod("lp_dir", signature = (object = "optsol"),
+setReplaceMethod("lp_dir", signature(object = "optsol", value = "factor"),
                  function(object, value) {
                      object@lp_dir <- value
+                     return(object)
+                 }
+)
+
+setReplaceMethod("lp_dir", signature(object = "optsol", value = "character"),
+                 function(object, value) {
+                     if (all(value == "min" | value == "max")) {
+                         object@lp_dir <- factor(value)
+                     }
+                     else {
+                         warning("only 'min' (1) and 'max' (-1) are allowed")
+                     }
+                     return(object)
+                 }
+)
+
+setReplaceMethod("lp_dir", signature(object = "optsol", value = "numeric"),
+                 function(object, value) {
+                     if (all(value == 1 | value == -1)) {
+                         fc <- value
+                         fc[fc ==  1] <- "min"
+                         fc[fc == -1] <- "max"
+                         object@lp_dir <- factor(fc)
+                     }
+                     else {
+                         warning("only '1' (min) and '-1' (max) are allowed")
+                     }
                      return(object)
                  }
 )
@@ -243,6 +287,21 @@ setMethod("obj_coef", signature(object = "optsol"),
 setReplaceMethod("obj_coef", signature(object = "optsol"),
           function(object, value) {
               object@obj_coef <- value
+              return(object)
+          }
+)
+
+
+# objective function
+setMethod("obj_func", signature(object = "optsol"),
+          function(object) {
+              return(object@obj_func)
+          }
+)
+
+setReplaceMethod("obj_func", signature(object = "optsol"),
+          function(object, value) {
+              object@obj_func <- value
               return(object)
           }
 )
@@ -322,10 +381,60 @@ setMethod("nfluxes", signature(object = "optsol"),
 
 
 # check solution status
-setMethod("checkStat", signature(object = "optsol"),
-          function(object) {
-              ng <- checkSolStat(object@lp_stat, object@solver)
+setMethod("checkStat", signature(opt = "optsol"),
+          function(opt) {
+              ng <- checkSolStat(opt@lp_stat, opt@solver)
               return(ng)
+          }
+)
+
+
+# get part of the flux distribution
+setMethod("getFluxDist", signature(lp = "optsol"),
+          function(lp, react = NULL, drop = TRUE) {
+          
+              if (num_of_fluxes(fluxdist(lp)) == 1) {
+                  return(fluxes(lp))
+              }
+              
+              if (is.null(react)) {
+                  fl <- fluxes(lp)[fldind(lp), , drop = drop]
+              }
+              else {
+                  if (is(react, "reactId")) {
+                      stopifnot(identical(mod_id(lp), mod_id(react)))
+                      
+                      cr <- fldind(lp)[react_pos(react)]
+                      if (isTRUE(hasId(react))) {
+                          nr <- react_id(react)
+                      }
+                      else {
+                          nr <- cr
+                      }
+                  }
+                  else if (is(react, "numeric")) {
+                      if (max(react) > nvar(fluxdist(lp))) {
+                          stop("react must be in [1,", nvar(fluxdist(lp)),"]")
+                      }
+                      else {
+                          cr <- react
+                          nr <- react
+                      }
+                  }
+                  else {
+                      stop("react must be numeric or of class reactId")
+                  }
+              
+                  fl <- fluxes(lp)[cr, , drop = drop]
+                  if (is.null(dim(fl))) {
+                      names(fl) <- nr
+                  }
+                  else {
+                      rownames(fl) <- nr
+                      #colnames(fl) <- paste("[", 1:num_of_prob(lp), "]", sep = "")
+                  }
+              }
+              return(fl)
           }
 )
 
@@ -333,15 +442,22 @@ setMethod("checkStat", signature(object = "optsol"),
 # consider using sprintf here
 setMethod("show", signature(object = "optsol"),
     function(object) {
-        
-        cat("solver:                                  ", solver(object), "\n")
-        cat("method:                                  ", method(object), "\n")
-        cat("algorithm:                               ", algorithm(object), "\n")
-        cat("number of variables:                     ", lp_num_cols(object), "\n")
-        cat("number of constraints:                   ", lp_num_rows(object), "\n")
-        cat("number of problems to solve:             ", num_of_prob(object), "\n")
-        ok <- sum(lp_ok(object) == 0, na.rm = TRUE)
-        cat("number of successful solution processes: ", ok, "\n")
+        cat(sprintf("%-42s%s\n", "solver:", solver(object)))
+        cat(sprintf("%-42s%s\n", "method:", method(object)))
+        cat(sprintf("%-42s%s\n", "algorithm:", algorithm(object)))
+        cat(sprintf("%-42s%s\n", "number of variables:", lp_num_cols(object)))
+        cat(sprintf("%-42s%s\n", "number of constraints:", lp_num_rows(object)))
+        if (num_of_prob(object) == 1) {
+            cat(sprintf("%-42s%s\n", "return value of solver:", getMeanReturn(lp_ok(object), solver(object))))
+            cat(sprintf("%-42s%s\n", "solution status:", getMeanStatus(lp_stat(object), solver(object))))
+            cat(sprintf("%s%-14s%f\n", "value of objective function ", paste("(", algorithm(object), "):", sep = ""), lp_obj(object)))
+            cat(sprintf("%-42s%f\n", "value of objective function (model):", mod_obj(object)))
+        }
+        else {
+            cat(sprintf("%-42s%s\n", "number of problems to solve:", num_of_prob(object)))
+            ok <- sum(lp_ok(object) == 0, na.rm = TRUE)
+            cat(sprintf("%-42s%s\n", "number of successful solution processes:", ok))
+        }
     }
 )
 
@@ -368,3 +484,54 @@ setMethod("histogram", signature(x = "optsol"),
 )
 
 
+# checkOptSol
+setMethod("checkOptSol", signature(opt = "optsol"),
+          function(opt, onlywarn = FALSE) {
+
+    lp_check <- FALSE
+
+    if (isTRUE(onlywarn)) {
+        if (sum(lp_ok(opt) != 0) != 0) {
+            msg <- paste("some optimizations did not end successful",
+                         "check results with checkOptSol()", sep = "\n")
+            warning(msg, call. = FALSE)
+        }
+        else {
+            lp_check <- TRUE
+        }
+    }
+    else {
+		lp_check <- checksol()
+
+		if (solver(opt) == "cplexAPI") {
+			TEMP_ENV <- cplexAPI::openEnvCPLEX()
+		}
+		else {
+			TEMP_ENV <- NULL
+		}
+
+		num_of_prob(lp_check) <- length(opt)
+		
+		ec <- table(lp_ok(opt))
+		sc <- table(lp_stat(opt))
+
+		exit_code(lp_check)    <- as.integer(rownames(ec))
+		exit_num(lp_check)     <- as.integer(ec)
+		exit_meaning(lp_check) <- mapply(getMeanReturn, exit_code(lp_check),
+									   MoreArgs = list(solver = solver(opt)))
+
+		status_code(lp_check)    <- as.integer(rownames(sc))
+		status_num(lp_check)     <- as.integer(sc)
+		status_meaning(lp_check) <- mapply(getMeanStatus, status_code(lp_check),
+										MoreArgs = list(solver = solver(opt),
+										env = TEMP_ENV))
+
+		if (!is.null(TEMP_ENV)) {
+			cplexAPI::closeEnvCPLEX(TEMP_ENV)
+		}
+    }
+
+    return(lp_check)
+              
+}
+)

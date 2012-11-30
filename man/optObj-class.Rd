@@ -27,23 +27,13 @@
 \alias{wrong_type_msg}
 \alias{wrong_solver_msg}
 
-% deprecated
-\alias{loadMatrix,optObj-method}
-\alias{loadProblemData,optObj-method}
-\alias{loadProblemDataLM,optObj-method}
-\alias{loadProblemDataMTF,optObj-method}
-\alias{loadMatrix}
-\alias{loadProblemData}
-\alias{loadProblemDataLM}
-\alias{loadProblemDataMTF}
-
 
 \title{Class \code{"optObj"}}
 
 \description{
   Structure of the class \code{"optObj"}. Objects extending \code{optObj}
   returned by the constructor function \code{optObj}. These objects are used
-  as part of class \code{\link[=sysBiolAlg-class]{sysBiolAlg}}.
+  as part of class \code{\linkS4class{sysBiolAlg}}.
 }
 
 \section{Objects from the Class}{
@@ -86,54 +76,6 @@
     }
     \item{\code{solver}}{\code{signature(object = "optObj")}:
       gets the \code{solver} slot.
-    }
-    \item{\code{loadMatrix}}{\code{signature(lp = "optObj")}(\code{lp, \dots}):
-      loads the contraint matrix to the problem object.
-      
-      Further arguments required for GLPK:
-      \code{ne}: number of non zero elements, \code{ia}: row indices of the
-      non zero elements, \code{ja}: column indices or the non zero elements,
-      \code{ar}: the non zero elements. \code{ia}, \code{ja} and \code{ar}
-      must be of length \code{ne}.
-
-      Further arguments required for COIN-OR CLP:
-      \code{ncols}: number of columns, \code{nrows}: number of rows,
-      \code{ia}: nz\$ia, \code{ja}: nz\$ja, \code{ra}: nz\$ra.
-
-      Further arguments required for lpSolveAPI:
-      S matrix of the model.\cr
-      This method os deprecated, use \code{loadLPprob} instead.
-    }
-    \item{\code{loadProblemData}}{\code{signature(lp = "optObj")}(\code{lp, model}):
-      loads the problem data to the problem object: sets the constraint
-      matrix, the upper and lower bounds for columns, the right hand side to
-      zero and the objective coefficients. \code{model}: object of class
-      \code{\linkS4class{modelorg}}.\cr
-      This method os deprecated, use \code{loadLPprob} instead.
-    }
-    \item{\code{loadProblemDataLM}}{\code{signature(lp = "optObj")}:
-      (\code{lp, model, wtflux, nCols, nRows, COBRAflag = FALSE, lpdir = NA}):
-      loads the problem data to the problem object for linear MOMA:
-      sets the constraint matrix, the upper and lower bounds for columns, the
-      right hand side and the objective coefficients.
-      \code{model}: object of class \code{"\linkS4class{modelorg}"},
-      \code{wtflux}: wild type flux distribution, \code{nCols}: number of
-      columns of the constraint matrix, \code{nRows}: number of rows of the
-      constraint matrix, \code{COBRAflag}: \code{TRUE}, if performing linear
-      MOMA like in the COBRA toolbox, \code{lpdir}: optimization direction.
-      See also \code{\link{simpleFBA}}.\cr
-      This method os deprecated, use \code{loadLPprob} instead.
-    }
-    \item{\code{loadProblemDataMTF}}{\code{signature(lp = "optObj")}:
-      (\code{lp, model, wtflux, nCols, nRows}):
-      loads the problem data to the problem object for minimization of total
-      flux: sets the constraint matrix, the upper and lower bounds for
-      columns, the right hand side and the objective coefficients.
-      \code{model}: object of class \code{"\linkS4class{modelorg}"},
-      \code{wtflux}: optimal value of the first optimization, \code{nCols}:
-      number of columns of the constraint matrix, \code{nRows}: number of rows
-      of the constraint matrix. See also \code{\link{simpleFBA}}.\cr
-      This method os deprecated, use \code{loadLPprob} instead.
     }
   }
 }
@@ -281,6 +223,9 @@
     \item{\code{\link{loadQobj}}:}{
       load quadratic part of the objective function to the problem object.
     }
+    \item{\code{\link{readProb}}:}{
+        read problem object from file (e.g. lp formated).
+    }
     \item{\code{\link{scaleProb}}:}{
       scaling of the constraint matrix.
     }
@@ -320,7 +265,7 @@
   The class \code{pointerToProb} contains an external pointer to a problem
   object (usually a C/C++ pointer). This is for \pkg{glpkAPI} an object of class
   \code{\link[glpkAPI]{glpkPtr}}, for \pkg{clpAPI} an object of class
-  \code{\link[=externalptr-class]{externalptr}}, for \pkg{lpSolveAPI} an object
+  \code{\linkS4class{externalptr}}, for \pkg{lpSolveAPI} an object
   of class \code{lpExtPtr} and for \pkg{cplexAPI} an object of class
   \code{cplexPointer}.
   
@@ -335,7 +280,7 @@
 
 \seealso{
   The constructor function \code{\link{sysBiolAlg}} for objects extending
-  class \code{\link[=sysBiolAlg-class]{sysBiolAlg}};
+  class \code{\linkS4class{sysBiolAlg}};
   The constructor function \code{\link{optObj}}; \code{\link{SYBIL_SETTINGS}}
   and \code{\link{checkDefaultMethod}}.
 }

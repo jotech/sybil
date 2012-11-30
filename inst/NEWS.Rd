@@ -7,6 +7,99 @@
 \newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 
 % ---------------------------------------------------------------------------- %
+\section{Changes in version 1.1.7 2012-11-30}{
+  \itemize{
+    \item method \code{shrinkMatrix} can get objects of class \code{reactId}
+    \item removed deprecated functions \code{simpleFBA} and \code{prepProbObj}
+    \item removed deprecated generics \code{loadProblemData},
+          \code{loadProblemDataLM}, \code{loadProblemDataMTF}
+          and \code{loadMatrix}
+    \item removed deprecated class \code{optsol_simpleFBA}
+    \item some updates in the vignette
+  }
+}
+
+
+% ---------------------------------------------------------------------------- %
+\section{Changes in version 1.1.6 2012-11-26}{
+  \itemize{
+    \item class \code{reactId} is reorganized: it has new slots \code{mod_id},
+          \code{mod_key}, \code{react_num} and \code{has_id} and new methods
+          \code{hasId} and \code{[}, also the implementation of method
+          \code{show} has changed
+    \item new class \code{reactId_Exch} extending class \code{react_id}
+    \item function \code{findExchReact} now returns an object of class
+          \code{reactId_Exch} when getting an object of class \code{modelorg}
+          instead of a list
+    \item class \code{modelorg}, class \code{reactId}, class \code{optsol} and
+          class \code{optsolSummary} have new slot \code{mod_key} containing a
+          character string functioning as a unique key to a model object
+    \item fixed a small bug in method \code{printObjFunc} of class
+          \code{modelorg}
+    \item fixed a small bug in function \code{fluxVar} which has occurred when
+          not all reactions given in a model where analyzed
+    \item function \code{fluxVar} has new argument \code{exex} in order to
+          exclude exchange reactions from the analysis
+    \item class \code{optsol_fluxVar} has a new method \code{blReact} which does
+          essentially the same as function \code{blockedReact}
+    \item function \code{blockedReact} is now deprecated
+    \item class \code{optsol} has a new slot \code{obj_func} containing the
+          objective function of the used model as a character string
+    \item method \code{optimizeProb} of class \code{modelorg} returns an object
+          of class \code{optsol_optimizeProb} as default behaviour (argument
+          \code{retOptSol} is \code{TRUE}, default)
+  }
+}
+
+
+% ---------------------------------------------------------------------------- %
+\section{Changes in version 1.1.5 2012-10-31}{
+  \itemize{
+    \item function \code{geneDel} now returns \code{NULL} instead of \code{NA}
+          if a gene deletion has no effect
+    \item default value for arguments \code{gene}, \code{react}, \code{lb},
+          \code{ub} and \code{obj_coef} in methods \code{optimizeProb} is
+          \code{NULL}
+    \item in \code{optimizeProb} all changes to variable bounds must be set
+          explicitly, there is no default anymore
+    \item added method \code{shrinkMatrix} to class \code{modelorg} for
+          retrieving subsets of the stoichiometric matrix
+  }
+}
+
+
+% ---------------------------------------------------------------------------- %
+\section{Changes in version 1.1.4 2012-10-24}{
+  \itemize{
+    \item changed argument \code{alg} in method \code{initialize} of class
+          \code{sysBiolAlg} to \code{sbalg}
+    \item changed argument \code{alg} in function \code{optimizer}
+          to \code{algorithm}
+  }
+}
+
+% ---------------------------------------------------------------------------- %
+\section{Changes in version 1.1.3 2012-10-22}{
+  \itemize{
+    \item slot \code{lp_dir} of class \code{optsol} is now of type \code{factor}
+    \item solver names \code{"glpk"}, \code{"cplex"} and \code{"clp"} are not
+          used anymore, use \code{"glpkAPI"}, \code{"cplexAPI"} and
+          \code{"clpAPI"} instead
+    \item added method \code{readProb} to class \code{optObj}
+    \item removed slot \code{rhs} from class \code{modelorg}, because this
+          parameter is algorithm dependent and not model dependent
+    \item added new class \code{optsolSummary}
+    \item the function \code{printObjFunc} is now a generic and has a method in
+          class \code{modelorg}
+    \item the function \code{checkOptSol} is now a generic and has a method in
+          class \code{optsol} and class \code{optsolSummary}
+    \item added methods \code{printMetabolite} and \code{printReaction} to
+          class \code{modelorg}
+    \item added method \code{nnzero} to class \code{fluxDistribution}
+  }
+}
+
+% ---------------------------------------------------------------------------- %
 \section{Changes in version 1.1.2 2012-10-10}{
   \itemize{
     \item fixed a bug in backupProb methods
@@ -14,7 +107,7 @@
     \item moved method \code{mod_obj} from class \code{optsol_fluxdel} to the
           base class \code{optsol}
     \item added deprecated class \code{optsol_simpleFBA} for compatibility
-          with other packages using \pkg{sybil}
+          with other packages depending on \pkg{sybil}
   }
 }
 
@@ -60,7 +153,7 @@
           returns
           \eqn{\mbox{\boldmath$c$\unboldmath}^{\mathrm{T}}\mbox{\boldmath$v$\unboldmath}}{c^T v}
           with \eqn{\mbox{\boldmath$c$\unboldmath}}{c} being the vector of
-          objective coefficients in the model (objecto of class \code{modelorg})
+          objective coefficients in the model (object of class \code{modelorg})
           and \eqn{\mbox{\boldmath$v$\unboldmath}}{v} being the flux
           distribution as a result of the optimization. In contrast, method
           \code{lp_obj} allways returns the value of the objective function

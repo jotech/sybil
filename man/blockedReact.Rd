@@ -41,7 +41,7 @@
   }
   \item{retOptSol}{
     Boolean.  Return an object of class
-    \code{\link[=optsol_blockedReact-class]{optsol_blockedReact}} or
+    \code{\linkS4class{optsol_blockedReact}} or
     just a list containing the results.\cr
     Default: \code{FALSE}.
   }
@@ -51,7 +51,7 @@
     Default: \code{2}.
   }
   \item{\dots}{
-    Further arguments passed to \code{\link[=sysBiolAlg_fv-class]{sysBiolAlg}}.
+    Further arguments passed to \code{\linkS4class{sysBiolAlg}}.
     Argument \code{solverParm} is a good candidate.
   }
 }
@@ -79,7 +79,7 @@
 
 \seealso{
   \code{\link{modelorg}},
-  \code{\link[=optsol_blockedReact-class]{optsol_blockedReact}} and
+  \code{\linkS4class{optsol_blockedReact}} and
   \code{\link{SYBIL_SETTINGS}}.
 }
 

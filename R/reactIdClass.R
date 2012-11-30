@@ -31,8 +31,12 @@
 
 setClass("reactId",
          representation(
+              mod_id    = "character",
+              mod_key   = "character",
               react_pos = "integer",
-              react_id  = "character"
+              react_id  = "character",
+              has_id    = "logical",
+              react_num = "integer"
          ),
          validity = sybil:::.validreactId
 )
@@ -42,20 +46,90 @@ setClass("reactId",
 #                              user constructor                                #
 #------------------------------------------------------------------------------#
 
-reactId <- function(pos, react) {
-    if (missing(pos) || missing(react)) {
-        stop("Creating an object of class reactId needs pos and react!")
+reactId <- function(pos, react = NULL, mod_id = "") {
+
+    if (missing(pos)) {
+        stop("creating an object of class ", sQuote("reactId"),
+             " needs argument ", sQuote("pos"))
     }
-    pos   <- as.integer(pos)
-    react <- as.character(react)
-    obj   <- new("reactId", react_pos = pos, react_id = react)
+    
+    obj <- new("reactId",
+               mod_id = as.character(mod_id),
+               pnt = as.integer(pos),
+               id = react)
+
     return(obj)
 }
 
 
 #------------------------------------------------------------------------------#
+#                            default constructor                               #
+#------------------------------------------------------------------------------#
+
+setMethod(f = "initialize",
+          signature = "reactId",
+          definition = function(.Object, mod_id, pnt, id = NULL, mod_key = "") {
+
+              if ( (!missing(mod_id)) || (!missing(pnt)) ) {
+              
+                  if (is.null(id)) {
+                      rid <- vector(mode = "character", length = 0L)
+                      hid <- FALSE
+                  }
+                  else {
+                      rid <- as.character(id)
+                      hid <- TRUE
+                  }
+
+                  nr  <- length(pnt)
+                  
+                  .Object@mod_id    <- as.character(mod_id)
+                  .Object@mod_key   <- as.character(mod_key)
+                  .Object@react_pos <- as.integer(pnt)
+                  .Object@react_id  <- as.character(rid)
+                  .Object@has_id    <- as.logical(hid)
+                  .Object@react_num <- as.integer(nr)
+                  validObject(.Object)
+              }
+
+              return(.Object)
+          }
+)
+
+
+#------------------------------------------------------------------------------#
 #                            setters and getters                               #
 #------------------------------------------------------------------------------#
+
+# mod_id
+setMethod("mod_id", signature(object = "reactId"),
+          function(object) {
+              return(object@mod_id)
+          }
+)
+
+setReplaceMethod("mod_id", signature = (object = "reactId"),
+                 function(object, value) {
+                     object@mod_id <- value
+                     return(object)
+                 }
+)
+
+
+# mod_key
+setMethod("mod_key", signature(object = "reactId"),
+          function(object) {
+              return(object@mod_key)
+          }
+)
+
+setReplaceMethod("mod_key", signature = (object = "reactId"),
+                 function(object, value) {
+                     object@mod_key <- value
+                     return(object)
+                 }
+)
+
 
 # position
 setMethod("react_pos", signature(object = "reactId"),
@@ -93,16 +167,64 @@ setReplaceMethod("react_id", signature = (object = "reactId"),
 
 setMethod("show", signature(object = "reactId"),
     function(object) {
-        posid <- cbind(react_pos(object), react_id(object))
-        colnames(posid) <- c("position", "reaction_id")
-        show(posid)
+        if ( (isTRUE(hasId(object))) && (length(object) > 0) ) {
+            wcn <- trunc(log10(length(object))) + 3
+            cn  <- paste("[", 1:length(object), "]", sep = "")
+            cat(sprintf(paste("%", wcn, "s  ", "%-11s%s\n", sep = ""),
+                "# " ,"position", "reaction id"))
+            cat(sprintf(paste("%", wcn, "s  ", "%-11s%s", sep = ""),
+                cn, react_pos(object), react_id(object)), sep = "\n")
+            cat("\nnumber of reactions: ", length(object), "\n", sep = "")
+        }
+        else {
+            show(react_pos(object))
+        }
     }
 )
 
 
-# length of an object of class reactId
-setMethod("length", signature = signature(x = "reactId"),
-          function(x) {
-              return(length(react_pos(x)))
+# id or not id
+setMethod("hasId", signature(object = "reactId"),
+          function(object) {
+              return(object@has_id)
           }
 )
+
+
+# length of an object of class reactId
+setMethod("length", signature(x = "reactId"),
+          function(x) {
+              return(x@react_num)
+          }
+)
+
+
+# [
+setMethod("[", signature(x = "reactId"),
+    function(x, i, j, ..., drop = FALSE) {
+
+        if ( (missing(i)) || (length(i) == 0) ) {
+            return(x)
+        }
+
+        if (max(i) > length(x)) {
+            stop("subscript out of bounds")
+        }
+
+        if (isTRUE(x@has_id)) {
+            xid <- x@react_id[i]
+        }
+        else {
+            xid <- NULL
+        }
+        
+        newRI <- new("reactId",
+                     mod_id = x@mod_id,
+                     pnt    = x@react_pos[i],
+                     id     = xid)
+
+        return(newRI)
+
+    }
+)
+

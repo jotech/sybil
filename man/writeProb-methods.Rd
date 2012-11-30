@@ -22,15 +22,16 @@
 
 \S4method{writeProb}{optObj_cplexAPI,character}(lp, fname, ff = "lp")
 
-\S4method{writeProb}{optObj_glpkAPI,character}(lp, fname, ff = "lp")
+\S4method{writeProb}{optObj_glpkAPI,character}(lp, fname, ff = "lp", ...)
 
-\S4method{writeProb}{optObj_lpSolveAPI,character}(lp, fname, ff = "lp")
+\S4method{writeProb}{optObj_lpSolveAPI,character}(lp, fname, ff = "lp", ...)
 }
 
 \section{Methods}{
   \describe{
     \item{\code{signature(lp = "optObj_clpAPI", fname = "character")}}{
-      method to use with package \pkg{optObj_clpAPI}.
+      method to use with package \pkg{optObj_clpAPI}. Argument \code{ff} is
+      not used here.
     }
     \item{\code{signature(lp = "optObj_cplexAPI", fname = "character")}}{
       method to use with package \pkg{optObj_cplexAPI}.
@@ -46,7 +47,7 @@
 
 \arguments{
   \item{lp}{
-    An object extending class \code{\link[=optObj-class]{optObj}}.
+    An object extending class \code{\linkS4class{optObj}}.
   }
   \item{fname}{
     A single character string giving the file name to write to.
@@ -54,6 +55,9 @@
   \item{ff}{
     A single character string giving the file format to use, see Details.\cr
     Default: \code{"lp"}.
+  }
+  \item{...}{
+    Further arguments passed to the corresponding API routine.
   }
 }
 
@@ -69,7 +73,7 @@
 }
 
 \seealso{
-  Superclass \code{\link[=optObj-class]{optObj}} and constructor function
+  Superclass \code{\linkS4class{optObj}} and constructor function
   \code{\link{optObj}}.
 }
 

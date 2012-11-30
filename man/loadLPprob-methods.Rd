@@ -14,7 +14,7 @@
 
 \description{
   Load data to the problem object (extending class
-  \code{\link[=optObj-class]{optObj}}). Use this method to generate problem
+  \code{\linkS4class{optObj}}). Use this method to generate problem
   objects.
 }
 
@@ -56,10 +56,10 @@
 \arguments{
   \item{lp}{
     An object of class
-    \code{\link[=optObj_clpAPI-class]{optObj_clpAPI}},
-    \code{\link[=optObj_cplexAPI-class]{optObj_cplexAPI}},
-    \code{\link[=optObj_glpkAPI-class]{optObj_glpkAPI}} or
-    \code{\link[=optObj_lpSolveAPI-class]{optObj_lpSolveAPI}}.
+    \code{\linkS4class{optObj_clpAPI}},
+    \code{\linkS4class{optObj_cplexAPI}},
+    \code{\linkS4class{optObj_glpkAPI}} or
+    \code{\linkS4class{optObj_lpSolveAPI}}.
   }
   \item{nCols}{
     Number of columns (variables) of the constraint matrix.
@@ -146,7 +146,7 @@
 }
 
 \seealso{
-  Superclass \code{\link[=optObj-class]{optObj}} and constructor function
+  Superclass \code{\linkS4class{optObj}} and constructor function
   \code{\link{optObj}}.
 }
 

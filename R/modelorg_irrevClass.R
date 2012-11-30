@@ -64,8 +64,7 @@ setMethod(f = "initialize",
           definition = function(.Object, id, name) {
 
               if (!missing(id) || !missing(name)) {
-                  .Object@mod_id   <- as.character(id)
-                  .Object@mod_name <- as.character(name)
+                  .Object <- callNextMethod(.Object, id = id, name = name)
               }
               
               return(.Object)

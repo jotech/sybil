@@ -3,10 +3,10 @@
 
 \encoding{utf8}
 
-\title{One Gene Deletion Experiment}
+\title{Single Gene Deletion Experiment}
 
 \description{
-  Compute in sillico simulations of single-gene knock out mutants.
+  Predict the metabolic phenotype of single-gene knock out mutants.
 }
 
 \usage{
@@ -15,44 +15,53 @@
 
 \arguments{
   \item{model}{
-    An object of class \code{modelorg}.
+    An object of class \code{\linkS4class{modelorg}}.
   }
   \item{geneList}{
-    A character vector containing the set of genes to be deleted.  If the
-    argument is missing, \code{geneList} is set to \code{allGenes(model)}.
+    A character vector containing the set of genes to be deleted one by one.\cr
+    Default: \code{allGenes(model)}.
   }
   \item{\dots}{
     Further arguments passed to \code{\link{optimizer}}.  Important ones are
-    \code{alg} or \code{solverParm} in order to set parameter values for the
-    optimization software.
+    \code{algorithm} in order to set the algorithm to use or \code{solverParm}
+    in order to set parameter values for the optimization software.
   }
 }
 
 \details{
-  The function \code{ondFluxDel} studies the effect of deletion of a
-  single gene on the current objective function (e.g. biomass
-  production).
-  
-  The first step is the calculation of a reference solution, which is
-  the wild type solution. Then n further optimizations are performed (n:
-  number of fluxes) with \eqn{v_i = 0} for \eqn{i = 1,\dots,n}.
+  The function \code{oneGeneDel} studies the effect of genetic perturbations
+  by single gene deletions on the phenotype of the metabolic network. The
+  function performs \eqn{n} optimizations with \eqn{n} being the length of the
+  character vector in argument \code{geneList}. For each gene deletion \eqn{j}
+  the set of fluxes effected by the deletion of gene given in \code{geneList[j]}
+  is constrained to zero flux. If the deletion of a certain gene has an effect,
+  is tested with the function \code{\link{geneDel}}. Each optimization
+  corresponds to the deletion of one gene.
 }
 
 \value{
-  An object of class \code{\link[=optsol_genedel-class]{optsol_genedel}}.
+  An object of class \code{\linkS4class{optsol_genedel}}.
 }
 
+\author{Gabriel Gelius-Dietrich}
 
 \seealso{
   \code{\link{modelorg}}, \code{\linkS4class{optsol}},
-  \code{\link[=optsol_genedel-class]{optsol_genedel}},
+  \code{\linkS4class{optsol_genedel}},
   \code{\link{checkOptSol}}, \code{\link{optimizer}} and
   \code{\link{SYBIL_SETTINGS}}.
 }
 
 \examples{
+  # load example data set
   data(Ec_core)
-  Ec_ofd <- oneFluxDel(Ec_core)
+  
+  # compute phenotypes of genetic pertubations via
+  # FBA (default)
+  Ec_ogd <- oneGeneDel(Ec_core)
+  
+  # or MOMA (linearized version)
+  Ec_ogd <- oneGeneDel(Ec_core, algorithm = "lmoma")
 }
 
 \keyword{optimize}

@@ -50,7 +50,7 @@
 
 \examples{
   data(Ec_core)
-  Ec_d <- doubleReact(Ec_core)
+  Ec_dr <- doubleReact(Ec_core)
 }
 
 \keyword{manip}

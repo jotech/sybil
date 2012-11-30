@@ -48,7 +48,7 @@
 
 \arguments{
   \item{lp}{
-    An object extending class \code{\link[=optObj-class]{optObj}}.
+    An object extending class \code{\linkS4class{optObj}}.
   }
   \item{j}{
     A numeric vector containing the column indices of the variables to change.
@@ -64,7 +64,7 @@
 }
 
 \seealso{
-  Superclass \code{\link[=optObj-class]{optObj}} and constructor function
+  Superclass \code{\linkS4class{optObj}} and constructor function
   \code{\link{optObj}}.
 }
 

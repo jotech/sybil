@@ -101,7 +101,7 @@ promptSysBiolAlg <- function(algorithm,
 
     cat("                  # use the default constructor for class sysBiolAlg\n",
         "                  .Object <- callNextMethod(.Object,\n",
-        "                                            alg        = \"", algorithm, "\",\n",
+        "                                            sbalg      = \"", algorithm, "\",\n",
         "                                            pType      = \n",
         "                                            scaling    = scaling,\n",
         "                                            fi         = \n",

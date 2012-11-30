@@ -33,25 +33,30 @@
 # singleRxnDeletion() contained in the COBRA Toolbox.
 
 
-oneFluxDel <- function(model, react, ...) {
+oneFluxDel <- function(model, react = c(1:react_num(model)), ...) {
 
     if (!is(model, "modelorg")) {
         stop("needs an object of class modelorg!")
     }
 
-    if (missing(react)) {
-        react <- reactId((1:react_num(model)), react_id(model))
-    }
-    else {
-        if (!is(react, "reactId")) {
-            react <- checkReactId(model, react)
-        }
+#    if (missing(react)) {
+#        react <- reactId((1:react_num(model)), react_id(model))
+#    }
+#    else {
+#        if (!is(react, "reactId")) {
+#            react <- checkReactId(model, react)
+#        }
+#    }
+
+    creact <- checkReactId(model, react)
+    if (!is(creact, "reactId")) {
+        stop("check argument react")
     }
 
-    react <- sort(react_pos(react))
+    creact <- sort(react_pos(creact))
 
     optsol <- optimizer(model = model,
-                        delete = matrix(react, ncol = 1),
+                        delete = matrix(creact, ncol = 1),
                         geneFlag = FALSE,
                         ...)
 

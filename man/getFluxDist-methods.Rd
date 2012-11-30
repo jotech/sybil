@@ -10,6 +10,7 @@
 \alias{getFluxDist,optObj_cplexAPI-method}
 \alias{getFluxDist,optObj_glpkAPI-method}
 \alias{getFluxDist,optObj_lpSolveAPI-method}
+\alias{getFluxDist,optsol-method}
 
 \title{Retrieve Flux Distribution}
 
@@ -26,6 +27,8 @@
 \S4method{getFluxDist}{optObj_glpkAPI}(lp)
 
 \S4method{getFluxDist}{optObj_lpSolveAPI}(lp)
+
+\S4method{getFluxDist}{optsol}(lp, react = NULL, drop = TRUE)
 }
 
 \section{Methods}{
@@ -42,12 +45,30 @@
     \item{\code{signature(lp = "optObj_lpSolveAPI")}}{
       method to use with package \pkg{optObj_lpSolveAPI}.
     }
+    \item{\code{signature(lp = "optsol")}}{
+      method to use with objects of class \code{\linkS4class{optsol}}.
+      Returns a subset of the flux distribution stored in slot \code{fluxdist}
+      as object of class \code{\link[Matrix]{Matrix}}.
+      If argument \code{react} is set to \code{NULL} (default), the flux
+      distribution corresponding to the variable indices in slot \code{fldind}
+      will be returned.
+    }
   }
 }
 
 \arguments{
   \item{lp}{
-    An object extending class \code{\link[=optObj-class]{optObj}}.
+    An object extending class \code{\linkS4class{optObj}} or class
+    \code{\linkS4class{optsol}}.
+  }
+  \item{react}{
+    Numeric vector object of class \code{\linkS4class{reactId}} indicating the
+    reactions (rows of the flux distribution) to return.\cr
+    Default: \code{NULL}.
+  }
+  \item{drop}{
+    Used for array subsetting like in \code{\link{[}}.\cr
+    Default: \code{TRUE}.
   }
 }
 
@@ -60,7 +81,7 @@
 }
 
 \seealso{
-  Superclass \code{\link[=optObj-class]{optObj}} and constructor function
+  Superclass \code{\linkS4class{optObj}} and constructor function
   \code{\link{optObj}}.
 }
 

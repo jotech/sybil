@@ -620,8 +620,7 @@ setMethod("getNumNnz", signature(lp = "optObj_clpAPI"),
 
 #------------------------------------------------------------------------------#
 
-setMethod("writeProb", signature(lp = "optObj_clpAPI",
-                                 fname = "character"),
+setMethod("writeProb", signature(lp = "optObj_clpAPI", fname = "character"),
 
     function(lp, fname, ff = "lp") {
 
@@ -634,31 +633,29 @@ setMethod("writeProb", signature(lp = "optObj_clpAPI",
 
 #------------------------------------------------------------------------------#
 
+setMethod("readProb", signature(lp = "optObj_clpAPI", fname = "character"),
+
+    function(lp, fname, ff = "mps", ...) {
+
+        switch(ff,
+            "mps" = {
+                fl <- clpAPI::readMPSCLP(lp@oobj, fname = fname, ...)
+            },
+            "clp" = {
+                fl <- clpAPI::restoreModelCLP(lp@oobj, fname = fname)
+            },
+            {
+                message("wrong format!")
+                fl <- 1
+            }
+        )
+        out <- ifelse(fl == 0, TRUE, fl)
+        
+        return(out)
+    }
+)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#------------------------------------------------------------------------------#
 
 

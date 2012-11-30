@@ -32,17 +32,20 @@
 
 
 modelorg2ExPA <- function(model,
-                          fname,
-                          exIntReact = NA,
+                          fname = NULL,
+                          exIntReact = NULL,
                           filepath = ".",
-                          suffix = "expa") {
+                          suffix = "expa",
+                          tol = SYBIL_SETTINGS("TOLERANCE")) {
 	
+    on.exit( closeAllConnections() )
+    
     if (!is(model, "modelorg")) {
         stop("needs an object of class modelorg!")
     }
 	
 	#expa <- ifelse (missing(fname), mod_id(model), fname)
-	expa <- if (missing(fname)) {
+	if (is.null(fname)) {
 	    expa <- paste(mod_id(model), suffix, sep = ".")
 	}
 	else {
@@ -59,7 +62,7 @@ modelorg2ExPA <- function(model,
     }
     
     # exclude reactions
-    if (any(is.na(exIntReact))) {
+    if (is.null(exIntReact)) {
         exInt <- NA
     }
     else {
@@ -72,7 +75,7 @@ modelorg2ExPA <- function(model,
 
     exch <- findExchReact(model)
     ex <- logical(react_num(model))
-    ex[react_pos(exch$exchange)] <- TRUE
+    ex[react_pos(exch)] <- TRUE
     if (is(exInt, "reactId")) {
         ex[react_pos(exInt)] <- TRUE
     }
@@ -82,7 +85,7 @@ modelorg2ExPA <- function(model,
     # ------------------------------------------------------------------------ #
     
 	cat("(Internal Fluxes)\n", file = fh)
-	
+
 	for (j in seq(along = react_id(model))) {
 		
 		if (isTRUE(ex[j])) {
@@ -93,7 +96,17 @@ modelorg2ExPA <- function(model,
 		ri <- ifelse(isTRUE(react_rev(model)[j]), "R", "I")
 		
 		scol <- S(model)[ ,j]
-		met  <- which(scol != 0)
+		met  <- which(abs(scol) > tol)
+        
+        nint <- abs(scol[met] - round(scol[met])) > .Machine$double.eps^0.5
+        if (any(nint)) {
+            msg <- sprintf(ngettext(length(met_id(model)[met[nint]]),
+                           "reaction %s contains %d non-integer stoichiometric coefficient, check metabolite %s",
+                           "reaction %s contains %d non-integer stoichiometric coefficients, check metabolites\n\t%s"),
+                           sQuote(react_id(model)[j]), length(met_id(model)[met[nint]]),
+                           paste(sQuote(met_id(model)[met[nint]]), collapse = "\n\t"))
+            warning(msg, call. = FALSE)
+        }
 
 		react <- character(length(met))
 		
@@ -128,7 +141,7 @@ modelorg2ExPA <- function(model,
 
 	cat("(Exchange Fluxes)\n", file = fh, append = TRUE)
 
-    exInd <- react_pos(exch$exchange)
+    exInd <- react_pos(exch)
     
     for (i in seq(along = exInd)) {
     
@@ -136,7 +149,7 @@ modelorg2ExPA <- function(model,
         met  <- which(scol != 0)
         
         if (length(met) != 1) {
-            warning("error in reaction id", react_id(exch$exchange)[i])
+            warning("error in reaction id", react_id(exch)[i])
             next
         }
         
@@ -168,7 +181,7 @@ modelorg2ExPA <- function(model,
     # end
     #--------------------------------------------------------------------------#
 
-    return(TRUE)
+    return(invisible(TRUE))
 
 }
 

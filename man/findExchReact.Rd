@@ -29,14 +29,8 @@
 }
 
 \value{
-  If \code{model} is of class \code{\linkS4class{modelorg}} a list is returned:
-  \item{exchange  }{An object of class \code{\linkS4class{reactId}} containing
-                    the id's of the exchange fluxes.}
-  \item{uptake    }{An integer vector giving the index of uptake reactions
-                    \code{react_id(model)[x$uptake]} has the reaction id's
-                    of the uptake reactions.}
-  \item{metabolite}{An integer vector giving the index of metabolite id's in
-                    \code{met_id(model)} having an exchange reaction.}
+  If \code{model} is of class \code{\linkS4class{modelorg}} an object of class
+  \code{\linkS4class{reactId_Exch}} is returned.
   Otherwise, if \code{model} is of class \code{\link{matrix}} or
   of class \code{\link[Matrix]{Matrix}}, a logical vector is returned.
   If element \code{i} equals \code{TRUE}, column \code{i} of \code{model} is an
@@ -65,7 +59,13 @@
 
 \examples{
   data(Ec_core)
-  ex <- findExchReact(Ec_core)
+  ex  <- findExchReact(Ec_core)
+  
+  # run FBA
+  opt <- optimizeProb(Ec_core)
+  
+  # get flux distribution of exchange reactions
+  getFluxDist(opt, ex)
 }
 
 \author{Gabriel Gelius-Dietrich}

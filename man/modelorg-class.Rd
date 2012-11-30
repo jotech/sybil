@@ -61,6 +61,10 @@
 \alias{mod_id,modelorg-method}
 \alias{mod_id<-}
 \alias{mod_id}
+\alias{mod_key<-,modelorg-method}
+\alias{mod_key,modelorg-method}
+\alias{mod_key<-}
+\alias{mod_key}
 \alias{mod_name<-,modelorg-method}
 \alias{mod_name,modelorg-method}
 \alias{mod_name<-}
@@ -69,6 +73,8 @@
 \alias{obj_coef,modelorg-method}
 \alias{obj_coef<-}
 \alias{obj_coef}
+\alias{printObjFunc,modelorg-method}
+\alias{printObjFunc}
 \alias{react_de<-,modelorg-method}
 \alias{react_de,modelorg-method}
 \alias{react_de<-}
@@ -93,10 +99,6 @@
 \alias{react_single,modelorg-method}
 \alias{react_single<-}
 \alias{react_single}
-\alias{rhs<-,modelorg-method}
-\alias{rhs,modelorg-method}
-\alias{rhs<-}
-\alias{rhs}
 \alias{rxnGeneMat<-,modelorg-method}
 \alias{rxnGeneMat,modelorg-method}
 \alias{rxnGeneMat<-}
@@ -130,6 +132,15 @@
   Objects can be created by calls of the function \code{modelorg}:
 
   \code{test <- modelorg(id = "foo", name = "bar")}.
+  \describe{
+    \item{\code{id}:}{
+      a single character string giving the model id.
+    }
+    \item{\code{name}:}{
+      a single character string giving the model name.
+    }
+  }
+  This constructor also generates the model key used in slot \code{mod_key}.
 }
 
 \section{Slots}{
@@ -142,6 +153,10 @@
     }
     \item{\code{mod_id}:}{
       Object of class \code{"character"} indicating the model id.
+    }
+    \item{\code{mod_key}:}{
+      Object of class \code{"character"} containing a single character string
+      functioning as a unique key to a model object.
     }
     \item{\code{mod_compart}:}{
       Object of class \code{"character"} containing the model compartments.
@@ -165,10 +180,6 @@
     \item{\code{met_de}:}{
       Object of class \code{"logical"} with length \code{met_num}. Element
       \code{i} is \code{TRUE}, if metabolite \code{i} is a dead end metabolite.
-    }
-    \item{\code{rhs}:}{
-      Object of class \code{"numeric"} containing the right hand side of the
-      model.
     }
     \item{\code{react_num}:}{
       Object of class \code{"integer"} indicating the number of reactions.
@@ -319,6 +330,12 @@
     \item{\code{mod_id}:}{
       \code{signature(object = "modelorg")}: gets the \code{mod_id} slot.
     }
+    \item{\code{mod_key<-}:}{
+      \code{signature(object = "modelorg")}: sets the \code{mod_key} slot.
+    }
+    \item{\code{mod_key}:}{
+      \code{signature(object = "modelorg")}: gets the \code{mod_key} slot.
+    }
     \item{\code{mod_name<-}:}{
       \code{signature(object = "modelorg")}: sets the \code{mod_name} slot.
     }
@@ -330,6 +347,10 @@
     }
     \item{\code{obj_coef}:}{
       \code{signature(object = "modelorg")}: gets the \code{obj_coef} slot.
+    }
+    \item{\code{printObjFunc}:}{
+      \code{signature(object = "modelorg")}: prints the objective function in
+      a human readable way.
     }
     \item{\code{react_de<-}:}{
       \code{signature(object = "modelorg")}: sets the \code{react_de} slot.
@@ -367,12 +388,6 @@
     \item{\code{react_single}:}{
       \code{signature(object = "modelorg")}: gets the \code{react_single} slot.
     }
-    \item{\code{rhs<-}:}{
-      \code{signature(object = "modelorg")}: sets the \code{rhs} slot.
-    }
-    \item{\code{rhs}:}{
-      \code{signature(object = "modelorg")}: gets the \code{rhs} slot.
-    }
     \item{\code{rxnGeneMat<-}:}{
       \code{signature(object = "modelorg")}: sets the \code{rxnGeneMat} slot.
     }
@@ -409,11 +424,6 @@
   }
 }
 
-\section{Details}{
-    The replace method "\code{S<-}" also updates the slots \code{Sia},
-    \code{Sja}, \code{Sar} and \code{Sne}, which do not have replace methods.
-}
-
 \author{Gabriel Gelius-Dietrich}
 
 \seealso{
@@ -422,6 +432,14 @@
 
 \examples{
   showClass("modelorg")
+
+  ## print human readable version of the objective function
+  data(Ec_core)
+  printObjFunc(Ec_core)
+
+  ## change objective function and print
+  Ec_objf <- changeObjFunc(Ec_core, c("EX_etoh(e)", "ETOHt2r"), c(1, 2))
+  printObjFunc(Ec_objf)
 }
 
 \keyword{classes}

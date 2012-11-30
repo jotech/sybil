@@ -12,25 +12,25 @@
 \title{Optimize Problem Object}
 
 \description{
-  The function \code{optimizeProb} performs the optimization of a problem
-  Object of class \code{\link[=sysBiolAlg-class]{sysBiolAlg}}.
+  The function \code{optimizeProb} performs the optimization of a mathematical
+  programming object.
 }
 
 \usage{
 \S4method{optimizeProb}{modelorg}(object,
-             gene = NA,
-             react = NA,
-             lb = NA,
-             ub = NA,
-             retOptSol = FALSE,
+             gene = NULL,
+             react = NULL,
+             lb = NULL,
+             ub = NULL,
+             retOptSol = TRUE,
              MoreArgs = list(),
              ...)
 
 \S4method{optimizeProb}{sysBiolAlg}(object,
-             react = NA,
-             lb = NA,
-             ub = NA,
-             obj_coef = NA,
+             react = NULL,
+             lb = NULL,
+             ub = NULL,
+             obj_coef = NULL,
              lpdir = NA,
              resetChanges = TRUE,
              prCmd = NA,
@@ -39,9 +39,9 @@
              poCil = NA)
 
 \S4method{optimizeProb}{sysBiolAlg_room}(object,
-             react = NA,
-             lb = NA,
-             ub = NA,
+             react = NULL,
+             lb = NULL,
+             ub = NULL,
              prCmd = NA,
              poCmd = NA,
              prCil = NA,
@@ -52,7 +52,7 @@
   \describe{
     \item{\code{signature(object = "modelorg")}}{
       Translates the object of class \code{\linkS4class{modelorg}} into an
-      object of class \code{\link[=sysBiolAlg-class]{sysBiolAlg}} and calls
+      object of class \code{\linkS4class{sysBiolAlg}} and calls
       \code{optimizeProb} again.
     }
     \item{\code{signature(object = "sysBiolAlg")}}{
@@ -61,7 +61,7 @@
     \item{\code{signature(object = "sysBiolAlg_room")}}{
       Run optimization with the given problem object and take care on specific
       needs for the ROOM algorithm.
-      See class \code{\link[=sysBiolAlg_room-class]{sysBiolAlg_room}} for
+      See class \code{\linkS4class{sysBiolAlg_room}} for
       details.
     }
   }
@@ -70,40 +70,44 @@
 \arguments{
   \item{object}{
     An object of class \code{\linkS4class{modelorg}} or
-    \code{\link[=sysBiolAlg-class]{sysBiolAlg}}.
+    \code{\linkS4class{sysBiolAlg}}.
   }
   \item{gene}{
     A character or integer vector containing gene id's or indices of gene id's
     in \code{\link{allGenes}(model)}. If arguments \code{lb} and/or \code{ub}
-    are additionally used (not \code{NA}), upper and lower bounds will be
+    are additionally used (not \code{NULL}), upper and lower bounds will be
     applied to all fluxes on which the deletion of the genes given in
     \code{gene} have an effect. In this case, the first value in \code{lb} and
     \code{ub} is used.
-    Default: \code{NA}.
+    Default: \code{NULL}.
   }
   \item{react}{
     An object of class \code{\linkS4class{reactId}}, character or integer.
     Specifies the fluxes (variables) for which to change the upper and lower
-    bound (see also arguments \code{lb} and \code{ub}).\cr
-    Default: \code{NA}.
+    bound (see also arguments \code{lb} and \code{ub}) or objective coefficients
+    (see also argument \code{obj_coef}). For classes
+    \code{\linkS4class{sysBiolAlg}} and \code{\linkS4class{sysBiolAlg_room}} it
+    must be numeric.\cr
+    Default: \code{NULL}.
   }
   \item{lb}{
     Numeric vector, must have the same length as \code{react}.  Contains the new
     values for the lower bounds of fluxes (variables) mentioned in \code{react}.
-    If set to \code{NA}, lower bounds for variables in \code{react} will be set
-    to zero.\cr
-    Default: \code{NA}.
+    If set to \code{NULL}, lower bounds for variables in \code{react} will be
+    left unchanged.\cr
+    Default: \code{NULL}.
   }
   \item{ub}{
     Same functionality as \code{lb}, but for upper bounds.\cr
-    Default: \code{NA}.
+    Default: \code{NULL}.
   }
   \item{obj_coef}{
     Numeric vector, must have the same length as \code{react}.  Contains the new
     values for the objective coefficients of fluxes (variables) mentioned in
-    \code{react}.  If set to \code{NA}, objective coefficients for variables in
-    \code{react} will not be changed.\cr
-    Default: \code{NA}.
+    \code{react}. All other objective coefficients stay untouched. If set to
+    \code{NULL}, objective coefficients for variables in \code{react} will be
+    left unchanged.\cr
+    Default: \code{NULL}.
   }
   \item{lpdir}{
     Character value, direction of optimization.  Can be set to \code{"min"} or
@@ -139,9 +143,9 @@
   }
   \item{retOptSol}{
     Boolean.  Return an object of class
-    \code{\link[=optsol_optimizeProb-class]{optsol_optimizeProb}} or
+    \code{\linkS4class{optsol_optimizeProb}} or
     just a list containing the results.\cr
-    Default: \code{FALSE}.
+    Default: \code{TRUE}.
   }
   \item{MoreArgs}{
     Only for the \code{modelorg-method}: a named list containing further
@@ -169,10 +173,10 @@
             quotes \code{' '}.
       \item Use the keyword \kbd{LP_PROB} in order to refer to the variable name
             of the problem object (object of class
-            \code{\link[=optObj-class]{optObj}}).
+            \code{\linkS4class{optObj}}).
       \item If the length of the character vector is one, it is treated as a
             function call with the problem object
-            (object of class \code{\link[=optObj-class]{optObj}}) as single
+            (object of class \code{\linkS4class{optObj}}) as single
             argument.
   }
   The result will be an object of class \code{\link{ppProc}}.
@@ -188,48 +192,50 @@
   with \code{LP_PROB} beeing the placeholder for the variable name of the
   problem object. The vector
   \preformatted{
-    c("writeProb", "LP_PROB", "'lp'", "'Ec_core.lp'")
+    c("writeProb", "LP_PROB", "'Ec_core.lp'", "'lp'")
   }
   will be translated to the command
   \preformatted{
-    writeProb(LP_PROB, 'lp', 'Ec_core.lp')
+    writeProb(LP_PROB, 'Ec_core.lp', 'lp')
   }
   The first element will be the function name and the others the arguments to
   that function. The list of commands
   \preformatted{
     list("sensitivityAnalysis",
-         c("getDjCPLEX", "LP_PROB@oobj$env",
-           "LP_PROB@oobj$lp", "0", "react_num(Ec_core)-1"
+         c("getDjCPLEX", "LP_PROB@oobj@env",
+           "LP_PROB@oobj@lp", "0", "react_num(Ec_core)-1"
          )
     )
   }
   will be translated to the commands
   \preformatted{
     sensitivityAnalysis(LP_PROB)
-    getDjCPLEX(LP_PROB@oobj$env, LP_PROB@oobj$lp,
+    getDjCPLEX(LP_PROB@oobj@env, LP_PROB@oobj@lp,
                0, react_num(Ec_core)-1)
   }
   For more information on the usage of \code{prCmd} and \code{poCmd}, see the
   examples section below.
 
   The method \code{optimizeProb} for class \code{\linkS4class{modelorg}}
-  generates a subclass of class \code{\link[=sysBiolAlg-class]{sysBiolAlg}}
+  generates a subclass of class \code{\linkS4class{sysBiolAlg}}
   and calls \code{optimizeProb} for that object again. Argument \code{MoreArgs}
   is used to transport arguments to the second \code{optimizeProb} call.
   Argument \code{\dots} instead is used to transport arguments to the constructor
-  function \code{\link{sysBiolAlg}}, for example \code{solver}, \code{method}
-  and \code{solverParm}.
+  function \code{\link{sysBiolAlg}}, for example \code{algorithm},
+  \code{solver}, \code{method} and \code{solverParm}.
+  See \code{\link{SYBIL_SETTINGS}} for possible values.
 
   Arguments \code{gene}, \code{react}, \code{lb}, \code{ub} and \code{react}
   cause changes in the problem object (object of class
-  \code{\link[=optObj-class]{optObj}}, slot \code{problem} of class
-  \code{\link[=sysBiolAlg-class]{sysBiolAlg}}). These changes will be reset
-  immediately after optimization.
+  \code{\linkS4class{optObj}}, slot \code{problem} of class
+  \code{\linkS4class{sysBiolAlg}}). These changes will be reset
+  immediately after optimization if argument \code{resetChanges} is set to
+  \code{TRUE}, otherwise changes will persist.
 }
 
 \value{
   Calls to \code{optimizeProb} returns either an object of class
-  \code{\link[=optsol_optimizeProb-class]{optsol_optimizeProb}}
+  \code{\linkS4class{optsol_optimizeProb}} of length one
   if argument \code{retOptSol} is set to \code{TRUE}, or a list containing the
   results of the optimization:
   \item{ok}{
@@ -266,7 +272,7 @@
 }
 
 \seealso{
-  \code{\link{modelorg}} and \code{\link[=sysBiolAlg-class]{sysBiolAlg}}.
+  \code{\link{modelorg}} and \code{\linkS4class{sysBiolAlg}}.
 }
 
 \examples{
@@ -278,12 +284,12 @@
 ## load the example data set
 data(Ec_core)
 
-## run optimizeProb(), Ec_sf will be a list
-Ec_sf <- optimizeProb(Ec_core)
-
 ## run optimizeProb(), Ec_sf will be an object of
 ## class optsol_optimizeProb
-Ec_sf <- optimizeProb(Ec_core, retOptSol = TRUE)
+Ec_sf <- optimizeProb(Ec_core)
+
+## run optimizeProb(), Ec_sf will be a list
+Ec_sf <- optimizeProb(Ec_core, retOptSol = FALSE)
 
 ## do FBA, change the upper and lower bounds for the reactions
 ## "ATPM" and "PFK".
@@ -298,11 +304,12 @@ optimizeProb(Ec_core,
              MoreArgs = list(poCmd = list(c("writeProb", "LP_PROB",
                                             "'Ec_core.lp'", "'lp'"))))
 
-## do FBA, use "cplexAPI" as lp solver. Get all upper bounds before
+## do FBA, use "cplexAPI" as lp solver. Get all lower bounds before
 ## solving the problem. After solving, perform a sensitivity
 ## analysis and retrieve the reduced costs
-optimizeProb(Ec_core, solver = "cplexAPI", MoreArgs = list(
-             prCmd = list(c("getColsUppBnds", "LP_PROB", "1:77")),
+optimizeProb(Ec_core, solver = "cplexAPI",
+             MoreArgs = list(
+             prCmd = list(c("getColsLowBnds", "LP_PROB", "1:77")),
              poCmd = list("sensitivityAnalysis",
                           c("getDjCPLEX",
                             "LP_PROB@oobj@env",

@@ -117,7 +117,17 @@ getMeanStatus <- function(code,
             out <- "see return code"
         },
         "cplexAPI" = {
-            out <- cplexAPI::status_codeCPLEX(env, code)
+            if (is.null(env)) {
+                cenv <- cplexAPI::openEnvCPLEX()
+            }
+            else {
+                cenv <- env
+            }
+            out <- cplexAPI::status_codeCPLEX(cenv, code)
+            if (is.null(env)) {
+                cplexAPI::closeEnvCPLEX(cenv)
+            }
+            rm(cenv)
         },
         {
             cmd <- paste(solver,"::getStatusString(code)", sep = "")

@@ -6,7 +6,7 @@
 \title{Double Gene Deletion Experiment}
 
 \description{
-  Compute in sillico simulations of double-gene knock out mutants.
+  Predict the metabolic phenotype of of double-gene knock out mutants.
 }
 
 \usage{
@@ -15,42 +15,89 @@
 }
 
 \arguments{
-  \item{model}{An object of class \code{modelorg}.}
-  \item{geneList1}{Character: the genes to delete (default: \code{allGenes(model)}).}
-  \item{geneList2}{Character: the genes to delete (default: \code{allGenes(model)}).}
-  \item{allComb}{Logical: If set to \code{TRUE}, all possible pairwise combinations of geneList1 and geneList2 were deleted.
-    If set to \code{FALSE}, geneList1 and geneList2 must have the same length. Every pair c(geneList1[i], geneList2[i]) will be deleted (default: FALSE).}
-  \item{exLethal}{Logical: If set to TRUE, lethal genes are removed from the
-    analysis. This increases the running time significantly (default: TRUE).}
-  \item{tol}{Numeric: threshold value for a gene beeing lethal or not (default: 1E-6).}
-  \item{\dots}{Further arguments passed to \code{\link{optimizer}}.}
+  \item{model}{
+    An object of class \code{\linkS4class{modelorg}}.
+  }
+  \item{geneList1}{
+    A character vector containing the set of genes to be deleted.\cr
+    Default: \code{allGenes(model)}.
+  }
+  \item{geneList2}{
+    A character vector containing the set of genes to be deleted.\cr
+    Default: \code{allGenes(model)}.
+  }
+  \item{allComb}{
+    A single boolean value. If set to \code{TRUE}, every possible pairwise
+    combination of genes given in arguments \code{geneList1} and
+    \code{geneList2} will be knocked-out. If set to \code{FALSE}, arguments
+    \code{geneList1} and \code{geneList2} must have the same length. The
+    knock-outs will be computed pair-wise: first \code{geneList1[1]} and
+    \code{geneList2[1]}, second \code{geneList1[2]} and \code{geneList2[2]}
+    and so on.\cr
+    Default: \code{FALSE}.
+  }
+  \item{exLethal}{
+    A single boolean value. If set to \code{TRUE}, lethal genes are removed from
+    the analysis. A unique set of genes in \code{geneList1} and \code{geneList2}
+    will be scanned for lethal genes. A particular gene \eqn{i} is considered as
+    lethal, if the deletion of this gene results in a zero flux rate in the
+    objective function given in \code{model}.
+    Default: \code{TRUE}.
+  }
+  \item{tol}{
+    A single numeric value, containing an absolute threshold value for a gene
+    beeing lethal or not.\cr
+    Default: \code{SYBIL_SETTINGS("TOLERANCE")}.
+  }
+  \item{\dots}{
+    Further arguments passed to \code{\link{optimizer}}.  Important ones are
+    \code{algorithm} in order to set the algorithm to use or \code{solverParm}
+    in order to set parameter values for the optimization software.
+  }
 }
 
 \details{
-  The function \code{doubleGeneDel} studies the effect of deletion of pairs of genes on
-  the current objective function (e.g. biomass production).
-  
-  The first step is the calculation of a reference solution, which is
-  the wild type solution. Then n further optimizations are performed (n:
-  number of required optimizations) with \eqn{v_i = 0} for \eqn{i = 1,\dots,n}.
+  The function \code{doubleGeneDel} studies the effect of genetic perturbations
+  by double gene deletions on the phenotype of the metabolic network. The
+  function performs \eqn{n} optimizations with \eqn{n} being either the length
+  of the character vector in argument \code{geneList1} times the length of the
+  character vector in argument \code{geneList2}, if argument \code{allComb} is
+  set to \code{TRUE}, or the length of one of these vectors if argument
+  \code{allComb} is set to \code{FALSE}. For each gene deletion \eqn{i,j}
+  the set of fluxes effected by the simultaneous deletion of genes \eqn{i} and
+  \eqn{j} is constrained to zero flux. If the deletion of a certain pair of
+  genes has an effect, is tested with the function \code{\link{geneDel}}. Each
+  optimization corresponds to the simultaneous deletion of two genes.
 }
 
 \value{
-  An object of class \code{\link[=optsol_genedel-class]{optsol_genedel}}.
+  An object of class \code{\linkS4class{optsol_genedel}}.
 }
 
 \author{Gabriel Gelius-Dietrich}
 
 \seealso{
   \code{\link{modelorg}}, \code{\linkS4class{optsol}},
-  \code{\link[=optsol_genedel-class]{optsol_genedel}},
+  \code{\linkS4class{optsol_genedel}},
   \code{\link{checkOptSol}}, \code{\link{optimizer}} and
   \code{\link{SYBIL_SETTINGS}}.
 }
 
 \examples{
+\dontrun{
+  ## compute all possible pairwise gene deletions
+  # load example data set
   data(Ec_core)
-  Ec_ofd <- doubleGeneDel(Ec_core)
+  
+  # compute all possible pairwise gene deletions via
+  # FBA (default)
+  Ec_dgd <- doubleGeneDel(Ec_core, allComb = TRUE)
+  
+  # or MOMA (linearized version)
+  Ec_dgd <- doubleGeneDel(Ec_core,
+                          allComb = TRUE,
+                          algorithm = "lmoma")
+}
 }
 
 \keyword{optimize}

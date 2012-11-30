@@ -31,6 +31,7 @@
 
 setClass("ppProc",
          representation(
+              #cmd = "character",
               cmd = "list",
               pa  = "list",
               ind = "integer"
@@ -75,7 +76,7 @@ setReplaceMethod("cmd", signature = (object = "ppProc"),
 )
 
 
-# cmd
+# pa
 setMethod("pa", signature(object = "ppProc"),
           function(object) {
               return(object@pa)

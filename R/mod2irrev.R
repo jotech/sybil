@@ -44,7 +44,7 @@ mod2irrev <- function(model, exex = FALSE) {
   # set the reversible flag of the exchange reactions to FALSE
   if (isTRUE(exex)) {
       exch <- findExchReact(model)
-      ex <- react_pos(exch$exchange)
+      ex <- react_pos(exch)
       react_rev(model)[ex] <- FALSE
   }
 
@@ -73,8 +73,6 @@ mod2irrev <- function(model, exex = FALSE) {
   met_single(modelIr)   <- met_single(model)
   met_de(modelIr)       <- met_de(model)
   
-  rhs(modelIr)          <- rhs(model)
-
   mod_desc(modelIr)     <- paste(mod_desc(model), "irreversible")
   #if (!is.na(match("description", slotNames(model)))) {
   #    description(modelIr) <- paste(description(model), "irreversible")

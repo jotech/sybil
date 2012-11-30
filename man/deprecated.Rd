@@ -14,11 +14,7 @@
 
 \details{
   \itemize{
-    \item Function \code{\link{simpleFBA}}
-    \item Method \code{\link{loadMatrix}}
-    \item Method \code{\link{loadProblemData}}
-    \item Method \code{\link{loadProblemDataLM}}
-    \item Method \code{\link{loadProblemDataMTF}}
+    \item Function \code{\link{blockedReact}}
   }
 }
 

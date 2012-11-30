@@ -65,9 +65,29 @@ findExchReact <- function(model) {
   }
 
   if (is(model, "modelorg")) {
-      react <- list(exchange   = reactId(ex, react_id(model)[ex]),
-                    uptake     = ex[up],
-                    metabolite = which(Matrix::rowSums(abs(S(model)[, ex])) == 1))
+#      react <- list(exchange   = reactId(ex, react_id(model)[ex]),
+#                    uptake     = ex[up],
+#                    metabolite = which(Matrix::rowSums(abs(S(model)[, ex])) == 1))
+
+      # get the row id's of S containing the non-zeros of the exchange reactions
+      exMet <- which(Matrix::rowSums(abs(S(model)[, ex])) == 1)
+      
+      # get the rows in the correct order
+      # (if exchange reactions are not in main diagonal)
+      
+      ### as(S(model), "CsparseMatrix") ###
+      metabolite <- exMet[S(model)[exMet, ex]@i+1]
+
+      react <- new("reactId_Exch",
+                   mod_id  = mod_id(model),                   
+                   mod_key = mod_key(model),                   
+                   rpnt    = ex,
+                   rid     = react_id(model)[ex],
+                   upt     = up,
+                   mpnt    = metabolite,
+                   mid     = met_id(model)[metabolite],
+                   lb      = lowbnd(model)[ex],
+                   ub      = uppbnd(model)[ex])
   }
   else {
       react <- oneEntry[exchangeReact]

@@ -6,7 +6,7 @@
 }
 \description{
   This function serves as a user constructor function for objects of class
-  \code{\link[=optObj-class]{optObj}}.
+  \code{\linkS4class{optObj}}.
 }
 \usage{
   optObj(solver = SYBIL_SETTINGS("SOLVER"),
@@ -56,7 +56,7 @@
 }
 
 \value{
-  An instance of a subclass of class \code{\link[=optObj-class]{optObj}}.
+  An instance of a subclass of class \code{\linkS4class{optObj}}.
 }
 
 \author{
@@ -64,7 +64,7 @@
 }
 
 \seealso{
-  Class \code{\link[=optObj-class]{optObj}}, \code{\link{SYBIL_SETTINGS}}
+  Class \code{\linkS4class{optObj}}, \code{\link{SYBIL_SETTINGS}}
   and \code{\link{checkDefaultMethod}}.
 }
 

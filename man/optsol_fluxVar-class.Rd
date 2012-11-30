@@ -12,6 +12,9 @@
 \alias{plot,optsol_fluxVar,missing-method}
 \alias{plotRangeVar,optsol_fluxVar-method}
 \alias{plotRangeVar}
+\alias{blReact,optsol_fluxVar-method}
+\alias{blReact}
+
 
 \title{Class \code{"optsol_fluxVar"}}
 
@@ -32,14 +35,17 @@
     }
     \item{\code{preProc}:}{Object of class \code{"ppProc"}
       containing the results of pre-processing.
-      See also \code{\link{optimizeProb,sysBiolAlg-method}}.
+      See also \code{\link{optimizeProb}}.
     }
     \item{\code{postProc}:}{Object of class \code{"ppProc"}
       containing the results of post-processing.
-      See also \code{\link{optimizeProb,sysBiolAlg-method}}.
+      See also \code{\link{optimizeProb}}.
     }
     \item{\code{mod_id}:}{Object of class \code{"character"}
       containing the model id of the used model.
+    }
+    \item{\code{mod_key}:}{Object of class \code{"character"}
+      containing the model key of the used model.
     }
     \item{\code{solver}:}{Object of class \code{"character"}
       indicating the used solver.
@@ -60,7 +66,12 @@
       indicating the number of rows.
     }
     \item{\code{lp_obj}:}{Object of class \code{"numeric"}
-      containing the values of the objective function.
+      containing the optimal values of the objective function after
+      optimization. If no flux distribution is available, slot \code{lp_obj}
+      contains the cross-product of the objective coefficients in slot
+      \code{obj_coef} and the part of the flux distribution in slot
+      \code{fluxdist} containing the values representing fluxes in the entire
+      metabolic network (slot \code{fldind}).
     }
     \item{\code{lp_ok}:}{Object of class \code{"integer"}
       containing the exit code of the optimization.
@@ -72,8 +83,14 @@
       indicating the direction of optimization.
     }
     \item{\code{obj_coef}:}{Object of class \code{"numeric"}
-      containing the objective coefficients of the used model. These are not
-      necessarily the objective coefficients of the used algorithm. 
+      containing the objective coefficients of the used model (slot
+      \code{obj_coef} of an object of class \code{\linkS4class{modelorg}}).
+      These are not necessarily the objective coefficients of the used
+      algorithm. 
+    }
+    \item{\code{obj_func}:}{Object of class \code{"character"}
+      containing the objective function of the used model. Usually, it contains
+      the return value of \code{\link{printObjFunc}}. 
     }
     \item{\code{fldind}:}{Object of class \code{"integer"}
       pointers to columns (variables) representing a flux (reaction) in the
@@ -176,6 +193,20 @@
         }
       }
     }
+    \item{\code{blReact}}{\code{signature(object = "optsol_fluxVar")}
+      (\code{tol = SYBIL_SETTINGS("TOLERANCE")}): returns a logical vector of
+      length equal to the number of reactions analyzed during flux variance
+      analysis (number of optimizations divided by two).
+      If \code{blReact(object)[j]} equals \code{TRUE}, reaction \code{j} is
+      considered to be blocked (zero flux rate) given the used conditions.
+      A reaction \eqn{j} is considered to be \sQuote{blocked}, if its calculated
+      range of reaction rates does not exceed \code{0 +/- tol}.
+      \describe{
+        \item{\code{tol}}{
+          limit of tolerance.
+        }
+      }
+    }
   }
 }
 
@@ -186,7 +217,7 @@
 }
       
 \examples{
-  showClass("optsol_blockedReact")
+  showClass("optsol_fluxVar")
 }
 
 \keyword{classes}

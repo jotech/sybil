@@ -44,6 +44,7 @@
                              loadPackage = FALSE)
     
     tmp <- optimizeProb(model,
+                        retOptSol = FALSE,
                         algorithm = "fba",
                         lpdir = "max",
                         solver = me$sol,

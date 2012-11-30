@@ -4,12 +4,13 @@
 \encoding{utf8}
 
 \title{
-  Simulate N Gene Deletion Experiments
+  Gene Deletion Experiments
 }
 
 \description{
-  The function \code{geneDeletion} studies the effect of in sillico gene
-  deletions on the current objective function (e.g. biomass production).
+  The function \code{geneDeletion} studies the effect of \eqn{n} in silico gene
+  deletions on the phenotype of a metabolic network. The value of \eqn{n} is the
+  number of genes knocked-out simultaneously.
 }
 
 \usage{
@@ -31,7 +32,9 @@
     Default: \code{1}.
   }
   \item{\dots}{
-    Further arguments passed to \code{\link{optimizer}}.
+    Further arguments passed to \code{\link{optimizer}}.  Important ones are
+    \code{algorithm} in order to set the algorithm to use or \code{solverParm}
+    in order to set parameter values for the optimization software.
   }
 }
 
@@ -43,21 +46,28 @@
   If argument \code{genes} is a character vector or integer, the argument
   \code{combinations} gives the number of gene id's taken each time in order
   to build all possible combinations of \code{genes}. A matrix is constructed
-  using \code{\link{combn}}.
+  using \code{\link{combn}}. The value of argument \code{combinations} gives the
+  number of genes, which are knocked-out simultaneously. The default value
+  \eqn{1} performs a single gene deletion experiment, like the function
+  \code{\link{oneGeneDel}} does. A value of \eqn{2} performs a double gene
+  deletion as described in \code{\link{doubleGeneDel}}. A value of \eqn{n}
+  performs an \eqn{n} gene deletion experiment. Keep in mind, that the number
+  of optimizations will get very high for increasing values of
+  \code{combinations}.
   
-  If argument \code{genes} is empty, the number of unique genes in \code{model}
-  is used.
+  If argument \code{genes} is empty, the number of unique genes present in
+  \code{model} is used.
 }
 
 \value{
-  An object of class \code{\link[=optsol_genedel-class]{optsol_genedel}}.
+  An object of class \code{\linkS4class{optsol_genedel}}.
 }
 
 \author{Gabriel Gelius-Dietrich}
 
 \seealso{
   \code{\linkS4class{modelorg}}, \code{\linkS4class{optsol}},
-  \code{\link[=optsol_genedel-class]{optsol_genedel}},
+  \code{\linkS4class{optsol_genedel}},
   \code{\link{checkOptSol}}, \code{\link{oneGeneDel}},
   \code{\link{optimizer}}, \code{\link{optimizeProb}},
   \code{\link{combn}} and \code{\link{SYBIL_SETTINGS}}.
@@ -67,15 +77,19 @@
   ## load the dataset
   data(Ec_core)
   
-  ## perform a single gene deletion analysis (delete every gene one time)
+  ## perform a single gene deletion analysis
+  ## (delete every gene one by one) via FBA
   gd <- geneDeletion(Ec_core)
+  
+  ## or via MOMA (linearized version)
+  gd <- geneDeletion(Ec_core, algorithm = "lmoma")
   
   ## triple gene deletion analysis using the first ten genes
   gd <- geneDeletion(Ec_core, genes = 10, combinations = 3)
 
 \dontrun{
-  ## perform a double gene deletion analysis (delete all possible pairwise
-  ## combinations of all genes)
+  ## perform a double gene deletion analysis
+  ##(delete all possible pairwise combinations of all genes)
   gd <- geneDeletion(Ec_core, combinations = 2)
 
   ## perform a triple gene deletion analysis

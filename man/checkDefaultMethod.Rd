@@ -58,7 +58,7 @@
 }
 
 \note{
-  Arguments \code{"glpk"}, \code{"cplex"} and \code{"clp"} are deprecated;
+  Arguments \code{"glpk"}, \code{"cplex"} and \code{"clp"} not used anymore;
   valid arguments must be the name of the desired solver package like
   \code{"glpkAPI"}, \code{"cplexAPI"} and \code{"cplAPI"}.
 }

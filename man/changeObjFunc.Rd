@@ -12,29 +12,36 @@
 }
 
 \usage{
-  changeObjFunc(lpmodel, react, obj_coef, checkIds = TRUE)
+  changeObjFunc(model, react, obj_coef = rep(1, length(react)))
 }
 
 \arguments{
-  \item{lpmodel}{A model. An object of class
-    \code{\linkS4class{modelorg}}, or a problem object of a lp solver.}
-  \item{react}{Charater vector containing reaction id's, or a numerical
-    vector containing indices of reaction id's.}
-  \item{obj_coef}{A numerical vector with the same length as
-    \code{react} containing the objective coefficients. If missing, a
-    vector of the same length as \code{react} with all ones (1) is produced.}
-  \item{checkIds}{Boolean: check \code{react} if ok (default: TRUE)}
+  \item{model}{
+    An object of class \code{\linkS4class{modelorg}}.
+  }
+  \item{react}{
+    An object of class \code{\linkS4class{reactId}}, character or integer.
+    Specifies the fluxes (variables) for which to change the objective
+    coefficients.
+  }
+  \item{obj_coef}{
+    A numerical vector with length equal to the number of reaction id's
+    given in argument \code{react} containing the objective coefficients.\cr
+    Default: a value of one for each reaction given in argument \code{react}.
+  }
 }
 
 \details{
   The argument \code{react} will be evaluated by the function
   \code{\link{checkReactId}}. The return value is used to change
   the objective function.
+  
+  All reactions not given in argument \code{react} will get an objective
+  value of zero.
 }
 
 \value{
-  Returns the given model (an object of the same class as the argument
-  \code{lpmodel}) containing the new objective function.
+  Returns the given model containing the new objective function.
 }
 
 \author{Gabriel Gelius-Dietrich}
@@ -48,4 +55,3 @@
 }
 
 \keyword{optimize}
-

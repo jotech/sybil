@@ -35,15 +35,11 @@
 }
 
 \value{
-  Returns NA if the values of \code{react} do not correspond to the
-  model, or an object of class \code{\linkS4class{reactId}}.
+  An object of class \code{\linkS4class{reactId}} or \code{NULL} if argument
+  \code{react} contains any reactions not in \code{model}.
 }
 
 \author{Gabriel Gelius-Dietrich}
-
-\note{
-  If the found reaction id's are not unique, NA is returned.
-}
 
 \seealso{\code{\linkS4class{reactId}}}
 

@@ -27,9 +27,6 @@
 #
 # Validity checking of an object of class reactId
 #
-# Returns TRUE if the model is valid, otherwise
-# a character String containing a description of
-# the error.
 
 
 .validreactId <- function(object) {
@@ -38,8 +35,18 @@
       return("needs an object of class reactId!")
   }
 
-  if (length(react_pos(object)) != length(react_id(object))) {
-      return("position and react_id must have the same length!")
+  if (length(mod_id(object)) != 1) {
+      return("slot mod_id must be of length 1")
+  }
+
+  if (length(react_pos(object)) != length(object)) {
+      return(paste("slot react_pos must be of length", length(object)))
+  }
+
+  if (isTRUE(hasId(object))) {
+      if (length(react_id(object)) != length(object)) {
+          return(paste("slot react_id must be of length", length(object)))
+      }
   }
 
   return(TRUE)

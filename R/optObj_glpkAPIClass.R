@@ -703,29 +703,56 @@ setMethod("getNumNnz", signature(lp = "optObj_glpkAPI"),
 
 #------------------------------------------------------------------------------#
 
-setMethod("writeProb", signature(lp = "optObj_glpkAPI",
-                                 fname = "character"),
+setMethod("writeProb", signature(lp = "optObj_glpkAPI", fname = "character"),
 
-    function(lp, fname, ff = "lp") {
+    function(lp, fname, ff = "lp", ...) {
 
         switch(ff,
-           "lp"  = {
-               fl <- glpkAPI::writeLPGLPK(lp@oobj, fname = fname)
-           },
-           "mps" = {
-               fl <- glpkAPI::writeMPSGLPK(lp@oobj, fname = fname)
-           },
-           "glpk" = {
-               fl <- glpkAPI::writeProbGLPK(lp@oobj, fname = fname)
-           },
-           {
-               message("wrong format!")
-               fl <- FALSE
-           }
+            "lp"  = {
+                fl <- glpkAPI::writeLPGLPK(lp@oobj, fname = fname)
+            },
+            "mps" = {
+                fl <- glpkAPI::writeMPSGLPK(lp@oobj, fname = fname, ...)
+            },
+            "glpk" = {
+                fl <- glpkAPI::writeProbGLPK(lp@oobj, fname = fname)
+            },
+            {
+                message("wrong format!")
+                fl <- 1
+            }
         )
         out <- ifelse(fl == 0, TRUE, fl)
 
         return(out)
+    }
+)
+
+
+#------------------------------------------------------------------------------#
+
+setMethod("readProb", signature(lp = "optObj_glpkAPI", fname = "character"),
+
+    function(lp, fname, ff = "lp", ...) {
+
+        switch(ff,
+            "lp"  = {
+                fl <- glpkAPI::readLPGLPK(lp@oobj, fname = fname)
+            },
+            "mps" = {
+                fl <- glpkAPI::readMPSGLPK(lp@oobj, fname = fname, ...)
+            },
+            "glpk" = {
+                fl <- glpkAPI::readProbGLPK(lp@oobj, fname = fname)
+            },
+            {
+                message("wrong format!")
+                fl <- 1
+            }
+        )
+        out <- ifelse(fl == 0, TRUE, fl)
+
+        return(fl)
     }
 )
 

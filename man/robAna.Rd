@@ -20,7 +20,7 @@
 
 \arguments{
   \item{model}{
-    An object of class \code{\link{modelorg}}.
+    An object of class \code{\linkS4class{modelorg}}.
   }
   \item{ctrlreact}{
     An object of class \code{\linkS4class{reactId}}, character or integer.
@@ -41,7 +41,7 @@
     Default: \code{2}.
   }
   \item{\dots}{
-    Further arguments passed to \code{\link[=sysBiolAlg_fba-class]{sysBiolAlg}}.
+    Further arguments passed to \code{\linkS4class{sysBiolAlg}}.
   }
 }
 
@@ -71,18 +71,18 @@
   by \eqn{n}. The parameter \eqn{c_k} is varied \code{numP} times in the range
   of \eqn{v_{j,\mathrm{min}}}{v_i,min} to \eqn{v_{j,\mathrm{max}}}{v_i,max}.
   The result of the optimization is returned as object of class
-  \code{\link[=optsol_robAna-class]{optsol_robAna}} containing the objective
+  \code{\linkS4class{optsol_robAna}} containing the objective
   value for each datapoint.
   
   The extreme points of the range for \code{ctrlreact} are calculated via flux
   balance analysis (see also
-  \code{\link[=sysBiolAlg_fba-class]{sysBiolAlg_fba}}) with the objective
+  \code{\linkS4class{sysBiolAlg_fba}}) with the objective
   function being minimization and maximization of the flux through
   \code{ctrlreact}.
 }
 
 \value{
-  An object of class \code{\link[=optsol_robAna-class]{optsol_robAna}}.
+  An object of class \code{\linkS4class{optsol_robAna}}.
 }
 
 \references{

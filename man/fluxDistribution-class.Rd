@@ -11,6 +11,9 @@
 \alias{fluxes<-,fluxDistribution-method}
 \alias{num_of_fluxes,fluxDistribution-method}
 \alias{plot,fluxDistribution,missing-method}
+\alias{nnzero,fluxDistribution-method}
+\alias{nvar,fluxDistribution-method}
+\alias{nvar}
 
 \alias{num_of_fluxes}
 
@@ -19,7 +22,8 @@
 \description{
   Structure of the class \code{"fluxDistribution"}. Objects of that class are
   used by class \code{"\linkS4class{optsol}"} in order to store flux
-  distributions.
+  distributions. Flux distributions are stored columnwise; each flux corresponds
+  to one row and the optimizations correspond to the columns.
 }
 
 \section{Objects from the Class}{
@@ -62,6 +66,15 @@
     \item{\code{num_of_fluxes}}{
       \code{signature(object = "fluxDistribution")}: gets the
       \code{num_of_fluxes} slot.
+    }
+    \item{\code{nnzero}}{
+      \code{signature(object = "fluxDistribution")}: gets the number of
+      non-zero elements in slot \code{fluxes}.
+    }
+    \item{\code{nvar}}{
+      \code{signature(object = "fluxDistribution")}: gets the number of
+      fluxes in the fluxdistribution in slot \code{fluxes} (the number of rows
+      of slot \code{fluxes}).
     }
     \item{\code{plot}}{
       \code{signature(x = "fluxDistribution", y = "missing")}: heatmap like

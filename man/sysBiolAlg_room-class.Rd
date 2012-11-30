@@ -6,12 +6,14 @@
 \docType{class}
 
 \alias{sysBiolAlg_room-class}
+\alias{sysBiolAlg_room}
+\alias{room}
 
 \title{Class \code{"sysBiolAlg_room"}}
 
 \description{
   The class \code{sysBiolAlg_room} holds an object of class
-  \code{\link[=optObj-class]{optObj}} which is generated to meet the
+  \code{\linkS4class{optObj}} which is generated to meet the
   requirements of the ROOM algorithm.
 }
 
@@ -110,7 +112,7 @@
     }
     \item{...}{
       Further arguments passed to the initialize method of
-      \code{\link[=sysBiolAlg-class]{sysBiolAlg}}. They are \code{solver},
+      \code{\linkS4class{sysBiolAlg}}. They are \code{solver},
       \code{method} and \code{solverParm}.
     }
   }
@@ -175,7 +177,7 @@
 
 \seealso{
   Constructor function \code{\link{sysBiolAlg}} and
-  superclass \code{\link[=sysBiolAlg-class]{sysBiolAlg}}.
+  superclass \code{\linkS4class{sysBiolAlg}}.
 }
 
 \examples{

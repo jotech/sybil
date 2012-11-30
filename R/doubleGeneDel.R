@@ -102,10 +102,11 @@ doubleGeneDel <- function(model, geneList1, geneList2,
             slv <- SYBIL_SETTINGS("SOLVER")
         }
 
-        wtobj <- optimizeProb(model, alg = "fba", solver = slv, lpdir = "max")
+        wtobj <- optimizeProb(model, retOptSol = FALSE,
+                              algorithm = "fba", solver = slv, lpdir = "max")
 
         unSol <- oneGeneDel(model, geneList = unGenes, solver = slv,
-                            lpdir = "max", fld = "none", alg = "fba")
+                            lpdir = "max", fld = "none", algorithm = "fba")
 
         # solution id of lethal genes
         letid <- lethal(unSol, wtobj$obj)

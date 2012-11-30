@@ -130,8 +130,10 @@ setMethod(f = "initialize",
                   # rows
                   # ---------------------------------------------
 
-                  rlower <- c(rhs(model), rep(0, 2*nc), wtobj)
-                  rupper <- c(rhs(model), rep(absMAX, 2*nc + 1))
+                  #rlower <- c(rhs(model), rep(0, 2*nc), wtobj)
+                  #rupper <- c(rhs(model), rep(absMAX, 2*nc + 1))
+                  rlower <- c(rep(0, nr), rep(0, 2*nc), wtobj)
+                  rupper <- c(rep(0, nr), rep(absMAX, 2*nc + 1))
                   rtype  <- c(rep("E", nr), rep("L", 2*nc + 1))
 
                   # ---------------------------------------------
@@ -163,7 +165,7 @@ setMethod(f = "initialize",
                   # ---------------------------------------------
 
                   .Object <- callNextMethod(.Object,
-                                            alg        = "mtf",
+                                            sbalg      = "mtf",
                                             pType      = "lp",
                                             scaling    = scaling,
                                             fi         = fi,

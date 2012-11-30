@@ -1,11 +1,11 @@
-#  printObjFunc.R
+#  recodeMatrix.R
 #  FBA and friends with R.
 #
 #  Copyright (C) 2010-2012 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
 #  Institute for Informatics, Heinrich-Heine-University, Duesseldorf, Germany.
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
-#  
+#
 #  This file is part of sybil.
 #
 #  Sybil is free software: you can redistribute it and/or modify
@@ -23,32 +23,30 @@
 
 
 ################################################
-# Function: printObjFunc
+# Function: .recodeMatrix
 #
+# arguments:
 #
-#
-#
+# mat:   the matrix to recode (class Matrix)
+# signs: character vector of length three:
+#        mat[i, j]  > tol    -->   signs[3]
+#        mat[i, j]  < tol    -->   signs[1]
+#        mat[i, j] == tol    -->   signs[2]
+# tol:   tolerance value
 
 
-printObjFunc <- function(model) {
+.recodeMatrix <- function(mat,
+                          signs = c("-", " ", "+"),
+                          tol = SYBIL_SETTINGS("TOLERANCE")) {
 
-    if (!is(model, "modelorg")) {
-        stop("needs an object of class modelorg!")
-    }
+    stopifnot(is(mat, "Matrix"), length(signs) == 3)
 
-    cInd <- which(obj_coef(model) != 0)
-  
-    # check if there is an objective function
-    if (length(cInd) == 0) {
-        of <- "no objective function"
-    }
-    else {
-        of <- paste(paste(obj_coef(model)[cInd],
-                          react_id(model)[cInd],
-                          sep = " * "), collapse = " + ")
-    }
+    mat <- apply(mat, 2,
+                 function(x) {
+                     ifelse(x > tol, signs[3], ifelse(abs(x) > tol,
+                                                      signs[1], signs[2]))
+                 })
 
-    return(of)  
-  
+    return(mat)
+
 }
-

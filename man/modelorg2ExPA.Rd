@@ -14,7 +14,9 @@
 }
 
 \usage{
-  modelorg2ExPA(model, fname, exIntReact = NA, filepath = ".", suffix = "expa")
+  modelorg2ExPA(model, fname = NULL, exIntReact = NULL,
+                filepath = ".", suffix = "expa",
+                tol = SYBIL_SETTINGS("TOLERANCE"))
 }
 
 \arguments{
@@ -28,7 +30,7 @@
   \item{exIntReact}{
     An object of class \code{\link{reactId}}, character or integer, giving id's
     of internal reactions to exclude in the ExPA file.\cr
-    Default: \code{NA}.
+    Default: \code{NULL}.
   }
   \item{filepath}{
     A single character string giving the path to a certain directory in which
@@ -39,15 +41,24 @@
     A single character string giving the file name extension.\cr
     Default: \code{"expa"}.
   }
+  \item{tol}{
+    A single numeric value giving the limit of tolerance. An element
+    \eqn{S_{ij}}{S[i,j]} of the stoichiometric matrix is treated as non-zero,
+    if \eqn{|S_{ij}| > \textrm{tol}}{S[i,j] > tol} is true.\cr
+    Default: \code{"expa"}.
+  }
 }
 
 \details{
   The function \code{modelorg2ExPA} produces input files for the program ExPA.
   With ExPA, it is possible to calculate extreme pathways in metabolic networks.
+  
+  The function produces a warning, if a reaction contains non-integer
+  stoichiometric values, because they are not compatible with the ExPA program.
 }
 
 \value{
-  Returns \code{TRUE} on success.
+  Returns \code{TRUE} invisibly on success.
 }
 
 \references{

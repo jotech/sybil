@@ -87,9 +87,6 @@
         if (met != length(met_comp(object))) {
             return("Wrong number of metabolite compartments!")
         }
-        if (met != length(rhs(object))) {
-            return("Wrong length of rhs!")
-        }
         if (met != length(met_single(object))) {
             return("Wrong length of met_single!")
         }

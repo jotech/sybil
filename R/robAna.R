@@ -51,34 +51,42 @@ robAna <- function(model, ctrlreact,
     ctrlr <- react_pos(tmp)
 
     # ------------------------------------------------------------------------ #
-    minmaxsol <- function(mmdir) {
+    minmaxsol <- function(mod, ...) {
 
-        obj <- numeric(length(fldind(lpmod)))
-        obj[ctrlr] <- 1
-        tmp_sol  <- optimizeProb(lpmod, lpdir = mmdir, obj_coef = obj)
-        if (tmp_sol$ok != 0) {
+        obj_coef(mod) <- integer(react_num(mod))
+        lp <- sysBiolAlg(mod, algorithm = "fba", ...)
+
+        tmp_sol_min  <- optimizeProb(lp,
+                                     react = ctrlr,
+                                     obj_coef = 1,
+                                     lpdir = "min")
+        tmp_sol_max  <- optimizeProb(lp,
+                                     react = ctrlr,
+                                     obj_coef = 1,
+                                     lpdir = "max")
+
+        if ( (tmp_sol_min$ok != 0) || (tmp_sol_max$ok != 0) ) {
             stop("Optimization for min/max solution ended not successfull!")
         }
 
-        return(tmp_sol$obj)
+        delProb(problem(lp))
+
+        return(c(tmp_sol_min$obj, tmp_sol_max$obj))
     }
     # ------------------------------------------------------------------------ #
-
 
 #------------------------------------------------------------------------------#
 #                       minimum and maximum solution                           #
 #------------------------------------------------------------------------------#
 
 
-    lpmod <- sysBiolAlg(model, algorithm = "fba", ...)
+    mm    <- minmaxsol(model, ...)
 
-    lpmin <- minmaxsol(mmdir = "max")
-    lpmax <- minmaxsol(mmdir = "min")
+    lpmod <- sysBiolAlg(model, algorithm = "fba", ...)
 
     # sequence of numP numbers between lpmin and lpmax,
     # all with the same distance
-    ctrlfl <- seq(lpmin, lpmax, length.out = numP)
-
+    ctrlfl <- seq(mm[1], mm[2], length.out = numP)
 
 #------------------------------------------------------------------------------#
 #                                optimization                                  #
@@ -127,6 +135,7 @@ robAna <- function(model, ctrlreact,
 
     optsol <- new("optsol_robAna",
         mod_id       = mod_id(model),
+        mod_key      = mod_key(model),
         solver       = solver(problem(lpmod)),
         method       = method(problem(lpmod)),
         algorithm    = algorithm(lpmod),
@@ -136,8 +145,9 @@ robAna <- function(model, ctrlreact,
         lp_obj       = as.numeric(obj),
         lp_ok        = as.integer(ok),
         lp_stat      = as.integer(stat),
-        lp_dir       = getObjDir(problem(lpmod)),
+        lp_dir       = factor(getObjDir(problem(lpmod))),
         obj_coef     = obj_coef(model),
+        obj_func     = printObjFunc(model),
         fldind       = fldind(lpmod),
         fluxdist     = fluxDistribution(flux),
 

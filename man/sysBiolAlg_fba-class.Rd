@@ -6,12 +6,14 @@
 \docType{class}
 
 \alias{sysBiolAlg_fba-class}
+\alias{sysBiolAlg_fba}
+\alias{fba}
 
 \title{Class \code{"sysBiolAlg_fba"}}
 
 \description{
   The class \code{sysBiolAlg_fba} holds an object of class
-  \code{\link[=optObj-class]{optObj}} which is generated to meet the
+  \code{\linkS4class{optObj}} which is generated to meet the
   requirements of the FBA algorithm.
 }
 
@@ -73,7 +75,7 @@
     }
     \item{...}{
       Further arguments passed to the initialize method of
-      \code{\link[=sysBiolAlg-class]{sysBiolAlg}}. They are \code{solver},
+      \code{\linkS4class{sysBiolAlg}}. They are \code{solver},
       \code{method} and \code{solverParm}.
     }
   }
@@ -122,7 +124,7 @@
 
 \seealso{
   Constructor function \code{\link{sysBiolAlg}} and
-  superclass \code{\link[=sysBiolAlg-class]{sysBiolAlg}}.
+  superclass \code{\linkS4class{sysBiolAlg}}.
 }
 
 \examples{

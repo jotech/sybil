@@ -38,7 +38,10 @@ checkReactId <- function(model, react, needId = FALSE) {
   if (!is(model, "modelorg")) {
     stop("needs an object of class modelorg!")
   }
-  
+
+  checkedIds <- NULL
+
+ 
 #------------------------------------------------------------------------------#
 #                           if "react" is numeric                              #
 #------------------------------------------------------------------------------#
@@ -47,20 +50,31 @@ checkReactId <- function(model, react, needId = FALSE) {
 # react is larger than the number of reactions and if all elements are positive.
 
   if (is.numeric(react) || is.integer(react)) {
-      num_react <- react_num(model)
 
-      if ((max(react) > num_react) || (!all(react > 0))) {
-          warning("Check argument react!")
-          return(NA)
+      if ( (max(react) > react_num(model)) || (min(react) < 1) ) {
+      #if ( (max(react) > react_num(model)) || (!all(react > 0)) ) {
+          warning("reaction numbers must be in between 1 and ", react_num(model))
       }
-
-      if (needId == FALSE) {
-          checkedIds <- reactId(react, character(length(react)))
-          return(checkedIds)
+      else {
+          if (needId == FALSE) {
+              #checkedIds <- reactId(react, character(length(react)))
+              #checkedIds <- reactId(react)
+              checkedIds <- new("reactId",
+                                mod_id  = mod_id(model),
+                                mod_key = mod_key(model),
+                                pnt     = react,
+                                id      = NULL)
+          }
+          else {
+              #checkedIds <- reactId(react, react_id(model)[react])
+              checkedIds <- new("reactId",
+                                mod_id  = mod_id(model),
+                                mod_key = mod_key(model),
+                                pnt     = react,
+                                id      = react_id(model)[react])
+          }
       }
-
-      checkedIds <- reactId(react, react_id(model)[react])
-      return(checkedIds)
+      #return(checkedIds)
 
   }
 
@@ -68,58 +82,71 @@ checkReactId <- function(model, react, needId = FALSE) {
 #                          if "react" is character                             #
 #------------------------------------------------------------------------------#
 
-  reaction_ids <- react_id(model)
-
-  # find the vector indices in the model of react
-  pos <- match(react, reaction_ids, nomatch = 0)
-  if (all(pos != 0)) {
-      checkedIds <- reactId(pos, react)
-      return(checkedIds)
-      #return(list(id = react, pos = pos))
-  }
-
-  # if we cannot find some entries in react, we try grep
-  else {
-      #print(pos)
-      # only those, we could not find above
-      pos_null <- which(pos == 0)
-
-      # the grep
-      react_null <- sapply(pos_null, function(x) grep(react[x], reaction_ids, ignore.case = TRUE, value = TRUE))
-      
-      #react  <- sapply(react, function(x) grep(x, Dmodel@react_id, ignore.case = TRUE, value = TRUE))
-
-      # check weather all results are unique
-      #print(is(react_null))
-      #print(react_null)
-      len    <- sapply(react_null, length)
-      n_uniq <- which(len != 1)
-
-      #print(len)
-
-      if ((length(n_uniq) != 0) || (is(react_null, "matrix"))) {
-          warning("Some reaction id's were not found or are ambiguous.", call. = FALSE)
-          #print(n_uniq)
-          #return(FALSE)
-          return(NA)
+  if (is(react, "character")) {
+      reaction_ids <- react_id(model)
+    
+      # find the vector indices in the model of react
+      pos <- match(react, reaction_ids, nomatch = 0)
+      if (all(pos != 0)) {
+          #checkedIds <- reactId(pos, react)
+          checkedIds <- new("reactId",
+                            mod_id  = mod_id(model),
+                            mod_key = mod_key(model),
+                            pnt     = pos,
+                            id      = react)
+          #return(checkedIds)
+          #return(list(id = react, pos = pos))
       }
-
-      pos_react <- match(react_null, reaction_ids)
-      #print(pos_null)
-      #print(pos_react)
-      #print(react_null)
-
-      pos[pos_null]   <- pos_react
-      react[pos_null] <- react_null
-      #print(pos)
-      #print(react)
-      #pos <- match(react, model@react_id)
-
-      checkedIds <- reactId(pos, react)
-      return(checkedIds)
-      #return(list(id = react, pos = pos))
-
+    
+      # if we cannot find some entries in react, we try grep
+      else {
+          #print(pos)
+          # only those, we could not find above
+          pos_null <- which(pos == 0)
+    
+          # the grep
+          react_null <- sapply(pos_null, function(x) grep(react[x], reaction_ids, ignore.case = TRUE, value = TRUE))
+          
+          #react  <- sapply(react, function(x) grep(x, Dmodel@react_id, ignore.case = TRUE, value = TRUE))
+    
+          # check weather all results are unique
+          #print(is(react_null))
+          #print(react_null)
+          len    <- sapply(react_null, length)
+          n_uniq <- which(len != 1)
+    
+          #print(len)
+    
+          if ((length(n_uniq) != 0) || (is(react_null, "matrix"))) {
+              warning("some reaction id's were not found or are ambiguous", call. = FALSE)
+              #print(n_uniq)
+              #return(FALSE)
+              #return(NA)
+          }
+          else {
+              pos_react <- match(react_null, reaction_ids)
+              #print(pos_null)
+              #print(pos_react)
+              #print(react_null)
+        
+              pos[pos_null]   <- pos_react
+              react[pos_null] <- react_null
+              #print(pos)
+              #print(react)
+              #pos <- match(react, model@react_id)
+        
+              #checkedIds <- reactId(pos, react)
+              checkedIds <- new("reactId",
+                                mod_id  = mod_id(model),
+                                mod_key = mod_key(model),
+                                pnt     = pos,
+                                id      = react)
+              #return(checkedIds)
+              #return(list(id = react, pos = pos))
+          }
+      }
   }
+  
+  return(checkedIds)                            
 
-                                      
 }

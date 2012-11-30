@@ -46,6 +46,9 @@
     \item{\code{mod_id}:}{Object of class \code{"character"}
       containing the model id of the used model.
     }
+    \item{\code{mod_key}:}{Object of class \code{"character"}
+      containing the model key of the used model.
+    }
     \item{\code{solver}:}{Object of class \code{"character"}
       indicating the used solver.
     }
@@ -65,7 +68,12 @@
       indicating the number of rows.
     }
     \item{\code{lp_obj}:}{Object of class \code{"numeric"}
-      containing the values of the objective function.
+      containing the optimal values of the objective function after
+      optimization. If no flux distribution is available, slot \code{lp_obj}
+      contains the cross-product of the objective coefficients in slot
+      \code{obj_coef} and the part of the flux distribution in slot
+      \code{fluxdist} containing the values representing fluxes in the entire
+      metabolic network (slot \code{fldind}).
     }
     \item{\code{lp_ok}:}{Object of class \code{"integer"}
       containing the exit code of the optimization.
@@ -77,8 +85,14 @@
       indicating the direction of optimization.
     }
     \item{\code{obj_coef}:}{Object of class \code{"numeric"}
-      containing the objective coefficients of the used model. These are not
-      necessarily the objective coefficients of the used algorithm. 
+      containing the objective coefficients of the used model (slot
+      \code{obj_coef} of an object of class \code{\linkS4class{modelorg}}).
+      These are not necessarily the objective coefficients of the used
+      algorithm. 
+    }
+    \item{\code{obj_func}:}{Object of class \code{"character"}
+      containing the objective function of the used model. Usually, it contains
+      the return value of \code{\link{printObjFunc}}. 
     }
     \item{\code{fldind}:}{Object of class \code{"integer"}
       pointers to columns (variables) representing a flux (reaction) in the
@@ -111,8 +125,9 @@
       sets the \code{ctrlr} slot.
     }
     \item{\code{plot}}{\code{signature(x = "optsol_robAna", y = "missing")}
-      (\code{xlab = "Control Flux", ylab = "Objective Function", type = "b",
-             pch = 20, fillColorBg = "grey", fillBg = TRUE,
+      (\code{xlab = paste("Control Flux:", react_id(ctrlr(x))),
+             ylab = paste("Objective Function:", obj_func(x)),
+             type = "b", pch = 20, fillColorBg = "grey", fillBg = TRUE,
              absCtrl = TRUE, ...}):\cr
       plots the optimal values of the objective function vs. the control flux
       values.
@@ -133,7 +148,7 @@
           color of the area below the curve.
         }
         \item{\code{fillBg}}{
-          color the area below the curve.
+          logical: color the area below the curve.
         }
         \item{\code{absCtrl}}{
           if set to \code{TRUE}, the control flux values (x axis) are plotted
@@ -154,7 +169,7 @@
 }
       
 \examples{
-  showClass("optsol_blockedReact")
+  showClass("optsol_robAna")
 }
 
 \keyword{classes}

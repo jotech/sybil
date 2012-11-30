@@ -46,12 +46,30 @@
       Object of class \code{"logical"} indicating weather deletion of
       gene \code{i} has an effect or not.
     }
+    \item{\code{chlb}:}{Object of class \code{"numeric"}
+      containing the new (changed) values for the columns lower bounds.
+    }
+    \item{\code{chub}:}{Object of class \code{"numeric"}
+      containing the new (changed) values for the columns upper bounds.
+    }
     \item{\code{dels}:}{
       Object of class \code{"matrix"} (one column) containing the position of
-      the reaction id's of deleted genes in the slot \code{react_id}.
+      the reaction id's of deleted reactions (fluxes) in the slot
+      \code{react_id}.
+    }
+    \item{\code{preProc}:}{Object of class \code{"ppProc"}
+      containing the results of pre-processing.
+      See also \code{\link{optimizeProb}}.
+    }
+    \item{\code{postProc}:}{Object of class \code{"ppProc"}
+      containing the results of post-processing.
+      See also \code{\link{optimizeProb}}.
     }
     \item{\code{mod_id}:}{Object of class \code{"character"}
       containing the model id of the used model.
+    }
+    \item{\code{mod_key}:}{Object of class \code{"character"}
+      containing the model key of the used model.
     }
     \item{\code{solver}:}{Object of class \code{"character"}
       indicating the used solver.
@@ -72,7 +90,12 @@
       indicating the number of rows.
     }
     \item{\code{lp_obj}:}{Object of class \code{"numeric"}
-      containing the values of the objective function.
+      containing the optimal values of the objective function after
+      optimization. If no flux distribution is available, slot \code{lp_obj}
+      contains the cross-product of the objective coefficients in slot
+      \code{obj_coef} and the part of the flux distribution in slot
+      \code{fluxdist} containing the values representing fluxes in the entire
+      metabolic network (slot \code{fldind}).
     }
     \item{\code{lp_ok}:}{Object of class \code{"integer"}
       containing the exit code of the optimization.
@@ -84,8 +107,14 @@
       indicating the direction of optimization.
     }
     \item{\code{obj_coef}:}{Object of class \code{"numeric"}
-      containing the objective coefficients of the used model. These are not
-      necessarily the objective coefficients of the used algorithm. 
+      containing the objective coefficients of the used model (slot
+      \code{obj_coef} of an object of class \code{\linkS4class{modelorg}}).
+      These are not necessarily the objective coefficients of the used
+      algorithm. 
+    }
+    \item{\code{obj_func}:}{Object of class \code{"character"}
+      containing the objective function of the used model. Usually, it contains
+      the return value of \code{\link{printObjFunc}}. 
     }
     \item{\code{fldind}:}{Object of class \code{"integer"}
       pointers to columns (variables) representing a flux (reaction) in the

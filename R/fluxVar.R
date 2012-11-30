@@ -32,22 +32,42 @@
 # The algorithm is the same.
 
 
-fluxVar <- function(model, react, fld = FALSE, verboseMode = 2, ...) {
+fluxVar <- function(model, react = c(1:react_num(model)),
+                    exex = FALSE, fld = FALSE, verboseMode = 2, ...) {
 
-    # check prerequisites
     if (!is(model, "modelorg")) {
       stop("needs an object of class modelorg!")
     }
 
-    if (missing(react)) {
-        react <- reactId((1:react_num(model)), react_id(model))
-    }
-    else {
-        if (!is(react, "reactId")) {
-            react <- checkReactId(model, react, needId = TRUE)
+#    if (missing(react)) {
+#        react <- reactId((1:react_num(model)), react_id(model))
+#    }
+#    else {
+#        if (!is(react, "reactId")) {
+#            react <- checkReactId(model, react, needId = TRUE)
+#        }
+#    }
+
+    # remove exchange reactions from analysis
+    if (isTRUE(exex)) {
+        exchReact <- findExchReact(model)
+        ex <- react_pos(exchReact)
+        intReact <- 1:react_num(model)
+        intReact <- intReact[-ex]
+        
+        if (length(intReact) < 1) {
+            stop("model contains no internal reactions!")
         }
     }
+    else {
+        intReact <- react
+    }
 
+    creact <- checkReactId(model, intReact, needId = TRUE)
+    
+    if (!is(creact, "reactId")) {
+        stop("check argument react")
+    }
 
 #------------------------------------------------------------------------------#
 #                            data strucktures                                  #
@@ -57,7 +77,7 @@ fluxVar <- function(model, react, fld = FALSE, verboseMode = 2, ...) {
     lpmod <- sysBiolAlg(model, algorithm = "fv", ...)
 
     # simulation solutions
-    nObj  <- 2 * length(react_pos(react))
+    nObj  <- 2 * length(react_pos(creact))
     obj   <- numeric(nObj)
     ok    <- integer(nObj)
     stat  <- integer(nObj)
@@ -69,8 +89,8 @@ fluxVar <- function(model, react, fld = FALSE, verboseMode = 2, ...) {
     }
 
     # reactions to optimize
-    num_of_probs_half <- length(react_pos(react))
-    fvR               <- react_pos(react)
+    num_of_probs_half <- length(creact)
+    fvR               <- react_pos(creact)
     
 
 #------------------------------------------------------------------------------#
@@ -84,9 +104,14 @@ fluxVar <- function(model, react, fld = FALSE, verboseMode = 2, ...) {
     # it is a bit faster, if we do first all minimisations and
     # afterwards all maximisations
 
-    cc <- numeric(react_num(model))
     od <- "min"
     j <- 0
+
+    if (verboseMode > 2) {
+        cat(sprintf("%-5s %-5s %-15s %12s\n",
+                    "dir", "no.", "reaction id", "flux rate"))
+    }
+
     for (i in 1:nObj) {
 
         if (verboseMode == 2) {
@@ -99,17 +124,13 @@ fluxVar <- function(model, react, fld = FALSE, verboseMode = 2, ...) {
             j <- 1
         }
 
-        
-        cc[j] <- 1
-
-        fluxVarSol <- optimizeProb(lpmod, lpdir = od, obj_coef = cc)
-
-        cc[j] <- 0
+        fluxVarSol <- optimizeProb(lpmod, lpdir = od,
+                                   react = fvR[j], obj_coef = 1)
 
         if (verboseMode > 2) {
-            print(sprintf("%-5s %-15s %12s", j,
-                          substr(react_id(model)[fvR[j]], 1, 15),
-                          sprintf("%.6f", fluxVarSol$obj)))
+            cat(sprintf("%-5s %-5s %-15s %12s\n", od, fvR[j],
+                        substr(react_id(creact)[j], 1, 15),
+                        sprintf("%.6f", fluxVarSol$obj)))
         }
 
         obj[i]    <- fluxVarSol$obj
@@ -127,6 +148,7 @@ fluxVar <- function(model, react, fld = FALSE, verboseMode = 2, ...) {
 
     optsol <- new("optsol_fluxVar",
         mod_id       = mod_id(model),
+        mod_key      = mod_key(model),
         solver       = solver(problem(lpmod)),
         method       = method(problem(lpmod)),
         algorithm    = algorithm(lpmod),
@@ -136,12 +158,14 @@ fluxVar <- function(model, react, fld = FALSE, verboseMode = 2, ...) {
         lp_obj       = as.numeric(obj),
         lp_ok        = as.integer(ok),
         lp_stat      = as.integer(stat),
-        lp_dir       = getObjDir(problem(lpmod)),
+        lp_dir       = factor(c(rep("min", floor(nObj/2)),
+                                rep("max", floor(nObj/2)))),
         obj_coef     = obj_coef(model),
+        obj_func     = printObjFunc(model),
         fldind       = fldind(lpmod),
         fluxdist     = fluxDistribution(flux),
 
-        react        = react
+        react        = creact
     )
 
     return(optsol)

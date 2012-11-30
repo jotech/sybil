@@ -26,7 +26,9 @@
 \alias{fluxes<-}
 \alias{lp_dir,optsol-method}
 \alias{lp_dir}
-\alias{lp_dir<-,optsol-method}
+\alias{lp_dir<-,optsol,character-method}
+\alias{lp_dir<-,optsol,factor-method}
+\alias{lp_dir<-,optsol,numeric-method}
 \alias{lp_dir<-}
 \alias{lp_num_cols,optsol-method}
 \alias{lp_num_cols}
@@ -54,6 +56,8 @@
 \alias{method<-}
 \alias{mod_id,optsol-method}
 \alias{mod_id<-,optsol-method}
+\alias{mod_key<-,optsol-method}
+\alias{mod_key,optsol-method}
 \alias{mod_obj,optsol-method}
 \alias{mod_obj}
 \alias{nfluxes,optsol-method}
@@ -64,6 +68,10 @@
 \alias{num_of_prob<-}
 \alias{obj_coef,optsol-method}
 \alias{obj_coef<-,optsol-method}
+\alias{obj_func,optsol-method}
+\alias{obj_func}
+\alias{obj_func<-,optsol-method}
+\alias{obj_func<-}
 \alias{react_id,optsol-method}
 \alias{react_id<-,optsol-method}
 \alias{show,optsol-method}
@@ -93,6 +101,9 @@
   \describe{
     \item{\code{mod_id}:}{Object of class \code{"character"}
       containing the model id of the used model.
+    }
+    \item{\code{mod_key}:}{Object of class \code{"character"}
+      containing the model key of the used model.
     }
     \item{\code{solver}:}{Object of class \code{"character"}
       indicating the used solver.
@@ -130,8 +141,14 @@
       indicating the direction of optimization.
     }
     \item{\code{obj_coef}:}{Object of class \code{"numeric"}
-      containing the objective coefficients of the used model. These are not
-      necessarily the objective coefficients of the used algorithm. 
+      containing the objective coefficients of the used model (slot
+      \code{obj_coef} of an object of class \code{\linkS4class{modelorg}}).
+      These are not necessarily the objective coefficients of the used
+      algorithm. 
+    }
+    \item{\code{obj_func}:}{Object of class \code{"character"}
+      containing the objective function of the used model. Usually, it contains
+      the return value of \code{\link{printObjFunc}}. 
     }
     \item{\code{fldind}:}{Object of class \code{"integer"}
       pointers to columns (variables) representing a flux (reaction) in the
@@ -152,7 +169,7 @@
     \item{\code{algorithm}:}{\code{signature(object = "optsol")}:
       gets the \code{algorithm} slot.
     }
-    \item{\code{checkStat}:}{\code{signature(object = "optsol")}:
+    \item{\code{checkStat}:}{\code{signature(opt = "optsol")}:
       returns the indices of problems with a non optimal solution status.
     }
     \item{\code{fldind<-}:}{\code{signature(object = "optsol")}:
@@ -177,11 +194,19 @@
       \code{signature(x = "optsol")}: plots a histogram of the
       values of the objective function in optimal state.
     }
-    \item{\code{length}:}{\code{signature(object = "optsol")}:
+    \item{\code{length}:}{\code{signature(x = "optsol")}:
       returns the number of optimizations.
     }
-    \item{\code{lp_dir<-}:}{\code{signature(object = "optsol")}:
+    \item{\code{lp_dir<-}:}{\code{signature(object = "optsol", value = "character")}:
+      sets the \code{lp_dir} slot. Argument \code{value} can be \code{"min"}
+      (minimization) or \code{"max"} (maximization).
+    }
+    \item{\code{lp_dir<-}:}{\code{signature(object = "optsol", value = "factor")}:
       sets the \code{lp_dir} slot.
+    }
+    \item{\code{lp_dir<-}:}{\code{signature(object = "optsol", value = "numeric")}:
+      sets the \code{lp_dir} slot. Argument \code{value} can be \code{1}
+      (minimization) or \code{-1} (maximization).
     }
     \item{\code{lp_dir}:}{\code{signature(object = "optsol")}:
       gets the \code{lp_dir} slot.
@@ -228,6 +253,12 @@
     \item{\code{mod_id}:}{\code{signature(object = "optsol")}:
       gets the \code{mod_id} slot.
     }
+    \item{\code{mod_key<-}:}{\code{signature(object = "optsol")}:
+      sets the \code{mod_key} slot.
+    }
+    \item{\code{mod_key}:}{\code{signature(object = "optsol")}:
+      gets the \code{mod_key} slot.
+    }
     \item{\code{mod_obj}:}{\code{signature(object = "optsol_fluxdel")}:
       returns allways the cross-product of the objective coefficients in slot
       \code{obj_coef} and the part of the flux distribution in slot
@@ -238,7 +269,7 @@
        objective function of the used algorithm after optimization.
     }
     \item{\code{nfluxes}:}{\code{signature(object = "optsol")}:
-      gets the number of flux distributions.
+      gets the number of elements in the flux distribution matrix.
     }
     \item{\code{num_of_prob<-}:}{\code{signature(object = "optsol")}:
       sets the \code{num_of_prob} slot.
@@ -251,6 +282,12 @@
     }
     \item{\code{obj_coef}:}{\code{signature(object = "optsol")}:
       gets the \code{obj_coef} slot.
+    }
+    \item{\code{obj_func<-}:}{\code{signature(object = "optsol")}:
+      sets the \code{obj_func} slot.
+    }
+    \item{\code{obj_func}:}{\code{signature(object = "optsol")}:
+      gets the \code{obj_func} slot.
     }
     \item{\code{react_id<-}:}{\code{signature(object = "optsol")}:
       sets the \code{react_id} slot.
@@ -277,7 +314,6 @@
   \code{\linkS4class{optsol_optimizeProb}}
   \code{\linkS4class{optsol_fluxdel}},
   \code{\linkS4class{optsol_genedel}},
-  \code{\linkS4class{optsol_blockedReact}},
   \code{\linkS4class{optsol_robAna}} and
   \code{\linkS4class{optsol_fluxVar}}
 }

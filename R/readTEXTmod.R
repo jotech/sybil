@@ -531,7 +531,6 @@ gpr(Model)        <- gpr
 allGenes(Model)   <- allGenes
 rxnGeneMat(Model) <- rxnGeneMat
 
-rhs(Model)        <- integer(num_met)
 obj_coef(Model)   <- integer(num_react)
 
 uppbnd(Model)     <- uppbnd

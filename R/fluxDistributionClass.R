@@ -52,11 +52,11 @@ fluxDistribution <- function(fluxes = NA, nrow = 1, ncol = 1) {
         Mfluxes <- Matrix::Matrix(fluxes, nrow = nrow, ncol = ncol)
     }
 
-    num_of_fluxes <- ncol(Mfluxes) * nrow(Mfluxes)
+    num_of_fluxes <- length(Mfluxes)
 
     obj <- new("fluxDistribution",
                fluxes = Mfluxes,
-               num_of_fluxes = num_of_fluxes)
+               num_of_fluxes = as.integer(num_of_fluxes))
     return(obj)
 }
 
@@ -92,8 +92,30 @@ setMethod("num_of_fluxes", signature(object = "fluxDistribution"),
 #                               other methods                                  #
 #------------------------------------------------------------------------------#
 
+# nnzero
+setMethod("nnzero", signature(x = "fluxDistribution"),
+    function(x) {
+
+        nnz <- Matrix::nnzero(fluxes(x))
+        return(nnz)
+
+    }
+)
+
+
+# nvar
+setMethod("nvar", signature(object = "fluxDistribution"),
+    function(object) {
+
+        nr <- nrow(fluxes(object))
+        return(nr)
+
+    }
+)
+
+
 # [
-setMethod("[", signature = signature(x = "fluxDistribution"),
+setMethod("[", signature(x = "fluxDistribution"),
     function(x, i, j, ..., drop = FALSE) {
 
         if (missing(i)) {

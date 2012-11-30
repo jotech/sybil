@@ -30,7 +30,6 @@
 setGeneric("plot")
 setGeneric("histogram")
 
-
 # sybil
 setGeneric(name = "addCols",
            def  = function(lp, ncols, ...) { standardGeneric("addCols") }
@@ -77,8 +76,16 @@ setGeneric(name = "blocked<-",
            def  = function(object, value) { standardGeneric("blocked<-") }
 )
 
+setGeneric(name = "blReact",
+           def  = function(object, tol = SYBIL_SETTINGS("TOLERANCE")) { standardGeneric("blReact") }
+)
+
 setGeneric(name = "changeColsBnds",
            def  = function(lp, ...) { standardGeneric("changeColsBnds") }
+)
+
+setGeneric(name = "changeColsBndsObjCoefs",
+           def  = function(lp, ...) { standardGeneric("changeColsBndsObjCoefs") }
 )
 
 setGeneric(name = "changeMatrixRow",
@@ -93,8 +100,12 @@ setGeneric(name = "changeRowsBnds",
            def  = function(lp, ...) { standardGeneric("changeRowsBnds") }
 )
 
+setGeneric(name = "checkOptSol",
+           def  = function(opt, ...) { standardGeneric("checkOptSol") }
+)
+
 setGeneric(name = "checkStat",
-           def  = function(object) { standardGeneric("checkStat") }
+           def  = function(opt) { standardGeneric("checkStat") }
 )
 
 setGeneric(name = "chlb",
@@ -192,6 +203,14 @@ setGeneric(name = "exit_num<-",
            def  = function(object, value) { standardGeneric("exit_num<-") }
 )
 
+setGeneric(name = "ex_met",
+           def  = function(object) { standardGeneric("ex_met") }
+)
+
+setGeneric(name = "ex_val",
+           def  = function(object) { standardGeneric("ex_val") }
+)
+
 setGeneric(name = "fenc",
            def  = function(object) { standardGeneric("fenc") }
 )
@@ -268,7 +287,7 @@ setGeneric(name = "getColsUppBnds",
 )
 
 setGeneric(name = "getFluxDist",
-           def  = function(lp) { standardGeneric("getFluxDist") }
+           def  = function(lp, ...) { standardGeneric("getFluxDist") }
 )
 
 setGeneric(name = "getNumCols",
@@ -336,6 +355,10 @@ setGeneric(name = "hasEffect<-",
            def  = function(object, value) { standardGeneric("hasEffect<-") }
 )
 
+setGeneric(name = "hasId",
+           def  = function(object) { standardGeneric("hasId") }
+)
+
 setGeneric(name = "ind",
            def  = function(object) { standardGeneric("ind") }
 )
@@ -371,22 +394,6 @@ setGeneric(name = "lethal",
 
 setGeneric(name = "loadLPprob",
            def  = function(lp, ...) { standardGeneric("loadLPprob") }
-)
-
-setGeneric(name = "loadMatrix",
-           def  = function(lp, ...) { standardGeneric("loadMatrix") }
-)
-
-setGeneric(name = "loadProblemData",
-           def  = function(lp, ...) { standardGeneric("loadProblemData") }
-)
-
-setGeneric(name = "loadProblemDataLM",
-           def  = function(lp, ...) { standardGeneric("loadProblemDataLM") }
-)
-
-setGeneric(name = "loadProblemDataMTF",
-           def  = function(lp, ...) { standardGeneric("loadProblemDataMTF") }
 )
 
 setGeneric(name = "loadQobj",
@@ -503,7 +510,7 @@ setGeneric(name = "matchrev<-",
 )
 
 setGeneric(name = "maxSol",
-           def  = function(object, slot) { standardGeneric("maxSol") }
+           def  = function(object, ...) { standardGeneric("maxSol") }
 )
 
 setGeneric(name = "met_comp",
@@ -541,6 +548,13 @@ setGeneric(name = "met_num<-",
            def  = function(object, value) { standardGeneric("met_num<-") }
 )
 
+setGeneric(name = "met_pos",
+           def  = function(object) { standardGeneric("met_pos") }
+)
+setGeneric(name = "met_pos<-",
+           def  = function(object, value) { standardGeneric("met_pos<-") }
+)
+
 setGeneric(name = "met_single",
            def  = function(object) { standardGeneric("met_single") }
 )
@@ -556,7 +570,7 @@ setGeneric(name = "method<-",
 )
 
 setGeneric(name = "minSol",
-           def  = function(object, slot) { standardGeneric("minSol") }
+           def  = function(object, ...) { standardGeneric("minSol") }
 )
 
 setGeneric(name = "mod_compart",
@@ -580,6 +594,13 @@ setGeneric(name = "mod_id<-",
            def  = function(object, value) { standardGeneric("mod_id<-") }
 )
 
+setGeneric(name = "mod_key",
+           def  = function(object) { standardGeneric("mod_key") }
+)
+setGeneric(name = "mod_key<-",
+           def  = function(object, value) { standardGeneric("mod_key<-") }
+)
+
 setGeneric(name = "mod_name",
            def  = function(object) { standardGeneric("mod_name") }
 )
@@ -589,6 +610,9 @@ setGeneric(name = "mod_name<-",
 
 setGeneric(name = "mod_obj",
            def  = function(object) { standardGeneric("mod_obj") }
+)
+setGeneric(name = "mod_obj<-",
+           def  = function(object, value) { standardGeneric("mod_obj<-") }
 )
 
 setGeneric(name = "nc",
@@ -609,6 +633,14 @@ setGeneric(name = "nr<-",
            def  = function(object, value) { standardGeneric("nr<-") }
 )
 
+setGeneric(name = "nvar",
+           def  = function(object) { standardGeneric("nvar") }
+)
+
+setGeneric(name = "nzeros",
+           def  = function(object) { standardGeneric("nzeros") }
+)
+
 setGeneric(name = "num_of_fluxes",
            def  = function(object) { standardGeneric("num_of_fluxes") }
 )
@@ -625,6 +657,13 @@ setGeneric(name = "obj_coef",
 )
 setGeneric(name = "obj_coef<-",
            def  = function(object, value) { standardGeneric("obj_coef<-") }
+)
+
+setGeneric(name = "obj_func",
+           def  = function(object) { standardGeneric("obj_func") }
+)
+setGeneric(name = "obj_func<-",
+           def  = function(object, value) { standardGeneric("obj_func<-") }
 )
 
 setGeneric(name = "optimizeProb",
@@ -654,6 +693,25 @@ setGeneric(name = "preProc",
 )
 setGeneric(name = "preProc<-",
            def  = function(object, value) { standardGeneric("preProc<-") }
+)
+
+setGeneric(name = "printExchange",
+           def  = function(object, ...) { standardGeneric("printExchange") }
+)
+
+setGeneric(name = "printMetabolite",
+           def  = function(object, ...) { standardGeneric("printMetabolite") }
+)
+
+setGeneric(name = "printObjFunc",
+           def  = function(object) { standardGeneric("printObjFunc") }
+)
+
+setGeneric(name = "printReaction",
+           def  = function(object, ...) { standardGeneric("printReaction") }
+)
+setGeneric(name = "printReaction",
+           def  = function(object, mod, ...) { standardGeneric("printReaction") }
 )
 
 setGeneric(name = "problem",
@@ -723,18 +781,15 @@ setGeneric(name = "react_single<-",
            def  = function(object, value) { standardGeneric("react_single<-") }
 )
 
+setGeneric(name = "readProb",
+           def  = function(lp, fname, ff = "lp", ...) { standardGeneric("readProb") }
+)
+
 setGeneric(name = "rev2irrev",
            def  = function(object) { standardGeneric("rev2irrev") }
 )
 setGeneric(name = "rev2irrev<-",
            def  = function(object, value) { standardGeneric("rev2irrev<-") }
-)
-
-setGeneric(name = "rhs",
-           def  = function(object) { standardGeneric("rhs") }
-)
-setGeneric(name = "rhs<-",
-           def  = function(object, value) { standardGeneric("rhs<-") }
 )
 
 setGeneric(name = "rxnGeneMat",
@@ -755,16 +810,12 @@ setGeneric(name = "scaleProb",
            def  = function(lp, ...) { standardGeneric("scaleProb") }
 )
 
-setGeneric(name = "shrinkSMatrix",
-           def  = function(model, i, j, names) { standardGeneric("shrinkSMatrix") }
+setGeneric(name = "shrinkMatrix",
+           def  = function(X, ...) { standardGeneric("shrinkMatrix") }
 )
 
 setGeneric(name = "sensitivityAnalysis",
            def  = function(lp, ...) { standardGeneric("sensitivityAnalysis") }
-)
-
-setGeneric(name = "changeColsBndsObjCoefs",
-           def  = function(lp, ...) { standardGeneric("changeColsBndsObjCoefs") }
 )
 
 setGeneric(name = "setObjDir",
@@ -829,6 +880,21 @@ setGeneric(name = "uppbnd<-",
            def  = function(object, value) { standardGeneric("uppbnd<-") }
 )
 
+setGeneric(name = "uptake",
+           def  = function(object) { standardGeneric("uptake") }
+)
+setGeneric(name = "uptake<-",
+           def  = function(object, value) { standardGeneric("uptake<-") }
+)
+
+setGeneric(name = "uptReact",
+           def  = function(object) { standardGeneric("uptReact") }
+)
+
+setGeneric(name = "uptMet",
+           def  = function(object) { standardGeneric("uptMet") }
+)
+
 setGeneric(name = "verblevel",
            def  = function(object) { standardGeneric("verblevel") }
 )
@@ -837,7 +903,7 @@ setGeneric(name = "verblevel<-",
 )
 
 setGeneric(name = "writeProb",
-           def  = function(lp, fname, ff = "lp") { standardGeneric("writeProb") }
+           def  = function(lp, fname, ff = "lp", ...) { standardGeneric("writeProb") }
 )
 
 

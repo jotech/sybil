@@ -19,8 +19,8 @@
 
 \details{
 
-  The package sybil is designed to read csv files. This is done by
-  the function \code{\link{readTSVmod}}. This function returns
+  The package sybil is designed to read metabolic networks from csv files.
+  This is done by the function \code{\link{readTSVmod}}. The function returns
   an object of the class \code{\linkS4class{modelorg}}.
 
   Read csv files (example files included):

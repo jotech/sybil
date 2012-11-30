@@ -7,7 +7,7 @@
 
 \description{
   This function serves as a user constructor function for objects of class
-  \code{\link[=sysBiolAlg-class]{sysBiolAlg}}.
+  \code{\linkS4class{sysBiolAlg}}.
 }
 
 \usage{
@@ -22,7 +22,9 @@
     An object of class \code{\linkS4class{modelorg}}.
   }
   \item{algorithm}{
-    A single character string giving the name of the algorithm to use.\cr
+    A single character string giving the name of the algorithm to use. See
+    parameter \code{"ALGORITHM"} in \code{\link{SYBIL_SETTINGS}} for possible
+    values.\cr
     Default: \code{SYBIL_SETTINGS("ALGORITHM")}.
   }
   \item{prefix}{
@@ -44,9 +46,9 @@
   If argument \code{algorithm} is set to \code{"foo"} and \code{prefix} is set
   to \code{"sysBiolAlg"} (default), \code{sysBiolAlg} will try to build an
   instance of class \code{sysBiolAlg_foo}.  If no such class definition exists,
-  an error will be returned. For the name of the class, the arguemts
-  \code{prefix} and \code{algorithm} are stick together separated by \code{sep}
-  (default: a single underscore \code{"_"}): \code{prefix_algorithm}.
+  an error will be returned. For the name of the class, the values of arguemts
+  \code{prefix} and \code{algorithm} are stick together separated by the value
+  of argument \code{sep}: \code{prefix_algorithm}.
   
   Additional arguments required by the initialize method are for example
   \code{solver}, \code{method} and \code{solverParm}.
@@ -54,7 +56,7 @@
 
 \value{
   An instance of a subclass of
-  class \code{\link[=sysBiolAlg-class]{sysBiolAlg}}.
+  class \code{\linkS4class{sysBiolAlg}}.
 }
 
 \author{
@@ -62,7 +64,7 @@
 }
 
 \seealso{
-  Class \code{\link[=sysBiolAlg-class]{sysBiolAlg}}
+  Class \code{\linkS4class{sysBiolAlg}}
 }
 
 \examples{

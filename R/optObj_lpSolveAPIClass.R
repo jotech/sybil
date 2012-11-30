@@ -618,12 +618,11 @@ setMethod("getColPrim", signature(lp = "optObj_lpSolveAPI", j = "numeric"),
 
 #------------------------------------------------------------------------------#
 
-setMethod("writeProb", signature(lp = "optObj_lpSolveAPI",
-                                 fname = "character"),
+setMethod("writeProb", signature(lp = "optObj_lpSolveAPI", fname = "character"),
 
-    function(lp, fname, ff = "lp") {
+    function(lp, fname, ff = "lp", ...) {
 
-        out <- lpSolveAPI::write.lp(lp@oobj, filename = fname, type = ff)
+        out <- lpSolveAPI::write.lp(lp@oobj, filename = fname, type = ff, ...)
 
         return(out)
     }
@@ -632,25 +631,17 @@ setMethod("writeProb", signature(lp = "optObj_lpSolveAPI",
 
 #------------------------------------------------------------------------------#
 
+setMethod("readProb", signature(lp = "optObj_lpSolveAPI", fname = "character"),
+
+    function(lp, fname, ff = "lp", ...) {
+
+        lp@oobj <- lpSolveAPI::read.lp(filename = fname, type = ff, ...)
+
+        return(lp)
+    }
+)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#------------------------------------------------------------------------------#
 
 

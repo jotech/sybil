@@ -29,45 +29,27 @@
 #
 #
 
-changeObjFunc <- function(lpmodel, react, obj_coef, checkIds = TRUE) {
+changeObjFunc <- function(model, react, obj_coef = rep(1, length(react))) {
 
-  if (!is(lpmodel, "modelorg")) {
+  if (!is(model, "modelorg")) {
       stop("needs an object of class modelorg!")
   }
 
-  if (missing(obj_coef)) {
-      obj_coef <- c(rep(1, length(react)))
-  }
-      
   if (length(react) != length(obj_coef)) {
       stop("react and obj_coef must have the same length!")
   }
 
-  if (checkIds == TRUE) {
-      checkedIds <- checkReactId(lpmodel, react)
-  }
-  else {
-      if (!is(react, "numeric") && (!is(react, "integer"))) {
-          stop("react has to be integer or numeric")
-      }
-      checkedIds <- reactId(react, character(length(react)))
-  }
-  
-  #print(is(check))
+  checkedIds <- checkReactId(model, react)
   if (!is(checkedIds, "reactId")) {
       stop("Check your reaction Id's")
   }
  
-#  if (is.logical(check) && (check == FALSE)) {
-#      stop("Check your reaction Id's")
-#  }
-
   # set all objective coefficients to zero
-  obj_coef(lpmodel) <- numeric(react_num(lpmodel))
+  obj_coef(model) <- numeric(react_num(model))
 
-  obj_coef(lpmodel)[react_pos(checkedIds)] <- obj_coef
+  obj_coef(model)[react_pos(checkedIds)] <- obj_coef
 
-  return(lpmodel)
+  return(model)
 
 }
 

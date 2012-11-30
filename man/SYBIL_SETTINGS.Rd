@@ -101,7 +101,28 @@
       Default: \code{1000}.
     }
     \item{\code{"ALGORITHM"}}{
-      Algorithm to use for e.g. FBA.\cr
+      Algorithm to use in order to analyze metabolic networks.
+      Possible values are:
+      \describe{
+        \item{\code{"\link[=sysBiolAlg_fba-class]{fba}"}}{
+          flux-balance analysis,
+        }
+        \item{\code{"\link[=sysBiolAlg_fv-class]{fv}"}}{
+          flux-variance analysis,
+        }
+        \item{\code{"\link[=sysBiolAlg_mtf-class]{mtf}"}}{
+          minimize total flux,
+        }
+        \item{\code{"\link[=sysBiolAlg_moma-class]{moma}"}}{
+          minimization of metabolic adjustment (MOMA),
+        }
+        \item{\code{"\link[=sysBiolAlg_lmoma-class]{lmoma}"}}{
+          linear version of MOMA,
+        }
+        \item{\code{"\link[=sysBiolAlg_room-class]{room}"}}{
+          regulatory on/off minimization (ROOM).
+        }
+      }
       Default: \code{"fba"}.
     }
     \item{\code{"OPT_DIRECTION"}}{

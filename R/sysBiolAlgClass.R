@@ -72,17 +72,17 @@ setMethod(f = "initialize",
                                 solver = SYBIL_SETTINGS("SOLVER"),
                                 method = SYBIL_SETTINGS("METHOD"),
                                 solverParm = SYBIL_SETTINGS("SOLVER_CTRL_PARM"),
-                                alg, pType = "lp", scaling = NULL, fi, nCols,
+                                sbalg, pType = "lp", scaling = NULL, fi, nCols,
                                 nRows, mat, ub, lb, obj, rlb, rtype,
                                 lpdir = "max", rub = NULL, ctype = NULL) {
 
               if ( (!missing(solver)) ||
                    (!missing(method)) ||
-                   (!missing(alg)) ) {
+                   (!missing(sbalg)) ) {
 
                   stopifnot(is(solver, "character"),
                             is(method, "character"),
-                            is(alg,    "character"),
+                            is(sbalg,  "character"),
                             is(pType,  "character"),
                             is(fi,     "numeric"),
                             is(nCols,  "numeric"),
@@ -139,7 +139,7 @@ setMethod(f = "initialize",
                   }
 
                   .Object@problem   <- lp
-                  .Object@algorithm <- alg
+                  .Object@algorithm <- sbalg
                   .Object@nr        <- as.integer(nRows)
                   .Object@nc        <- as.integer(nCols)
                   .Object@fldind    <- as.integer(fi)
@@ -243,75 +243,56 @@ setMethod("show", signature(object = "sysBiolAlg"),
 #------------------------------------------------------------------------------#
 
 setMethod("optimizeProb", signature(object = "sysBiolAlg"),
-    function(object,
-             react = NA,
-             lb = NA,
-             ub = NA,
-             obj_coef = NA,
+    function(object, react = NULL,
+             lb = NULL,
+             ub = NULL,
+             obj_coef = NULL,
              lpdir = NA,
              resetChanges = TRUE,
+             #prCmd = NULL, poCmd = NULL,
              prCmd = NA, poCmd = NA,
              prCil = NA, poCil = NA) {
 
 
         # check the argument react
-        if (any(is.na(react))) {
+        if (is.null(react)) {
             del <- FALSE
+            obj <- FALSE
         }
         else {
             # if model is of class "sysBiolAlg", react is given by a
             # preceeding function
-            if (is(react, "numeric")) {
+            stopifnot(is(react, "numeric"))
+    
+            if ( (is.null(lb)) || (is.null(ub)) ) {
+                del <- FALSE
+            }
+            else {
                 del <- TRUE
-            }
-            else {
-                stop("argument 'react' must be numeric")
-            }
-    
-            if (any(is.na(lb))) {
-                lb <- rep(0, length(react))
-            }
-            else {
-                if (!is(lb, "numeric")) {
-                    stop("argument lb must be numeric")
-                }
-                if (length(lb) != length(react)) {
-                    stop("argument react and lb must have same length")
-                }
+                stopifnot(is(lb, "numeric"),
+                          is(ub, "numeric"),
+                          length(lb) == length(react),
+                          length(ub) == length(react))
             }
     
-            if (any(is.na(ub))) {
-                ub <- rep(0, length(react))
+            # check argument obj_coef
+            if (is.null(obj_coef)) {
+                obj <- FALSE
             }
             else {
-                if (!is(ub, "numeric")) {
-                    stop("argument ub must be numeric")
+                if ( (is(obj_coef, "numeric")) &&
+                     (length(obj_coef) == length(react)) ) {
+                    obj <- TRUE
                 }
-                if (length(ub) != length(react)) {
-                    stop("argument react and ub must have same length")
+                else {
+                    stop("argument ", sQuote("obj_coef"), "must be numeric ",
+                         " and of same length as argument react")
                 }
             }
         }
-
-
-        # check argument obj_coef
-        if (any(is.na(obj_coef))) {
-            obj <- FALSE
-        }
-        else {
-            if ( (is(obj_coef, "numeric")) &&
-                 (length(obj_coef) == length(fldind(object))) ) {
-                obj <- TRUE
-            }
-            else {
-                stop("argument ", sQuote(obj_coef), "must be numeric ",
-                     " and of length ", length(fldind(object)))
-            }
-        }
-
 
         # check argument lpdir
-        if ( (length(lpdir) > 1) || (is.na(lpdir)) ) {
+        if ( (length(lpdir) > 1L) || (is.na(lpdir)) ) {
             ld <- FALSE
         }
         else {
@@ -338,10 +319,10 @@ setMethod("optimizeProb", signature(object = "sysBiolAlg"),
     
         if (isTRUE(obj)) {
             # store default objective function
-            obj_tmp <- getObjCoefs(lpmod, fi)
+            obj_tmp <- getObjCoefs(lpmod, fi[react])
             
             # change objective function
-            check <- changeObjCoefs(lpmod, fi, obj_coef)
+            check <- changeObjCoefs(lpmod, fi[react], obj_coef)
         }
 
         if (isTRUE(ld)) {
@@ -389,7 +370,7 @@ setMethod("optimizeProb", signature(object = "sysBiolAlg"),
         
             # reset the default objective function
             if (isTRUE(obj)) {
-                check <- changeObjCoefs(lpmod, fi, obj_tmp)
+                check <- changeObjCoefs(lpmod, fi[react], obj_tmp)
             }
     
             # reset the default optimization direction

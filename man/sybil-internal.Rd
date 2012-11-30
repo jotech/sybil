@@ -8,10 +8,6 @@
 % ???
 \alias{object}
 
-% !!!!!!!!!!
-\alias{shrinkSMatrix}
-\alias{shrinkSMatrix,modelorg-method}
-
 
 \title{Internal sybil Functions}
 

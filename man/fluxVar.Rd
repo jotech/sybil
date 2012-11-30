@@ -7,20 +7,27 @@
   Flux Variability Analysis
 }
 \description{
-  Performs flux variablilty analysis for a given model.
+  Performs flux variability analysis for a given model.
 }
 \usage{
-  fluxVar(model, react, fld = FALSE, verboseMode = 2, ...)
+  fluxVar(model, react = c(1:react_num(model)),
+          exex = FALSE, fld = FALSE, verboseMode = 2, ...)
 }
 
 \arguments{
   \item{model}{
-    An object of class \code{\link{modelorg}}.
+    An object of class \code{\linkS4class{modelorg}}.
   }
   \item{react}{
     An object of class \code{\linkS4class{reactId}}, character or integer.
     Specifies the fluxes (variables) to analyse.\cr
-    If left empty: \code{react_id(model)}.
+    Default: all reactions present in \code{model}.
+  }
+  \item{exex}{
+    Boolean.  Exclude exchange reactions from analysis. If set to \code{TRUE},
+    argument \code{react} will be ignored. All reactions present in \code{model}
+    will be used, except for the exchange reactions.\cr
+    Default: \code{FALSE}
   }
   \item{fld}{
     Boolean.  Save the resulting flux distribution.\cr
@@ -35,17 +42,17 @@
   }
   \item{\dots}{
     Further arguments passed to \code{\link{sysBiolAlg}}.
-    See class \code{\link[=sysBiolAlg_fv-class]{sysBiolAlg_fv}} for details.
+    See class \code{\linkS4class{sysBiolAlg_fv}} for details.
   }
 }
 
 \details{
   The algorithm is described in
-  \code{\link[=sysBiolAlg_fv-class]{sysBiolAlg_fv}}.
+  \code{\linkS4class{sysBiolAlg_fv}}.
 }
 
 \value{
-  An object of class \code{\link[=optsol_fluxVar-class]{optsol_fluxVar}}.
+  An object of class \code{\linkS4class{optsol_fluxVar}}.
 }
 
 \references{

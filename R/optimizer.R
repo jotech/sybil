@@ -31,13 +31,13 @@
 
 optimizer <- function(model, lb, ub,
                       delete, geneFlag,
-                      alg = SYBIL_SETTINGS("ALGORITHM"),
+                      algorithm = SYBIL_SETTINGS("ALGORITHM"),
                       setToZero = FALSE,
                       checkOptSolObj = FALSE,
                       rebuildModel = FALSE,
                       fld = "none",
                       prCmd = NA, poCmd = NA,
-                      prDIR = NA, poDIR = NA,
+                      prDIR = NULL, poDIR = NULL,
                       verboseMode = 2,
                       ...) {
 
@@ -78,8 +78,8 @@ optimizer <- function(model, lb, ub,
         ub <- rep(0, nrow(delete))
     }
 
-    if (!checkAlgorithm(alg = alg, fkt = "optimizer")) {
-        stop(sQuote(alg), " is not a valid algorithm")
+    if (!checkAlgorithm(alg = algorithm, fkt = "optimizer")) {
+        stop(sQuote(algorithm), " is not a valid algorithm")
     }
 
     if (isTRUE(fld)) {
@@ -98,7 +98,7 @@ optimizer <- function(model, lb, ub,
     # prepare problem object
     #--------------------------------------------------------------------------#
 
-    lpmod <- sysBiolAlg(model, algorithm = alg, ...)
+    lpmod <- sysBiolAlg(model, algorithm = algorithm, ...)
 
 
     #--------------------------------------------------------------------------#
@@ -192,7 +192,7 @@ optimizer <- function(model, lb, ub,
             # get the reactions for gene i
             tmp_del <- geneDel(model, delete[i, ])
 
-            if (any(is.na(tmp_del))) {
+            if (is.null(tmp_del)) {
                 fdels[[i]] <- NA
             }
             else {
@@ -227,10 +227,11 @@ optimizer <- function(model, lb, ub,
         # solution i
         if (isTRUE(rebuildModel)) {
             sol <- optimizeProb(model,
+                                retOptSol = FALSE,
                                 react = tmp_del,
                                 lb = rep(lb[i], length(tmp_del)),
                                 ub = rep(ub[i], length(tmp_del)),
-                                alg = alg,
+                                algorithm = algorithm,
                                 MoreArgs = list(lpdir = getObjDir(problem(lpmod)),
                                                 prCmd = prCmd_tmp,
                                                 poCmd = poCmd_tmp,
@@ -317,6 +318,7 @@ optimizer <- function(model, lb, ub,
     if (isTRUE(geneFlag)) {
         optsol <- new("optsol_genedel",
             mod_id       = mod_id(model),
+            mod_key      = mod_key(model),
             solver       = solver(problem(lpmod)),
             method       = method(problem(lpmod)),
             algorithm    = algorithm(lpmod),
@@ -326,8 +328,9 @@ optimizer <- function(model, lb, ub,
             lp_obj       = as.numeric(obj),
             lp_ok        = as.integer(ok),
             lp_stat      = as.integer(stat),
-            lp_dir       = getObjDir(problem(lpmod)),
+            lp_dir       = factor(getObjDir(problem(lpmod))),
             obj_coef     = obj_coef(model),
+            obj_func     = printObjFunc(model),
             fldind       = as.integer(fli),
             fluxdist     = fluxDistribution(flux),
     
@@ -342,6 +345,7 @@ optimizer <- function(model, lb, ub,
     else {
         optsol <- new("optsol_fluxdel",
             mod_id       = mod_id(model),
+            mod_key      = mod_key(model),
             solver       = solver(problem(lpmod)),
             method       = method(problem(lpmod)),
             algorithm    = algorithm(lpmod),
@@ -351,8 +355,9 @@ optimizer <- function(model, lb, ub,
             lp_obj       = as.numeric(obj),
             lp_ok        = as.integer(ok),
             lp_stat      = as.integer(stat),
-            lp_dir       = getObjDir(problem(lpmod)),
+            lp_dir       = factor(getObjDir(problem(lpmod))),
             obj_coef     = obj_coef(model),
+            obj_func     = printObjFunc(model),
             fldind       = as.integer(fli),
             fluxdist     = fluxDistribution(flux),
     

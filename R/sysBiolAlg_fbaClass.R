@@ -53,7 +53,7 @@ setMethod(f = "initialize",
                   nRows <- met_num(model)
 
                   .Object <- callNextMethod(.Object,
-                                            alg        = "fba",
+                                            sbalg      = "fba",
                                             pType      = "lp",
                                             scaling    = scaling,
                                             fi         = 1:nCols,

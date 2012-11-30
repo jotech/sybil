@@ -47,7 +47,7 @@
 \author{Gabriel Gelius-Dietrich}
 
 \seealso{
-  Superclass \code{\link[=optObj-class]{optObj}} and constructor function
+  Superclass \code{\linkS4class{optObj}} and constructor function
   \code{\link{optObj}}
 }
 

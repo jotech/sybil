@@ -23,7 +23,7 @@
 
 \description{
   Structure of the class \code{"ppProc"}. Objects of that class are
-  returned as part of class \code{\link[=optsol-class]{optsol}} when performing
+  returned as part of class \code{\linkS4class{optsol}} when performing
   pre- or post-processing of an optimization, e.g. in
   \code{\link{optimizeProb}}.
 }

@@ -184,7 +184,7 @@ setMethod("[", "optsol_fluxdel", function(x, i, j, ..., drop = FALSE) {
         }
 
         if (isTRUE(NC_fl)) {
-            newSol@fluxdist <- fluxDistribution(x@fluxes[,i, drop = FALSE])
+            newSol@fluxdist <- fluxDistribution(x@fluxes[ , i, drop = FALSE])
         }
 
         if ("fluxdels" %in% slots) {

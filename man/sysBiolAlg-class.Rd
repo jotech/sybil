@@ -25,7 +25,7 @@
 
 \description{
   The class \code{sysBiolAlg} holds an object of class
-  \code{\link[=optObj-class]{optObj}} which is generated concerning a particular
+  \code{\linkS4class{optObj}} which is generated concerning a particular
   algorithm, e.g. FBA or ROOM. This class is extended by other classes and will
   not be used as is. The representation of class \code{sysBiolAlg} is used as
   superclass.
@@ -93,7 +93,7 @@
     \item{initialize}{\code{signature(object = "sysBiolAlg")}:
       default constructor method for objects inheriting from class
       \code{sysBiolAlg}. It gets all data structures necessary to built a
-      problem object (object of class \code{\link[=optObj-class]{optObj}})
+      problem object (object of class \code{\linkS4class{optObj}})
       representing a particular algorithm. This method can be used in
       constructor methods for subclasses of \code{sysBiolAlg} via
       \code{\link{callNextMethod}}. In this case, the constructor has to
@@ -128,7 +128,7 @@
       (e.g. \pkg{glpkAPI}).\cr
       Default: \code{SYBIL_SETTINGS("SOLVER_CTRL_PARM")}.
     }
-    \item{alg}{
+    \item{sbalg}{
       Single character string containing the name of the algorithm to use.
     }
     \item{pType}{
@@ -207,6 +207,7 @@
 
 \seealso{
   The general constructor function \code{\link{sysBiolAlg}},
+  and classes
   \code{\linkS4class{sysBiolAlg_fba}},
   \code{\linkS4class{sysBiolAlg_fv}},
   \code{\linkS4class{sysBiolAlg_mtf}},

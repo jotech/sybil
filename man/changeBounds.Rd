@@ -8,12 +8,12 @@
 }
 
 \description{
-  The function changes the upper and lower bounds of a given metabolic network
-  model to new values.
+  The function changes the upper and/or lower bounds of a given metabolic
+  network model to new values.
 }
 
 \usage{
-  changeBounds(model, react, lb, ub)
+  changeBounds(model, react, lb = NULL, ub = NULL)
 }
 
 \arguments{
@@ -22,7 +22,7 @@
   }
   \item{react}{
     An object of class \code{\linkS4class{reactId}}, character or integer.
-    Specifies the fluxes (variables) for which to change the upper and lower
+    Specifies the fluxes (variables) for which to change the upper and/or lower
     bounds.
   }
   \item{lb}{

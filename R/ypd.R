@@ -116,7 +116,7 @@ ypd <- function(model,
   if (!is(react, "reactId")) {
       stop("model seems not compatible with ypd")
   }
-  ex      <- findExchReact(model)$exchange
+  ex      <- findExchReact(model)
 
   num_med <- length(react_pos(react))
   num_ex  <- length(react_pos(ex))

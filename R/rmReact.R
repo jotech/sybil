@@ -198,7 +198,6 @@ rmReact <- function(model, react, rm_met = TRUE) {
       met_id(mod_out)     <- met_id(model)[keepMet]
       met_name(mod_out)   <- met_name(model)[keepMet]
       met_comp(mod_out)   <- met_comp(model)[keepMet]
-      rhs(mod_out)        <- rhs(model)[keepMet]
       met_single(mod_out) <- met_single(model)[keepMet]
       met_de(mod_out)     <- met_de(model)[keepMet]
   }
@@ -206,7 +205,6 @@ rmReact <- function(model, react, rm_met = TRUE) {
       met_num(mod_out)  <- met_num(model)
       met_id(mod_out)   <- met_id(model)
       met_comp(mod_out) <- met_comp(model)
-      rhs(mod_out)      <- rhs(model)
   }
 
   check <- validObject(mod_out, test = TRUE)

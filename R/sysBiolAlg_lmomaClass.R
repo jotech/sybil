@@ -142,10 +142,10 @@ setMethod(f = "initialize",
                       # the final contraint matrix
                       LHS <- rBind(LHSwt, LHS, crow)
           
-                      alg <- "lmoma_cobra"
+                      subalg <- "lmoma_cobra"
                   }
                   else {
-                      alg <- "lmoma"
+                      subalg <- "lmoma"
                   }
 
 
@@ -209,7 +209,7 @@ setMethod(f = "initialize",
                   # ---------------------------------------------
 
                   .Object <- callNextMethod(.Object,
-                                            alg        = alg,
+                                            sbalg      = subalg,
                                             pType      = "lp",
                                             scaling    = scaling,
                                             fi         = fi,
@@ -260,7 +260,7 @@ setMethod(f = "initialize",
 #                  }
 #
 #                  .Object@problem   <- lp
-#                  .Object@algorithm <- alg
+#                  .Object@algorithm <- subalg
 #                  .Object@nr        <- as.integer(nRows)
 #                  .Object@nc        <- as.integer(nCols)
 #                  .Object@fldind    <- as.integer(fi)

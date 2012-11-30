@@ -10,7 +10,7 @@
   (the functions \code{\link{oneFluxDel}}, \code{\link{oneGeneDel}},
   \code{\link{doubleFluxDel}} and \code{\link{doubleGeneDel}})
   and fills a solution object (a derivative of class
-  \code{\link[=optsol-class]{optsol}}) and a problem object depending on the
+  \code{\linkS4class{optsol}}) and a problem object depending on the
   specified solver. The optimizations are then performed by calls to
   \code{\link{optimizeProb}}.
 }
@@ -18,13 +18,13 @@
 \usage{
 optimizer(model, lb, ub,
           delete, geneFlag,
-          alg = SYBIL_SETTINGS("ALGORITHM"),
+          algorithm = SYBIL_SETTINGS("ALGORITHM"),
           setToZero = FALSE,
           checkOptSolObj = FALSE,
           rebuildModel = FALSE,
           fld = "none",
           prCmd = NA, poCmd = NA,
-          prDIR = NA, poDIR = NA,
+          prDIR = NULL, poDIR = NULL,
           verboseMode = 2,
           ...)
 }
@@ -35,12 +35,12 @@ optimizer(model, lb, ub,
   }
   \item{lb}{
     A numeric vector containing the lower bounds for the reactions/genes in the
-    \code{dels} slot of \code{\link[=optsol-class]{optsol}}.  If \code{lb} is
+    \code{dels} slot of \code{\linkS4class{optsol}}.  If \code{lb} is
     missing, the values are set to 0.
   }
   \item{ub}{
     A numeric vector containing the upper bounds for the reactions/genes in the
-    \code{dels} slot of \code{\link[=optsol-class]{optsol}}.  If \code{ub} is
+    \code{dels} slot of \code{\linkS4class{optsol}}.  If \code{ub} is
     missing, the values are set to 0.
   }
   \item{delete}{
@@ -58,10 +58,15 @@ optimizer(model, lb, ub,
     optimization representing a flux (reaction) in the model. If set to
     \code{"all"}, all variable values are returned.
   }
-  \item{alg}{
-    A single character value. Can be \dQuote{\code{FBA}},
-    \dQuote{\code{linearMOMA}} or \dQuote{\code{linearMOMA_COBRA}} (see Details
-    below).\cr
+  \item{algorithm}{
+    A single character value giving the algorithm to compute genetic
+    pertubations. Can be
+    \code{"\link[=sysBiolAlg_fba-class]{fba}"}: flux-balance analysis,
+    \code{"\link[=sysBiolAlg_moma-class]{moma}"}: minimization of
+                                                  metabolic adjustment (MOMA),
+    \code{"\link[=sysBiolAlg_lmoma-class]{lmoma}"}: linear version of MOMA or
+    \code{"\link[=sysBiolAlg_room-class]{room}"}: regulatory on/off
+                                                  minimization (ROOM).\cr
     Default: \code{SYBIL_SETTINGS("ALGORITHM")}.
   }
   \item{setToZero}{
@@ -101,19 +106,18 @@ optimizer(model, lb, ub,
     executes the commands in prCmd before the second, 5th and 10th optimization.
     
     If \code{prDIR} is a character vector, for example
-    \code{prDIR = c("10")} executes the commands in \code{prCmd} every 10th
-    round of optimization.  If the last element of \code{prDIR} is \code{"WT"},
-    preprocessing is additionally performed on the wild type (first) problem.
-    If \code{prDIR} is character and has a length \code{> 1} (a possible last
-    element \code{"WT"} excluded), the first element is an offset to the
-    following elements. \code{prDIR = c("-2", "10")} will do the preprocessing
-    on every 10th round of optimization, beginning in round number
-    \code{10 - 2 = 8}.\cr
-    Default: \code{NA}.
+    \code{prDIR = c("10")}, the preprocessing commands given in \code{prCmd}
+    will pe executed every 10th round of optimization. 
+    
+    If \code{prDIR} is character and has length \code{2}, the first element is
+    an offset to the following elements. \code{prDIR = c("-2", "10")} will do
+    the preprocessing on every 10th round of optimization, beginning in round
+    number \code{10 - 2 = 8}.\cr
+    Default: \code{NULL}.
   }
   \item{poDIR}{
     The same as \code{prDIR}, but for postprocessing.
-    Default: \code{NA}.
+    Default: \code{NULL}.
   }
   \item{\dots}{
     Further arguments passed to \code{\link{sysBiolAlg}}.
@@ -131,7 +135,7 @@ optimizer(model, lb, ub,
 }
 
 \value{
-  A derivative of class \code{\link[=optsol-class]{optsol}}.
+  A derivative of class \code{\linkS4class{optsol}}.
 }
 
 \references{
@@ -151,7 +155,7 @@ optimizer(model, lb, ub,
 
 \seealso{\code{\link{oneFluxDel}}, \code{\link{oneGeneDel}},
          \code{\link{doubleFluxDel}}, \code{\link{doubleGeneDel}},
-         code{\link[=optsol-class]{optsol}}, \code{\link{optimizeProb}}
+         \code{\linkS4class{optsol}}, \code{\link{optimizeProb}}
          and \code{\link{SYBIL_SETTINGS}}.}
 
 

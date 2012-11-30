@@ -6,12 +6,14 @@
 \docType{class}
 
 \alias{sysBiolAlg_moma-class}
+\alias{sysBiolAlg_moma}
+\alias{moma}
 
 \title{Class \code{"sysBiolAlg_moma"}}
 
 \description{
   The class \code{sysBiolAlg_moma} holds an object of class
-  \code{\link[=optObj-class]{optObj}} which is generated to meet the
+  \code{\linkS4class{optObj}} which is generated to meet the
   requirements of the MOMA algorithm.
 }
 
@@ -74,7 +76,7 @@
     }
     \item{...}{
       Further arguments passed to the initialize method of
-      \code{\link[=sysBiolAlg-class]{sysBiolAlg}}. They are \code{solver},
+      \code{\linkS4class{sysBiolAlg}}. They are \code{solver},
       \code{method} and \code{solverParm}.
     }
   }
@@ -126,7 +128,7 @@
 
 \seealso{
   Constructor function \code{\link{sysBiolAlg}} and
-  superclass \code{\link[=sysBiolAlg-class]{sysBiolAlg}}.
+  superclass \code{\linkS4class{sysBiolAlg}}.
 }
 
 \examples{

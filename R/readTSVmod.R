@@ -1116,7 +1116,6 @@ readTSVmod <- function(prefix, suffix,
 
     met_id(model)     <- Rmet[1:NRmet]        # use only detected metabolites
     met_num(model)    <- as.integer(NRmet)
-    rhs(model)        <- integer(NRmet)
 
     met_single(model) <- sing_met[SKIP_METABOLITE]
     met_de(model)     <- de_met[SKIP_METABOLITE]

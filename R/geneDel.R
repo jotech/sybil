@@ -132,6 +132,7 @@ geneDel <- function(model, genes, checkId = FALSE) {
     return(unique(reactInd[constReact]))
   }
 
-  return(NA)
+  #return(as.numeric(NA))
+  return(NULL)
 
 }

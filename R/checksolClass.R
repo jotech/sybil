@@ -167,19 +167,19 @@ setReplaceMethod("status_meaning", signature = (object = "checksol"),
 
 setMethod("show", signature(object = "checksol"),
     function(object) {
-        cat("Return code:\n\n")
-        cat("Code    #       meaning\n")
-        tmp <- sprintf("%-8i%-8i%s\n",
+        cat("Return code:\n")
+        cat(" Code    #       meaning\n")
+        tmp <- sprintf(" %-8i%-8i%s\n",
                        exit_code(object),
                        exit_num(object),
                        exit_meaning(object))
         cat(tmp, sep = "")
 
-        cat("\n\n")
-        cat("Solution status:\n\n")
-        cat("Code    #       meaning\n")
+        cat("\n")
+        cat("Solution status:\n")
+        cat(" Code    #       meaning\n")
 
-        tmp <- sprintf("%-8i%-8i%s\n",
+        tmp <- sprintf(" %-8i%-8i%s\n",
                        status_code(object),
                        status_num(object),
                        status_meaning(object))

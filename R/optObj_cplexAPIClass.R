@@ -801,14 +801,29 @@ setMethod("getNumNnz", signature(lp = "optObj_cplexAPI"),
 
 #------------------------------------------------------------------------------#
 
-setMethod("writeProb", signature(lp = "optObj_cplexAPI",
-                                 fname = "character"),
+setMethod("writeProb", signature(lp = "optObj_cplexAPI", fname = "character"),
 
     function(lp, fname, ff = "lp") {
 
         tp  <- ifelse(is.null(ff), NULL, toupper(ff))
         fl  <- cplexAPI::writeProbCPLEX(lp@oobj@env, lp@oobj@lp,
                                         fname = fname, ftype = tp)
+        out <- ifelse(fl == 0, TRUE, fl)
+
+        return(out)
+    }
+)
+
+
+#------------------------------------------------------------------------------#
+
+setMethod("readProb", signature(lp = "optObj_cplexAPI", fname = "character"),
+
+    function(lp, fname, ff = "lp") {
+
+        tp  <- ifelse(is.null(ff), NULL, toupper(ff))
+        fl  <- cplexAPI::readCopyProbCPLEX(lp@oobj@env, lp@oobj@lp,
+                                           fname = fname, ftype = tp)
         out <- ifelse(fl == 0, TRUE, fl)
 
         return(out)

@@ -8,7 +8,8 @@
 }
 
 \description{
-  The function \code{geneDel} finds the fluxes corresponding to gene id's.
+  The function \code{geneDel} returns the fluxes which are effected by a
+  particular gene deletion.
 }
 
 \usage{
@@ -33,11 +34,12 @@
 
 \details{
   The function \code{geneDel} checks for a set of gene id's in \code{gene}
-  which fluxes this set effects.
+  on which fluxes a deletion of this set of genes has an effect.
 }
 
 \value{
-  An integer vector of pointers to reaction id's in \code{model} or \code{NA}.
+  An numeric vector of pointers to reaction id's in \code{model} or \code{NULL},
+  if no fluxes are effected by the gene deletion.
 }
 
 \references{

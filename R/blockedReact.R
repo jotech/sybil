@@ -39,6 +39,8 @@ blockedReact <- function(model,
                          ...
                         ) {
 
+    .Deprecated(new = "fluxVar")
+
     if (!is(model, "modelorg")) {
         stop("needs an object of class modelorg!")
     }
@@ -50,7 +52,7 @@ blockedReact <- function(model,
     # remove exchange reactions from analysis
     if (isTRUE(exex)) {
         exchReact <- findExchReact(model)
-        ex <- react_pos(exchReact$exchange)
+        ex <- react_pos(exchReact)
         intReact <- 1:react_num(model)
         intReact <- intReact[-ex]
         
@@ -92,7 +94,6 @@ blockedReact <- function(model,
 
     obj_max <- 0
     obj_min <- 0
-    cc <- numeric(react_num(model))
     
     if (verboseMode > 1) { progr <- sybil:::.progressBar() }
   
@@ -103,8 +104,8 @@ blockedReact <- function(model,
 #         if (uppbnd(model)[intReact[i]] > 0) {
         
             #print(intReact[i])
-            cc[intReact[i]] <- 1
-            sol <- optimizeProb(lpmod, lpdir = "max", obj_coef = cc)
+            sol <- optimizeProb(lpmod, lpdir = "max",
+                                react = intReact[i], obj_coef = 1)
             obj_max <- sol$obj
             if (isTRUE(retOptSol)) {
                 obj[(solpl-1)]   <- sol$obj
@@ -130,7 +131,8 @@ blockedReact <- function(model,
 #         if (lowbnd(model)[intReact[i]] < 0) {
         if (!is(model, "modelorg_irrev")) {
         
-            sol <- optimizeProb(lpmod, lpdir = "min", obj_coef = cc)
+            sol <- optimizeProb(lpmod, lpdir = "min",
+                                react = intReact[i], obj_coef = 1)
             obj_min <- sol$obj
             if (isTRUE(retOptSol)) {
                 obj[solpl]   <- sol$obj
@@ -159,8 +161,6 @@ blockedReact <- function(model,
         #print(paste("min", obj_min))
         #print(" ")
 
-        cc[intReact[i]] <- 0
-
         if (is(model, "modelorg_irrev")) {
             blocked_react[intReact[i]] <- ifelse(abs(obj_max) < tol, TRUE, FALSE)
         }
@@ -187,6 +187,7 @@ blockedReact <- function(model,
     if (isTRUE(retOptSol)) {
         optsol <- new("optsol_blockedReact",
             mod_id       = mod_id(model),
+            mod_key      = mod_key(model),
             solver       = solver(problem(lpmod)),
             method       = method(problem(lpmod)),
             algorithm    = algorithm(lpmod),
@@ -196,13 +197,17 @@ blockedReact <- function(model,
             lp_obj       = as.numeric(obj),
             lp_ok        = as.integer(ok),
             lp_stat      = as.integer(stat),
-            lp_dir       = getObjDir(problem(lpmod)),
+            lp_dir       = factor(rep(c("max", "min"), length(intReact))),
             obj_coef     = obj_mod,
             fldind       = fldind(lpmod),
             fluxdist     = fluxDistribution(flux),
     
             blocked      = blocked_react,
-            react        = reactId(intReact, react_id(model)[intReact])
+            react        = new("reactId",
+                               mod_id  = mod_id(model),
+                               mod_key = mod_key(model),
+                               pnt     = intReact,
+                               id      = react_id(model)[intReact])
         )
     }
     else {

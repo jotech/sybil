@@ -1,18 +1,24 @@
 \name{reactId-class}
-\docType{class}
 
-\alias{reactId-class}
+\docType{class}
+\encoding{utf8}
+
 \alias{reactId}
+\alias{reactId-class}
 \alias{react_pos<-,reactId-method}
 \alias{react_pos,reactId-method}
 \alias{react_pos<-}
 \alias{react_pos}
 \alias{react_id<-,reactId-method}
 \alias{react_id,reactId-method}
+\alias{hasId}
+\alias{hasId,reactId-method}
+\alias{mod_id,reactId-method}
+\alias{mod_id<-,reactId-method}
+\alias{mod_key,reactId-method}
+\alias{mod_key<-,reactId-method}
 \alias{length,reactId-method}
-\alias{show,reactId-method}
-
-\encoding{utf8}
+\alias{[,reactId,ANY,ANY,ANY-method}
 
 \title{Strukture of Class "reactId"}
 
@@ -22,24 +28,70 @@
 }
 
 \section{Objects from the Class}{
-  Objects can be created by calls of the function \code{reactId}:
-
-  \code{test <- reactId(pos = c(1, 2), react = c("foo", "bar"))}.
+  Objects can be created by calls of the form
+  \code{new("reactId", mod_id, pnt, id = NULL, mod_key = "")}.
+  \describe{
+    \item{\code{mod_id}:}{
+      Object of class \code{"character"} containing the model id.
+    }
+    \item{\code{pnt}:}{
+      Object of class \code{"numeric"} containing the column indices in a
+      stoichiometric matrix of the reactions given in \code{react}.
+    }
+    \item{\code{id}:}{
+      Object of class \code{"character"} containing the reaction id's
+      corresponding to argument \code{pos}. If set to \code{NULL} (default),
+      no reaction id's are used.
+    }
+    \item{\code{mod_key}:}{
+      Object of class \code{"character"} containing the model key.
+    }
+  }
 }
 
 \section{Slots}{
-	 \describe{
-    \item{\code{react_pos}:}{Object of class \code{"integer"} containing
-      the index of reaction id's.}
-    \item{\code{react_id}:}{Object of class \code{"character"}
-      containing the reaction id's.}
+  \describe{
+    \item{\code{mod_id}:}{
+      Object of class \code{"character"} containing the model id.
+    }
+    \item{\code{mod_key}:}{Object of class \code{"character"}
+      containing the model key of the used model.
+    }
+    \item{\code{react_pos}:}{
+      Object of class \code{"integer"} containing the column indices of reaction
+      id's in the stoichiometric matrix of the metabolic model with id
+      \code{mod_id}.
+    }
+    \item{\code{react_id}:}{
+      Object of class \code{"character"} containing the reaction id's
+      corresponding to the indices given in slot \code{react_pos}.
+    }
+    \item{\code{has_id}:}{
+      Object of class \code{"logical"}, \code{TRUE} if slot \code{react_id} is
+      not empty, otherwise \code{FALSE}.
+    }
+    \item{\code{react_num}:}{
+      Object of class \code{"integer"} containing the number of reaction id's.
+    }
   }
 }
 
 \section{Methods}{
   \describe{
-    \item{\code{react_pos<-}:}{\code{signature(object = "reactId")}:
-      sets the \code{react_pos} slot.
+    \item{\code{mod_id<-}:}{
+      \code{signature(object = "reactId")}: sets the \code{mod_id} slot.
+    }
+    \item{\code{mod_id}:}{
+      \code{signature(object = "reactId")}: gets the \code{mod_id} slot.
+    }
+    \item{\code{mod_key<-}:}{
+      \code{signature(object = "reactId")}: sets the \code{mod_key} slot.
+    }
+    \item{\code{mod_key}:}{
+      \code{signature(object = "reactId")}: gets the \code{mod_key} slot.
+    }
+    \item{\code{react_pos<-}:}{
+      \code{signature(object = "reactId")}: sets the \code{react_pos} slot.
     }
     \item{\code{react_pos}:}{
       \code{signature(object = "reactId")}: gets the \code{react_pos} slot.
@@ -53,9 +105,14 @@
     \item{\code{length}}{
       \code{signature(object = "reactId")}: returns the number of reaction id's.
     }
-    \item{\code{show}}{
-      \code{signature(object = "reactId")}: prints the instance of class
-      \code{reactId} as table.
+    \item{\code{hasId}}{
+      \code{signature(object = "reactId")}: returns \code{TRUE} if slot
+      \code{react_id} is not empty, otherwise \code{FALSE}.
+    }
+    \item{\code{[}:}{
+      \code{signature(x = "reactId")}: access like a vector.
+      \code{x[i]} returns a new object of class \code{reactId} containing
+      the \code{i}th reaction id.
     }
   }
 }

@@ -37,6 +37,7 @@ setClass("modelorg",
          mod_desc     = "character",
          mod_name     = "character",   # model name
          mod_id       = "character",   # model id
+         mod_key      = "character",   # model key (unique character string)
          mod_compart  = "character",   # vector compartments
          met_num      = "integer",     # number of metabolites
          met_id       = "character",   # vector metabolite id's
@@ -44,7 +45,6 @@ setClass("modelorg",
          met_comp     = "integer",     # vector the metabolites compartment
          met_single   = "logical",     # metabolites appearing only once in S
          met_de       = "logical",     # dead end metabolites
-         rhs          = "numeric",     # vector right hand side zeros Sv = 0
          react_num    = "integer",     # number of reactions
          react_rev    = "logical",     # vector reversibilities
          react_id     = "character",   # vector reaction id's
@@ -91,8 +91,12 @@ setMethod(f = "initialize",
           definition = function(.Object, id, name) {
 
               if ( (!missing(id)) || (!missing(name)) ) {
+                  key <- paste(sample(letters, size = 2),
+                             sample(c(letters, 0:9), size = 8, replace = FALSE),
+                             collapse = "", sep = "")
                   .Object@mod_id   <- as.character(id)
                   .Object@mod_name <- as.character(name)
+                  .Object@mod_key  <- as.character(key)
               }
 
               return(.Object)
@@ -114,6 +118,21 @@ setMethod("mod_id", signature(object = "modelorg"),
 setReplaceMethod("mod_id", signature = (object = "modelorg"),
                  function(object, value) {
                      object@mod_id <- value
+                     return(object)
+                 }
+)
+
+
+# model key
+setMethod("mod_key", signature(object = "modelorg"),
+          function(object) {
+              return(object@mod_key)
+          }
+)
+
+setReplaceMethod("mod_key", signature = (object = "modelorg"),
+                 function(object, value) {
+                     object@mod_key <- value
                      return(object)
                  }
 )
@@ -249,21 +268,6 @@ setMethod("met_de", signature(object = "modelorg"),
 setReplaceMethod("met_de", signature(object = "modelorg"),
           function(object, value) {
               object@met_de <- value
-              return(object)
-          }
-)
-
-
-# right hand site
-setMethod("rhs", signature(object = "modelorg"),
-          function(object) {
-              return(object@rhs)
-          }
-)
-
-setReplaceMethod("rhs", signature(object = "modelorg"),
-          function(object, value) {
-              object@rhs <- value
               return(object)
           }
 )
@@ -547,17 +551,17 @@ setMethod("show", signature(object = "modelorg"),
 #------------------------------------------------------------------------------#
 
 setMethod("optimizeProb", signature(object = "modelorg"),
-    function(object,
-             gene = NA,
-             react = NA,
-             lb = NA,
-             ub = NA,
-             retOptSol = FALSE,
+    function(object, 
+             gene = NULL,
+             react = NULL,
+             lb = NULL,
+             ub = NULL,
+             retOptSol = TRUE,
              MoreArgs = list(),
              ...) {
 
 
-        if (!any(is.na(gene))) {
+        if (!is.null(gene)) {
             react <- geneDel(object, gene, checkId = TRUE)
             lb <- rep(lb[1], length(react))
             ub <- rep(ub[1], length(react))
@@ -565,7 +569,7 @@ setMethod("optimizeProb", signature(object = "modelorg"),
 
         # check the argument react
         # if object is of class "modelorg", react is given by the user
-        if (!any(is.na(react))) {
+        if (!is.null(react)) {
             check <- checkReactId(object, react = react)
             if (is(check, "reactId")) {
                 react <- react_pos(check)
@@ -582,10 +586,10 @@ setMethod("optimizeProb", signature(object = "modelorg"),
 
         lpmod <- sysBiolAlg(model = object, ...)
         
-        MoreArgs[["object"]] <- lpmod
-        MoreArgs[["react"]]  <- react
-        MoreArgs[["lb"]]     <- lb
-        MoreArgs[["ub"]]     <- ub
+        MoreArgs[["object"]]          <- lpmod
+        MoreArgs[["react"]]           <- react
+        MoreArgs[["lb"]]              <- lb
+        MoreArgs[["ub"]]              <- ub
         
         sol <- do.call("optimizeProb", args = MoreArgs)
 
@@ -599,17 +603,19 @@ setMethod("optimizeProb", signature(object = "modelorg"),
             # solution object
             optsol <- new("optsol_optimizeProb",
                           mod_id       = mod_id(object),
+                          mod_key      = mod_key(object),
                           solver       = solver(problem(lpmod)),
                           method       = method(problem(lpmod)),
                           algorithm    = algorithm(lpmod),
                           num_of_prob  = 1L,
-                          lp_dir       = getObjDir(problem(lpmod)),
+                          lp_dir       = factor(getObjDir(problem(lpmod))),
                           lp_num_rows  = nr(lpmod),
                           lp_num_cols  = nc(lpmod),
                           lp_ok        = as.integer(sol$ok),
                           lp_obj       = sol$obj,
                           lp_stat      = as.integer(sol$stat),
                           obj_coef     = obj_coef(object),
+                          obj_func     = printObjFunc(object),
                           fldind       = fldind(lpmod),
                           fluxdist     = fluxDistribution(fluxes = sol$fluxes,
                                                       nrow = length(sol$fluxes),
@@ -634,7 +640,7 @@ setMethod("optimizeProb", signature(object = "modelorg"),
             checkOptSol(optsol, onlywarn = TRUE)
         }
         else {
-            optsol <- sol
+            optsol             <- sol
             optsol[["fldind"]] <- fldind(lpmod)
         }
 
@@ -649,67 +655,233 @@ setMethod("optimizeProb", signature(object = "modelorg"),
 
 #------------------------------------------------------------------------------#
 
-setMethod("shrinkSMatrix", signature(model = "modelorg"),
-    function(model, i = NULL, j = NULL, names = NULL) {
+# print objective function
+setMethod("printObjFunc", signature(object = "modelorg"),
+          function(object) {
+              cInd <- obj_coef(object) != 0
+              
+              # check if there is an objective function
+              if (sum(cInd) == 0) {
+                  of <- "no objective function"
+              }
+              else {
+                  obj <- gsub("^([^-])", "+\\1",
+                              obj_coef(object)[cInd], perl = TRUE)
+                  of  <- paste(paste(obj, react_id(object)[cInd]),
+                               collapse = " ")
+              }
+            
+              return(of)  
+          }
+)
+
+
+#------------------------------------------------------------------------------#
+
+# print reactions
+setMethod("printReaction", signature(object = "modelorg"),
+    function(object, react, printOut = TRUE, ...) {
   	
-#         if (! any(is.null(i), is.numeric(i), is.character(i))) {
-#             stop("i has to be numeric, characer or NULL")
-#         }
-#         
-#         if (! any(is.null(j), is.numeric(j), is.character(j))) {
-#             stop("j has to be numeric, characer or NULL")
-#         }
-#         
-#         useNames <- ifelse(any(is.character(i), is.character(j)), TRUE, FALSE)
-# 
-#         m <- S(model)
-#         rows <- i
-#         cols <- j
-#         
-#         if(isTRUE(useNames)){
-#             rownames(m) <- met_id(model)
-#             colnames(m) <- react_id(model)
-#             
-#             if(is.character(i)){
-#                 if(any(! i %in% met_id(model))){
-#                     stop("invalid met_id")
-#                 }
-#             }
-#             if(is.character(j)){
-#                 if(any(! j %in% react_id(model))){
-#                     stop("invalid react_id")
-#                 }
-#             }
-#         }
-#     
-#         #checking of parameters should be done here
-#     
-#         #m <- as.matrix(m)
-#     
-#         if(!is.null(cols)){
-#             m <- m[, cols, drop=FALSE]
-#         }
-#         if(!is.null(rows)){
-#             m <- m[rows, , drop=FALSE]
-#         }
-#     
-#     
-#         m <- m[
-#         apply(m, 1, function(x){
-#                         any(x!=0)
-#                     }), , drop=FALSE]
-#     
-#         m <- m[,
-#         apply(m, 2, function(x){
-#                         any(x!=0)
-#                     }), drop=FALSE]
-#                     
-#         if(all(dim(m)==0)){
-#             return(NULL)
-#         }
-#         else{
-#             return(m)
-#         }
+        check <- checkReactId(object, react = react, needId = TRUE)
+        if (is(check, "reactId")) {
+            cind <- react_pos(check)
+        }
+        else {
+            stop("check argument react")
+        }
+
+        mat <- S(object)[, cind, drop = FALSE]
+        nnz <- apply(mat, 2, "!=", 0)
+        reaction <- character(length(cind))
+
+        for (j in seq(along = cind)) {
+        
+            met <- met_id(object)[nnz[, j]]
+            nzv <- mat[, j][nnz[, j]]
+            
+            ed <- nzv < 0
+            pd <- nzv > 0
+
+            if (sum(ed) > 0) {
+                educt   <- paste(paste("(", abs(nzv[ed]), ")", sep = ""),
+                                 met[ed], collapse = " + ")
+            }
+            else {
+                educt = ""
+            }
+
+            if (sum(pd) > 0) {
+                product <- paste(paste("(", nzv[pd], ")", sep = ""),
+                                 met[pd], collapse = " + ")
+            }
+            else {
+                product = ""
+            }
+            
+            arrow   <- ifelse(react_rev(object)[cind[j]], " <==> ", " --> ")
+            
+            reaction[j] <- paste(react_id(check)[j],
+                                 paste(educt, product, sep = arrow), sep = "\t")
+        }
+
+        if (isTRUE(printOut)) {
+           cat("abbreviation\tequation", reaction, sep = "\n", ...)
+        }
+        
+        return(invisible(reaction))
+
+    }
+)
+
+
+#------------------------------------------------------------------------------#
+
+# print metabolites
+setMethod("printMetabolite", signature(object = "modelorg"),
+    function(object, met, FBAlp = FALSE, printOut = TRUE, ...) {
+  	
+        if ( (missing(met)) || (isTRUE(FBAlp)) ) {
+            mid  <- met_id(object)
+            rind <- c(1:met_num(object))
+        }
+        else {
+            if (is(met, "numeric")) {
+                mid  <- met_id(object)[met]
+                rind <- met
+            }
+            else if (is(met, "character")) {
+                rind <- match(met, met_id(object))
+                if (any(is.na(rind))) {
+                    stop("check argument met")
+                }
+                else {
+                    mid <- met
+                }
+            }
+            else {
+                stop("argument met must be character or numeric")
+            }
+        }
+        
+        midbr <- sub("[", "(", mid, fixed = TRUE)
+        midbr <- sub("]", ")", midbr, fixed = TRUE)
+        midbr <- sub("^([^a-z])", "n\\1", midbr,
+                     perl = TRUE, ignore.case = TRUE)
+
+        mat <- S(object)[rind, , drop = FALSE]
+        nnz <- apply(mat, 1, "!=", 0)
+        metabolite <- character(length(rind))
+
+        for (i in seq(along = rind)) {
+        
+            react <- react_id(object)[nnz[, i]]
+            nzv   <- mat[i, ][nnz[, i]]
+            
+            nm <- nzv != 0
+
+            if (sum(nm) > 0) {
+                nz <- gsub("^([^-])", "+\\1", nzv[nm], perl = TRUE)
+                bal <- paste(nz, react[nm], collapse = " ")
+            }
+            else {
+                bal = ""
+            }
+
+            metabolite[i] <- paste(paste(" ", midbr[i], ":", sep = ""),
+                                   bal, sep = "\t")
+        }
+
+        if (isTRUE(FBAlp)) {
+            obj  <- c("Maximize",
+                      paste(" obj:", printObjFunc(object)),
+                      "",
+                      "Subject To")
+            bnds <- c("",
+                      "Bounds",
+                      paste(paste("", lowbnd(object)),
+                            react_id(object), uppbnd(object), sep = " <= "),
+                      "",
+                      "End")
+            
+            tof  <- c(obj, paste(metabolite, "", sep = " = 0"), bnds)
+        }
+        else {
+            tof  <- metabolite
+        }
+        
+        if (isTRUE(printOut)) {
+            cat(tof, sep = "\n", ...)
+        }
+
+        return(invisible(tof))
+
+    }
+)
+
+
+#------------------------------------------------------------------------------#
+
+setMethod("shrinkMatrix", signature(X = "modelorg"),
+    function(X, i = NULL, j = NULL, tol = SYBIL_SETTINGS("TOLERANCE")) {
+  	
+        stopifnot(xor(is.null(i), is.null(j)))
+
+        # look for reactions
+        if (is.null(i)) {
+            # translate reaction id's to indices
+            cj <- checkReactId(X, react = j, needId = TRUE)
+            if (!is(cj, "reactId")) {
+                stop("check argument j")
+            }
+            else {
+                cn <- react_pos(cj)
+            }
+            met <- NULL
+        }
+
+
+        # look for metabolites
+        if (is.null(j)) {
+            # translate reaction id's to indices
+            if (is(i, "character")) {
+                met <- which(met_id(X) %in% i)
+            }
+            else if (is(i, "reactId_Exch")) {
+                met <- met_pos(i)
+            }
+            else if (is(i, "numeric")) {
+                met <- i
+            }
+            else {
+                stop("check argument i")
+            }
+
+            matB <- abs(S(X)[met, , drop = FALSE]) > tol
+
+            cn <- colSums(matB) > 0
+        }
+         
+        # generate new matrix
+        mat <- S(X)[, cn, drop = FALSE]
+
+        # binary matrix
+        matB <- abs(mat) > tol
+
+        if (is.null(met)) {
+            rn <- rowSums(matB) > 0
+        }
+        else {
+            nzm <- which(rowSums(matB) > 0)
+            ord <- nzm %in% met
+            rn <- c(nzm[ord], nzm[!ord])
+        }
+
+        mat <- mat[rn, , drop = FALSE]
+
+        colnames(mat) <- react_id(X)[cn]
+        rownames(mat) <- met_id(X)[rn]
+
+        return(mat)
               
     }
 )

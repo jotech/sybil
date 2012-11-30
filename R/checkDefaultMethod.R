@@ -28,27 +28,6 @@ checkDefaultMethod <- function(solver, method, probType, loadPackage = TRUE) {
               is(method, "character"),
               is(probType, "character"))
 
-    # -------------------------------------------------------------- #
-    # validate solver
-
-    # fetch deprecated arguments
-    solverAPI <- switch(solver,
-        "glpk"  = {
-            .Deprecated(new = "glpkAPI", old = "glpk")
-            "glpkAPI"
-        },
-        "clp"   = {
-            .Deprecated(new = "clpAPI", old = "clp")
-            "clpAPI"
-        },
-        "cplex" = {
-            .Deprecated(new = "cplexAPI", old = "cplex")
-            "cplexAPI"
-        },
-        { solver }
-    )
-
-
 #    # -------------------------------------------------------------- #
 #    # load solver package
 #
@@ -63,18 +42,18 @@ checkDefaultMethod <- function(solver, method, probType, loadPackage = TRUE) {
     # -------------------------------------------------------------- #
     # validate solver
 
-    val_solver_ind <- match(solverAPI, .SYBILenv$solvers)
+    val_solver_ind <- match(solver, .SYBILenv$solvers)
 
     if (is.na(val_solver_ind)) {
-        cmd <- paste(solverAPI, ".onAttach()", sep = ":::")
+        cmd <- paste(solver, ".onAttach()", sep = ":::")
         slv <- tryCatch(eval(parse(text = cmd)), error = function(e) e)
         if (isTRUE(slv)) {
-            val_solver_ind <- match(solverAPI, .SYBILenv$solvers)
+            val_solver_ind <- match(solver, .SYBILenv$solvers)
         }
 
         if (is.na(val_solver_ind)) {
             val_solver_ind <- 1L
-            warning("solver ", sQuote(solverAPI),
+            warning("solver ", sQuote(solver),
                     " not found, using default: ",
                     sQuote(.SYBILenv$solvers[val_solver_ind]))
         }

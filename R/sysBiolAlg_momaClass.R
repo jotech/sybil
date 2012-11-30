@@ -76,7 +76,7 @@ setMethod(f = "initialize",
                   # ---------------------------------------------
 
                   .Object <- callNextMethod(.Object,
-                                            alg        = "moma",
+                                            sbalg      = "moma",
                                             pType      = "qp",
                                             scaling    = scaling,
                                             fi         = 1:nCols,

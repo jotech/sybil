@@ -70,7 +70,7 @@ doubleFluxDel <- function(model, react1, react2,
     if ((ex == 2) && (exex == TRUE)) {
 
         exch <- findExchReact(model)
-        exch <- react_pos(exch[[1]])
+        exch <- react_pos(exch)
 
         react1 <- react1[-exch]
         react2 <- react2[-exch]

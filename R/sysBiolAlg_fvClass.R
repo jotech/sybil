@@ -60,7 +60,7 @@ setMethod(f = "initialize",
                   nRows <- met_num(model)
 
                   .Object <- callNextMethod(.Object,
-                                            alg        = "fv",
+                                            sbalg      = "fv",
                                             pType      = "lp",
                                             scaling    = scaling,
                                             fi         = 1:nCols,
@@ -81,6 +81,7 @@ setMethod(f = "initialize",
                   if ( (isTRUE(fixObjVal)) && (any(obj_coef(model) != 0)) ) {
                       if (is.null(Zopt)) {
                           optimal <- optimizeProb(model,
+                                                  retOptSol = FALSE,
                                                   algorithm = "fba",
                                                   lpdir = lpdir,
                                                   scaling = scaling, ...)
