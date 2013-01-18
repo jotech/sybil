@@ -9,7 +9,7 @@
 
 \description{
   The function \code{geneDel} returns the fluxes which are effected by a
-  particular gene deletion.
+  particular combination of genes.
 }
 
 \usage{

@@ -1,7 +1,7 @@
 #  doubleReact.R
 #  FBA and friends with R.
 #
-#  Copyright (C) 2010-2012 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
+#  Copyright (C) 2010-2013 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
 #  Institute for Informatics, Heinrich-Heine-University, Duesseldorf, Germany.
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
@@ -147,7 +147,7 @@ doubleReact <- function(model, checkRev = TRUE) {
                       next
                   }
 
-                  # First, we only check weather the row indices of the
+                  # First, we only check whether the row indices of the
                   # non zero entries in columns k and l are the same (the
                   # columns are much smaller if we only take the row indices).
                   if (identical(Stmp_rows[, k],Stmp_rows[, l])) {

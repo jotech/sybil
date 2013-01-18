@@ -1,7 +1,7 @@
 #  reactId_ExchClass.R
 #  FBA and friends with R.
 #
-#  Copyright (C) 2010-2012 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
+#  Copyright (C) 2010-2013 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
 #  Institute for Informatics, Heinrich-Heine-University, Duesseldorf, Germany.
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
@@ -48,7 +48,7 @@ setClass("reactId_Exch",
 
 setMethod(f = "initialize",
           signature = "reactId_Exch",
-          definition = function(.Object, mod_id, mod_key,
+          definition = function(.Object, mod_id, mod_key = "",
                                 rpnt, rid, upt, mpnt, mid, lb, ub) {
 
               if ( (!missing(mod_id))  ||
@@ -166,21 +166,16 @@ setReplaceMethod("uptake", signature = (object = "reactId_Exch"),
 
 setMethod("show", signature(object = "reactId_Exch"),
     function(object) {
-        if ( (isTRUE(hasId(object))) && (length(object) > 0) ) {
-            wcn <- trunc(log10(length(object))) + 3
-            cn  <- paste("[", 1:length(object), "]", sep = "")
-            lb <- ifelse(lowbnd(object) <= SYBIL_SETTINGS("MAXIMUM")*-1, -Inf, lowbnd(object))
-            ub <- ifelse(uppbnd(object) >= SYBIL_SETTINGS("MAXIMUM"), Inf, uppbnd(object))
-            cat(sprintf(paste("%", wcn, "s  ", "%-6s%-22s%-23s%-7s%6s %6s\n", sep = ""),
-                "# ", "pos.", "reaction id", "metabolite id", "uptake", "lb", "ub"))
-            cat(sprintf(paste("%", wcn, "s  ", "%-6s%-22s%-23s%-7s%6s %6s", sep = ""),
-                        cn, react_pos(object), react_id(object),
-                        met_id(object), uptake(object), lb, ub), sep = "\n")
-            cat("\nnumber of exchange reactions: ", length(object), "\n", sep = "")
-        }
-        else {
-            show(react_pos(object))
-        }
+        wcn <- trunc(log10(length(object))) + 3
+        cn  <- paste("[", 1:length(object), "]", sep = "")
+        lb <- ifelse(lowbnd(object) <= SYBIL_SETTINGS("MAXIMUM")*-1, -Inf, lowbnd(object))
+        ub <- ifelse(uppbnd(object) >= SYBIL_SETTINGS("MAXIMUM"), Inf, uppbnd(object))
+        cat(sprintf(paste("%", wcn, "s  ", "%-6s%-22s%-23s%-7s%6s %6s\n", sep = ""),
+            "# ", "pos.", "reaction id", "metabolite id", "uptake", "lb", "ub"))
+        cat(sprintf(paste("%", wcn, "s  ", "%-6s%-22s%-23s%-7s%6s %6s", sep = ""),
+                    cn, react_pos(object), react_id(object),
+                    met_id(object), uptake(object), lb, ub), sep = "\n")
+        cat("\nnumber of exchange reactions: ", length(object), "\n", sep = "")
     }
 )
 
@@ -212,6 +207,9 @@ setMethod("[", signature(x = "reactId_Exch"),
         if (is(i, "character")) {
             ind <- match(i, react_id(x))
         }
+#        else if (is(i, "reactId")) {
+#            ind <- which(react_pos(x) %in% react_pos(i))
+#        }
         else {
             ind <- i
         }
@@ -220,18 +218,11 @@ setMethod("[", signature(x = "reactId_Exch"),
             stop("subscript out of bounds")
         }
 
-        if (isTRUE(x@has_id)) {
-            xid <- x@react_id[ind]
-        }
-        else {
-            xid <- NULL
-        }
-        
         newRI <- new("reactId_Exch",
                      mod_id  = x@mod_id,
                      mod_key = x@mod_key,
                      rpnt    = x@react_pos[ind],
-                     rid     = xid,
+                     rid     = x@react_id[ind],
                      upt     = x@uptake[ind],
                      mpnt    = x@met_pos[ind],
                      mid     = x@met_id[ind],

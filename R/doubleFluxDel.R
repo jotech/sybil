@@ -1,7 +1,7 @@
 #  doubleFluxDel.R
 #  FBA and friends with R.
 #
-#  Copyright (C) 2010-2012 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
+#  Copyright (C) 2010-2013 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
 #  Institute for Informatics, Heinrich-Heine-University, Duesseldorf, Germany.
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
@@ -30,8 +30,9 @@
 # and the objective function will be computed.
 
 
-doubleFluxDel <- function(model, react1, react2,
-                          allComb = FALSE, exex = FALSE, ...) {
+doubleFluxDel <- function(model, react1, react2, lb = NULL, ub = NULL,
+                          allComb = FALSE, exex = FALSE,
+                          checkOptSolObj = FALSE, ...) {
 
     if (!is(model, "modelorg")) {
         stop("needs an object of class modelorg!")
@@ -41,7 +42,7 @@ doubleFluxDel <- function(model, react1, react2,
 
     if (missing(react1)) {
         ex <- 1
-        react1 <- reactId((1:react_num(model)), react_id(model))
+        react1 <- checkReactId(model, 1:react_num(model))
     }
 	else {
         if (!is(react1, "reactId")) {
@@ -51,7 +52,7 @@ doubleFluxDel <- function(model, react1, react2,
 
     if (missing(react2)) {
         ex <- 2
-        react2 <- reactId((1:react_num(model)), react_id(model))
+        react2 <- checkReactId(model, 1:react_num(model))
     }
     else {
         if (!is(react2, "reactId")) {
@@ -94,7 +95,7 @@ doubleFluxDel <- function(model, react1, react2,
   
     if (isTRUE(allComb)) {
 
-        # Compute boolean matrix with TRUE in the upper triangonal
+        # Compute Boolean matrix with TRUE in the upper triangonal
         # (the maximum number of comparisons)
         tmpMAT <- upper.tri(matrix(nrow = react_num(model),
                                    ncol = react_num(model)))
@@ -156,12 +157,44 @@ doubleFluxDel <- function(model, react1, react2,
 #------------------------------------------------------------------------------#
   
     deletions <- which(tmpMAT == TRUE, arr.ind = TRUE)
+
+    koreactID <- cbind(react1[deletions[,"row"]],
+                       react2[deletions[,"col"]])
+    koreact   <- lapply(seq_len(nrow(koreactID)), function(x) koreactID[x, ])
     
-    optsol <- optimizer(model = model,
-                        delete = cbind(react1[deletions[,"row"]],
-                                       react2[deletions[,"col"]]),
-                        geneFlag = FALSE,
-                        ...)
+    if (is.null(lb)) {
+        lb <- rep(0, length(koreact))
+    }
+    else {
+        if (length(lb) != length(koreact)) {
+            stop("lb must be of length ", length(koreact))
+        }
+    }
+    if (is.null(ub)) {
+        ub <- rep(0, length(koreact))
+    }
+    else {
+        if (length(ub) != length(koreact)) {
+            stop("ub must be of length ", length(koreact))
+        }
+    }
+
+    sol <- optimizer(model = model, lb = lb, ub = ub, react = koreact, ...)
+
+
+    # ------------------------------------------------------------------------ #
+
+    optsol <- new("optsol_fluxdel")
+    opt <- makeOptsolMO(model, sol)
+    as(optsol, "optsol_optimizeProb") <- opt
+    
+    chlb(optsol) <- as.numeric(lb)
+    chub(optsol) <- as.numeric(ub)
+    dels(optsol) <- matrix(react_id(model)[koreactID], ncol = 2)
+
+    if (isTRUE(checkOptSolObj)) {
+        checkOptSol(optsol, onlywarn = TRUE)
+    }
 
     return(optsol)
 

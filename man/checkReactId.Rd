@@ -12,15 +12,14 @@
 }
 
 \usage{
-  checkReactId(model, react, needId = FALSE)
+  checkReactId(model, react)
 }
 
 \arguments{
   \item{model}{A model. An object of class
     \code{\linkS4class{modelorg}}, or a problem object of a lp solver.}
-  \item{react}{Charater vector containing reaction id's, or a numerical
+  \item{react}{Character vector containing reaction id's, or a numerical
     vector containing indices of reaction id's.}
-  \item{needId}{Logical: if reaction ids are needed (default: FALSE).}
 }
 
 \details{

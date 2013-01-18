@@ -1,7 +1,7 @@
 #  geneDel.R
 #  FBA and friends with R.
 #
-#  Copyright (C) 2010-2012 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
+#  Copyright (C) 2010-2013 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
 #  Institute for Informatics, Heinrich-Heine-University, Duesseldorf, Germany.
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
@@ -78,20 +78,24 @@ geneDel <- function(model, genes, checkId = FALSE) {
 
   # Get the reaction id's of reactions in the gene list. Returns a list
   # Perhaps we find something better here.
-  reactInd <- as.list(apply(
-                    as.matrix(rxnGeneMat(model)[,geneInd]), 2, function(x)
-                                                        which(x != 0)
+#  reactInd <- as.list(apply(
+#                    as.matrix(rxnGeneMat(model)[,geneInd]), 2, function(x)
+#                                                        which(x != 0)
+#
+#                    ))
+  reactInd <- apply(rxnGeneMat(model)[,geneInd, drop = FALSE], 2, function(x) which(x != 0) )
 
-                    ))
-  
+                    
+ #   print(reactInd)  
   #print(unlist(reactInd))
 
   reactInd <- unlist(reactInd)
+#return(reactInd)  
 
 #print(reactInd)
   
-  x <- logical(length(allGenes(model)))
-  x <- rep(TRUE, length(x))
+  #x <- logical(length(allGenes(model)))
+  x <- rep(TRUE, length(allGenes(model)))
   #print(x)
   x[geneInd] <- FALSE
   constReact <- logical(length(reactInd))
@@ -103,9 +107,12 @@ geneDel <- function(model, genes, checkId = FALSE) {
   # Constrain a reaction if the corresponding gpr rule is FALSE.
   # If that's the case, the reaction needs gene bla.
 
+  ru <- gprRules(model)[reactInd]
   for(i in 1:length(reactInd)) {
       #print(reactInd[i])
-      if (eval(parse(text = gprRules(model)[reactInd[i]])) == FALSE) {
+      #print(ru[i])
+      #if (eval(parse(text = gprRules(model)[reactInd[i]])) == FALSE) {
+      if (eval(parse(text = ru[i])) == FALSE) {
           #print(reactInd[i])
           #print("cool")
           constReact[i] <- TRUE

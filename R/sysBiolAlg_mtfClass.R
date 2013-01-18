@@ -1,7 +1,7 @@
 #  sysBiolAlg_mtfClass.R
 #  FBA and friends with R.
 #
-#  Copyright (C) 2010-2012 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
+#  Copyright (C) 2010-2013 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
 #  Institute for Informatics, Heinrich-Heine-University, Duesseldorf, Germany.
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
@@ -27,6 +27,9 @@
 #------------------------------------------------------------------------------#
 
 setClass(Class = "sysBiolAlg_mtf",
+         representation(
+             maxobj = "numeric"
+         ),
          contains = "sysBiolAlg"
 )
 
@@ -40,7 +43,8 @@ setMethod(f = "initialize",
           signature = "sysBiolAlg_mtf",
           definition = function(.Object,
                                 model,
-                                wtobj,
+                                wtobj = NULL,
+                                react = NULL, lb = NULL, ub = NULL,
                                 costcoefbw = NULL,
                                 costcoeffw = NULL,
                                 scaling = NULL,
@@ -48,14 +52,21 @@ setMethod(f = "initialize",
 
               if ( ! missing(model) ) {
 
-                  if (missing(wtobj)) {
-                      tmp <- sybil:::.generateWT(model, ...)
-                      wtobj <- tmp$obj
+                  if (is.null(wtobj)) {
+                      tmp <- sybil:::.generateWT(model, react, lb, ub, ...)
+                      wtobj  <- tmp[["obj"]]
+                  }
+                  
+                  if (length(wtobj) > 1) {
+                      maxobj <- wtobj
+                      currmo <- 0
+                  }
+                  else {
+                      maxobj <- NULL
+                      currmo <- wtobj[1]
                   }
 
-                  stopifnot(is(model, "modelorg"),
-                            is(wtobj, "numeric"),
-                            length(wtobj) == 1)
+                  stopifnot(is(model, "modelorg"), is(wtobj, "numeric"))
                   
                   #  the problem: minimize:
                   #
@@ -130,24 +141,15 @@ setMethod(f = "initialize",
                   # rows
                   # ---------------------------------------------
 
-                  #rlower <- c(rhs(model), rep(0, 2*nc), wtobj)
+                  #rlower <- c(rhs(model), rep(0, 2*nc), currmo)
                   #rupper <- c(rhs(model), rep(absMAX, 2*nc + 1))
-                  rlower <- c(rep(0, nr), rep(0, 2*nc), wtobj)
+                  rlower <- c(rep(0, nr), rep(0, 2*nc), currmo)
                   rupper <- c(rep(0, nr), rep(absMAX, 2*nc + 1))
                   rtype  <- c(rep("E", nr), rep("L", 2*nc + 1))
 
                   # ---------------------------------------------
                   # objective function
                   # ---------------------------------------------
-
-                  if (is.null(costcoefbw)) {
-                      bw <- rep(1, nc)
-                  }
-                  else {
-                      stopifnot(is(costcoefbw, "numeric"),
-                                (length(costcoefbw) == nc))
-                      bw <- costcoefbw
-                  }
 
                   if (is.null(costcoeffw)) {
                       fw <- rep(1, nc)
@@ -158,7 +160,17 @@ setMethod(f = "initialize",
                       fw <- costcoeffw
                   }
 
-                  cobj <- c(rep(0, nc), fw, bw)
+                  if (is.null(costcoefbw)) {
+                      bw <- fw
+                  }
+                  else {
+                      stopifnot(is(costcoefbw, "numeric"),
+                                (length(costcoefbw) == nc))
+                      bw <- costcoefbw
+                  }
+
+
+                  cobj <- c(rep(0, nc), bw, fw)
 
                   # ---------------------------------------------
                   # build problem object
@@ -180,7 +192,12 @@ setMethod(f = "initialize",
                                             rtype      = rtype,
                                             lpdir      = "min",
                                             ctype      = NULL,
+                                            algPar     = list("wtobj" = wtobj,
+                                                              "costcoefbw" = bw,
+                                                              "costcoeffw" = fw),
                                             ...)
+
+                   .Object@maxobj <- as.numeric(maxobj)
 
 #
 #                  # ---------------------------------------------
@@ -230,3 +247,18 @@ setMethod(f = "initialize",
 
 
 #------------------------------------------------------------------------------#
+#                                other methods                                 #
+#------------------------------------------------------------------------------#
+
+setMethod("changeMaxObj", signature(object = "sysBiolAlg_mtf"),
+    function(object, j) {
+
+        if (!is.null(object@maxobj)) {
+            changeRowsBnds(problem(object), i = nr(object),
+                           lb = object@maxobj[j], ub = SYBIL_SETTINGS("MAXIMUM"))
+        }
+
+        return(invisible(TRUE))
+    }
+)
+

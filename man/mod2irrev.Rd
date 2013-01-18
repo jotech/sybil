@@ -16,7 +16,7 @@
 
 \arguments{
   \item{model}{An object of class \code{\linkS4class{modelorg}}.}
-  \item{exex}{boolean. Exclude exchange fluxes (default: FALSE).}
+  \item{exex}{Boolean. Exclude exchange fluxes (default: FALSE).}
 }
 
 \details{

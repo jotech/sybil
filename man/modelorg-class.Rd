@@ -121,7 +121,7 @@
 
 \encoding{utf8}
 
-\title{Strukture of Class "modelorg"}
+\title{Structure of Class "modelorg"}
 
 \description{
   Structure of the class \code{"modelorg"}. Objects of that class are
@@ -185,7 +185,7 @@
       Object of class \code{"integer"} indicating the number of reactions.
     }
     \item{\code{react_rev}:}{
-      Object of class \code{"logical"} indicating weather a reaction is
+      Object of class \code{"logical"} indicating whether a reaction is
       reversible or not.
     }
     \item{\code{react_id}:}{

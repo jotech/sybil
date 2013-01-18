@@ -7,6 +7,75 @@
 \newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 
 % ---------------------------------------------------------------------------- %
+\section{Changes in version 1.1.11 2013-01-18}{
+  \itemize{
+    \item fixed a bug in function \code{doubleGeneDel} which appears if
+          argument \code{exLethal} is set to \code{TRUE}
+    \item removed old file \file{NEWS.Rd} from top level directory
+  }
+}
+
+
+% ---------------------------------------------------------------------------- %
+\section{Changes in version 1.1.10 2012-12-21}{
+  \itemize{
+    \item fixed a bug in the calculation of default objective values in the
+          \code{mtf} algorithm
+  }
+}
+
+
+% ---------------------------------------------------------------------------- %
+\section{Changes in version 1.1.9 2012-12-21}{
+  \itemize{
+    \item method \code{histogram} of class \code{optsol} plots the return value
+          of \code{mod_obj}, not \code{lp_obj}
+    \item removed argument \code{MoreArgs} from method \code{optimizeProb} of
+          class \code{modelorg}
+    \item slots \code{dels} and \code{fluxdels} of class \code{optsol_fluxdel}
+          and class \code{optsol_genedel} are matrices of class \code{character}
+    \item class \code{sysBiolAlg} has new methods \code{applyChanges} and
+          \code{resetChanges} for altering objects of class \code{sysBiolAlg}
+          temporarily
+    \item replaced method \code{optimizeProb} of class \code{sysBiolAlg_room} by
+          methods \code{applyChanges} and \code{resetChanges}
+    \item constructor method of class \code{sysBiolAlg} has new arguments
+          \code{retAlgPar} and \code{algPar} used for saving algorithm specific
+          parameters in objects extending class \code{sysBiolAlg}
+    \item added slot \code{maxobj} and method \code{changeMaxObj} to class
+          \code{sysBiolAlg_mtf}
+    \item fixed a bug in algorithm \code{mtf}: modifications in the model (like
+          gene knock-outs) were ignored during the calculation of the optimized
+          objective value
+    \item argument algorithm to function \code{optimizer} can now also be
+          \code{"mtf"} or \code{"fv"}
+    \item added class \code{netFlux} and constructor function \code{getNetFlux}
+          to order exchange reaction rates according to their sign
+    \item function \code{optimizer} returns a list and no longer an object
+          extending class \code{optsol}.
+    \item removed method \code{logOptimizationNE} of class \code{sybilLog}
+  }
+}
+
+
+% ---------------------------------------------------------------------------- %
+\section{Changes in version 1.1.8 2012-12-03}{
+  \itemize{
+    \item requires R version 2.14.2 or higher
+    \item method \code{getFluxDist} of class \code{optsol} get additional
+          argument \code{opt} to access specific optimization results
+    \item removed argument \code{needId} from function \code{checkReactId}
+    \item removed slot \code{has_id} and method \code{hasId} from
+          class \code{reactId}
+    \item removed constructor function \code{reactId} for objects of class
+          \code{reactId}, use function \code{checkReactId} instead
+    \item added function \code{editEnvir}: the environment editor for metabolic
+          networks
+  }
+}
+
+
+% ---------------------------------------------------------------------------- %
 \section{Changes in version 1.1.7 2012-11-30}{
   \itemize{
     \item method \code{shrinkMatrix} can get objects of class \code{reactId}
@@ -156,7 +225,7 @@
           objective coefficients in the model (object of class \code{modelorg})
           and \eqn{\mbox{\boldmath$v$\unboldmath}}{v} being the flux
           distribution as a result of the optimization. In contrast, method
-          \code{lp_obj} allways returns the value of the objective function
+          \code{lp_obj} always returns the value of the objective function
           of the used algorithm after optimization.
     \item added functions \code{addAlgorithm}, \code{checkAlgorithm} and
           \code{getsybilenv}
@@ -347,9 +416,9 @@
   \itemize{
     \item added slots \code{met_de} and \code{react_de} to \code{modelorg}
 
-    \item added boolean arguments \code{remMet}, \code{contrMet},
+    \item added Boolean arguments \code{remMet}, \code{contrMet},
           \code{singletonMet} and \code{deadEndmet} to \code{readTSVmod()}, the
-          two boolean arguments \code{remSingleMet} and \code{constrSingleMet}
+          two Boolean arguments \code{remSingleMet} and \code{constrSingleMet}
           are removed, see \code{help("readTSVmod")} for details
   }
 }
@@ -795,9 +864,9 @@ simpleFBA(<model>, solver = "cplex",
           \code{react}}
         \item{ub}{(default: \code{NA}) new upper bounds for fluxes in argument
           \code{react}}
-        \item{minTotalFlux}{(default: \code{FALSE}) boolean, if set to
+        \item{minTotalFlux}{(default: \code{FALSE}) Boolean, if set to
           \code{TRUE}, after FBA, the sum of all flux rates will be minimized}
-        \item{minDist}{(default: \code{FALSE}) boolean, if set to \code{TRUE},
+        \item{minDist}{(default: \code{FALSE}) Boolean, if set to \code{TRUE},
           a minimized distance to a wild type flux distribution will be
           generated}
         \item{wtFluxes}{(default: \code{NA}) a single flux value (if
@@ -823,10 +892,10 @@ simpleFBA(<model>, solver = "cplex",
           \code{optimizer()} by argument \code{\dots} in e.g.
           \code{oneGeneDel()} or \code{doubleGeneDel()}]:
       \describe{
-        \item{rebuildModel}{(default: \code{FALSE}) boolean. If set to
+        \item{rebuildModel}{(default: \code{FALSE}) Boolean. If set to
           \code{TRUE}, the problem object will be recreated for every
           optimization.  That will increase the running time significantly!}
-        \item{copyModel}{(default: \code{FALSE}) boolean. If set to \code{TRUE},
+        \item{copyModel}{(default: \code{FALSE}) Boolean. If set to \code{TRUE},
           the problem object will be taken from a backup copy. That backup copy
           will be created prior to the very first optimization from the modelorg
           object.}
@@ -957,7 +1026,7 @@ simpleFBA(<model>, solver = "cplex",
 
     \item argument \code{resolve} in \code{optimizer()} and \code{refineSol()}:
       \itemize{
-        \item no longer boolean
+        \item no longer Boolean
         \item default: \code{NA}
         \item if non optimal solutions should be resolved: set to method
               resolve should use
@@ -965,14 +1034,14 @@ simpleFBA(<model>, solver = "cplex",
 
     \item argument \code{logfile} in \code{optimizer()} and \code{refineSol()}:
       \itemize{
-        \item no longer boolean
+        \item no longer Boolean
         \item default: \code{NA}
         \item if a logfile should printed, \code{logfile} will be the filename
       }
 
     \item argument \code{scaling} in \code{optimizer()} and \code{refineSol()}:
       \itemize{
-        \item no longer boolean
+        \item no longer Boolean
         \item default: \code{NA}
         \item if the model should be scaled, scaling will be the scaling method
       }

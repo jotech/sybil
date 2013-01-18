@@ -1,7 +1,7 @@
 #  checkReactId.R
 #  FBA and friends with R.
 #
-#  Copyright (C) 2010-2012 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
+#  Copyright (C) 2010-2013 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
 #  Institute for Informatics, Heinrich-Heine-University, Duesseldorf, Germany.
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
@@ -29,7 +29,7 @@
 # 
 #
 
-checkReactId <- function(model, react, needId = FALSE) {
+checkReactId <- function(model, react) {
 
   if (is(react, "reactId")) {
       return(react)
@@ -46,7 +46,7 @@ checkReactId <- function(model, react, needId = FALSE) {
 #                           if "react" is numeric                              #
 #------------------------------------------------------------------------------#
 
-# If react is numeric (or integer), we only need to check, weather no element of
+# If react is numeric (or integer), we only need to check, whether no element of
 # react is larger than the number of reactions and if all elements are positive.
 
   if (is.numeric(react) || is.integer(react)) {
@@ -56,23 +56,11 @@ checkReactId <- function(model, react, needId = FALSE) {
           warning("reaction numbers must be in between 1 and ", react_num(model))
       }
       else {
-          if (needId == FALSE) {
-              #checkedIds <- reactId(react, character(length(react)))
-              #checkedIds <- reactId(react)
-              checkedIds <- new("reactId",
-                                mod_id  = mod_id(model),
-                                mod_key = mod_key(model),
-                                pnt     = react,
-                                id      = NULL)
-          }
-          else {
-              #checkedIds <- reactId(react, react_id(model)[react])
-              checkedIds <- new("reactId",
-                                mod_id  = mod_id(model),
-                                mod_key = mod_key(model),
-                                pnt     = react,
-                                id      = react_id(model)[react])
-          }
+          checkedIds <- new("reactId",
+                            mod_id  = mod_id(model),
+                            mod_key = mod_key(model),
+                            pnt     = react,
+                            id      = react_id(model)[react])
       }
       #return(checkedIds)
 
@@ -88,7 +76,6 @@ checkReactId <- function(model, react, needId = FALSE) {
       # find the vector indices in the model of react
       pos <- match(react, reaction_ids, nomatch = 0)
       if (all(pos != 0)) {
-          #checkedIds <- reactId(pos, react)
           checkedIds <- new("reactId",
                             mod_id  = mod_id(model),
                             mod_key = mod_key(model),
@@ -109,7 +96,7 @@ checkReactId <- function(model, react, needId = FALSE) {
           
           #react  <- sapply(react, function(x) grep(x, Dmodel@react_id, ignore.case = TRUE, value = TRUE))
     
-          # check weather all results are unique
+          # check whether all results are unique
           #print(is(react_null))
           #print(react_null)
           len    <- sapply(react_null, length)
@@ -135,7 +122,6 @@ checkReactId <- function(model, react, needId = FALSE) {
               #print(react)
               #pos <- match(react, model@react_id)
         
-              #checkedIds <- reactId(pos, react)
               checkedIds <- new("reactId",
                                 mod_id  = mod_id(model),
                                 mod_key = mod_key(model),

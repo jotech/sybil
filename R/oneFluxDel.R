@@ -1,7 +1,7 @@
 #  oneFluxDel.R
 #  FBA and friends with R.
 #
-#  Copyright (C) 2010-2012 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
+#  Copyright (C) 2010-2013 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
 #  Institute for Informatics, Heinrich-Heine-University, Duesseldorf, Germany.
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
@@ -33,20 +33,14 @@
 # singleRxnDeletion() contained in the COBRA Toolbox.
 
 
-oneFluxDel <- function(model, react = c(1:react_num(model)), ...) {
+oneFluxDel <- function(model, react = c(1:react_num(model)),
+                       lb = rep(0, length(react)),
+                       ub = rep(0, length(react)),
+                       checkOptSolObj = FALSE, ...) {
 
     if (!is(model, "modelorg")) {
         stop("needs an object of class modelorg!")
     }
-
-#    if (missing(react)) {
-#        react <- reactId((1:react_num(model)), react_id(model))
-#    }
-#    else {
-#        if (!is(react, "reactId")) {
-#            react <- checkReactId(model, react)
-#        }
-#    }
 
     creact <- checkReactId(model, react)
     if (!is(creact, "reactId")) {
@@ -55,10 +49,22 @@ oneFluxDel <- function(model, react = c(1:react_num(model)), ...) {
 
     creact <- sort(react_pos(creact))
 
-    optsol <- optimizer(model = model,
-                        delete = matrix(creact, ncol = 1),
-                        geneFlag = FALSE,
-                        ...)
+    sol <- optimizer(model = model, lb = lb, ub = ub,
+                     react = as.list(creact), ...)
+
+    # ------------------------------------------------------------------------ #
+
+    optsol <- new("optsol_fluxdel")
+    opt <- makeOptsolMO(model, sol)
+    as(optsol, "optsol_optimizeProb") <- opt
+    
+    chlb(optsol) <- as.numeric(lb)
+    chub(optsol) <- as.numeric(ub)
+    dels(optsol) <- matrix(react_id(model)[creact], ncol = 1)
+
+    if (isTRUE(checkOptSolObj)) {
+        checkOptSol(optsol, onlywarn = TRUE)
+    }
 
     return(optsol)
 

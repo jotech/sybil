@@ -10,7 +10,10 @@
 }
 
 \usage{
-  oneGeneDel(model, geneList, ...)
+  oneGeneDel(model, geneList,
+             lb = rep(0, length(geneList)),
+             ub = rep(0, length(geneList)),
+             checkOptSolObj = FALSE, ...)
 }
 
 \arguments{
@@ -20,6 +23,25 @@
   \item{geneList}{
     A character vector containing the set of genes to be deleted one by one.\cr
     Default: \code{allGenes(model)}.
+  }
+  \item{lb}{
+    A numeric vector of the same length as \code{geneList} containing the lower
+    bounds for the reaction rates of reactions (variables) affected by the genes
+    given in argument \code{geneList}.\cr
+    Default: \code{0} for all genes in \code{geneList}, simulating knock-out
+    mutants.
+  }
+  \item{ub}{
+    A numeric vector of the same length as \code{geneList} containing the upper
+    bounds for the reaction rates of reactions (variables) affected by the genes
+    given in argument \code{geneList}.\cr
+    Default: \code{0} for all genes in \code{geneList}, simulating knock-out
+    mutants.
+  }
+  \item{checkOptSolObj}{
+    A single logical value. If set to \code{TRUE}, a warning will be generated,
+    if not all optimizations ended successful.\cr
+    Default: \code{FALSE}.
   }
   \item{\dots}{
     Further arguments passed to \code{\link{optimizer}}.  Important ones are
@@ -56,7 +78,7 @@
   # load example data set
   data(Ec_core)
   
-  # compute phenotypes of genetic pertubations via
+  # compute phenotypes of genetic perturbations via
   # FBA (default)
   Ec_ogd <- oneGeneDel(Ec_core)
   

@@ -1,7 +1,7 @@
 #  optObjClass.R
 #  FBA and friends with R.
 #
-#  Copyright (C) 2010-2012 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
+#  Copyright (C) 2010-2013 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
 #  Institute for Informatics, Heinrich-Heine-University, Duesseldorf, Germany.
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
@@ -139,7 +139,7 @@ setMethod("show", signature(object = "optObj"),
                     cat("mixed integer linear programming problem object\n")
                 },
                 "qp" = {
-                    cat("continous problem object with quadratic objective\n")
+                    cat("continuous problem object with quadratic objective\n")
                 },
                 {
                     cat("problem object of type ", probType(object),"\n")

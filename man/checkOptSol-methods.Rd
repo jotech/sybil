@@ -31,7 +31,7 @@
     An object of class \code{\linkS4class{optsol}}.
   }
   \item{onlywarn}{
-    A single boolean value. If set to \code{TRUE}, the method will check,
+    A single Boolean value. If set to \code{TRUE}, the method will check,
     if all optimizations ended successfully.\cr
     Default: \code{FALSE}.
   }

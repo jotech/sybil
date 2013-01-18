@@ -144,7 +144,7 @@
           A numeric vector indicating the optimizations (columns) to print.
         }
         \item{\code{dense}}{
-          A single boolean value. If set to \code{TRUE}, each column has a
+          A single Boolean value. If set to \code{TRUE}, each column has a
           column with of one letter.
         }
       }

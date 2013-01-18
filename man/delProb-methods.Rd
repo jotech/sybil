@@ -49,7 +49,7 @@
     An object extending class \code{\linkS4class{optObj}}.
   }
   \item{closeEnv}{
-    A boolean value. If set to \code{TRUE}, the CPLEX environment assicciated
+    A Boolean value. If set to \code{TRUE}, the CPLEX environment associated
     with the problem object will be closed also. Otherwise not.\cr
     Default: \code{TRUE}.
   }

@@ -1,7 +1,7 @@
 #  sysBiolAlg_roomClass.R
 #  FBA and friends with R.
 #
-#  Copyright (C) 2010-2012 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
+#  Copyright (C) 2010-2013 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
 #  Institute for Informatics, Heinrich-Heine-University, Duesseldorf, Germany.
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
@@ -201,6 +201,9 @@ setMethod(f = "initialize",
                                             rtype      = rtype,
                                             ctype      = ctype,
                                             lpdir      = "min",
+                                            algPar     = list("wtflux"  = wtflux,
+                                                              "delta"   = delta,
+                                                              "epsilon" = epsilon),
                                             ...)
 
                   .Object@wu  <- as.numeric(wu)
@@ -261,40 +264,19 @@ setMethod(f = "initialize",
 
 
 #------------------------------------------------------------------------------#
+#                                other methods                                 #
+#------------------------------------------------------------------------------#
 
-setMethod("optimizeProb", signature(object = "sysBiolAlg_room"),
-    function(object,
-             react = NULL,
-             lb = NULL,
-             ub = NULL,
-             prCmd = NA, poCmd = NA,
-             prCil = NA, poCil = NA) {
+setMethod("applyChanges", signature(object = "sysBiolAlg_room"),
+    function(object, del, obj, ld,
+             react    = NULL,
+             lb       = NULL,
+             ub       = NULL,
+             obj_coef = NULL,
+             lpdir    = NULL) {
 
+        tmp_val <- list("react" = react, "lb" = NULL, "ub" = NULL)
 
-        # check the argument react
-        if (is.null(react)) {
-            del <- FALSE
-        }
-        else {
-            stopifnot(is(react, "numeric"))
-    
-            if ( (is.null(lb)) || (is.null(ub)) ) {
-                del <- FALSE
-            }
-            else {
-                del <- TRUE
-                stopifnot(is(lb, "numeric"),
-                          is(ub, "numeric"),
-                          length(lb) == length(react),
-                          length(ub) == length(react))
-            }
-        }
-
-   
-        # -------------------------------------------------------------- #
-        # modifications to problem object
-        # -------------------------------------------------------------- #
-    
         fi    <- fldind(object)
         wu    <- object@wu
         wl    <- object@wl
@@ -302,8 +284,8 @@ setMethod("optimizeProb", signature(object = "sysBiolAlg_room"),
 
         if (isTRUE(del)) {
             # store default lower and upper bounds
-            lowb_tmp <- getColsLowBnds(lpmod, fi[react])
-            uppb_tmp <- getColsUppBnds(lpmod, fi[react])
+            tmp_val[["lb"]] <- getColsLowBnds(lpmod, fi[react])
+            tmp_val[["ub"]] <- getColsUppBnds(lpmod, fi[react])
     
             # change bounds of fluxes in react
             check <- changeColsBnds(lpmod, fi[react], lb, ub)
@@ -323,70 +305,48 @@ setMethod("optimizeProb", signature(object = "sysBiolAlg_room"),
             }
             
             #changeObjCoefs(lpmod, ci, rep(0, length(react)))
-            
+
+            tmp_val[["ri"]] <- ri
+            tmp_val[["ci"]] <- ci
         }
     
-    
-        # -------------------------------------------------------------- #
-        # optimization
-        # -------------------------------------------------------------- #
-    
-        # do some kind of preprocessing
-        preP <- sybil:::.ppProcessing(lpprob  = lpmod,
-                                      ppCmd   = prCmd,
-                                      loopvar = prCil)
-
-
-        lp_ok     <- solveLp(lpmod)
-        lp_stat   <- getSolStat(lpmod)
-        if (is.na(lp_stat)) {
-            lp_stat <- lp_ok
-        }
-
-        lp_obj    <- getObjVal(lpmod)
-        lp_fluxes <- getFluxDist(lpmod)
-
-        # do some kind of postprocessing
-        postP <- sybil:::.ppProcessing(lpprob = lpmod,
-                                       ppCmd = poCmd,
-                                       loopvar = poCil)
-    
-    
-        # -------------------------------------------------------------- #
-        # reset modifications
-        # -------------------------------------------------------------- #
-    
-        # reset the default values
-        if (isTRUE(del)) {
-            check <- changeColsBnds(lpmod, fi[react], lowb_tmp, uppb_tmp)
-
-            vwu <- (uppb_tmp - wu[fi[react]]) * -1
-            vwl <- (lowb_tmp - wl[fi[react]]) * -1
-
-            for (i in seq(along = react)) {
-                changeMatrixRow(lpmod, ri[i], c(react[i], ci[i]), c(1, vwl[i]))
-                changeMatrixRow(lpmod,
-                                ri[i]+object@fnc,
-                                c(react[i], ci[i]),
-                                c(1, vwu[i]))
-            }
-            
-            #changeObjCoefs(lpmod, ci, rep(1, length(react)))
-
-        }
-    
-
-        # -------------------------------------------------------------- #
-        # store solution
-        # -------------------------------------------------------------- #
-
-        return(list(ok = lp_ok,
-                    obj = lp_obj,
-                    stat = lp_stat,
-                    fluxes = lp_fluxes,
-                    preP = preP,
-                    postP = postP))
-
+        return(tmp_val)
     }
 )
 
+
+#------------------------------------------------------------------------------#
+
+setMethod("resetChanges", signature(object = "sysBiolAlg_room"),
+    function(object, old_val) {
+
+        fi    <- fldind(object)
+        wu    <- object@wu
+        wl    <- object@wl
+        lpmod <- problem(object)
+
+        if ( (!is.null(old_val[["lb"]])) || (!is.null(old_val[["ub"]])) ) {
+            check <- changeColsBnds(lpmod,
+                                    fi[old_val[["react"]]],
+                                    old_val[["lb"]], old_val[["ub"]])
+
+            vwu <- (old_val[["ub"]] - wu[fi[old_val[["react"]]]]) * -1
+            vwl <- (old_val[["lb"]] - wl[fi[old_val[["react"]]]]) * -1
+
+            for (i in seq(along = old_val[["react"]])) {
+                changeMatrixRow(lpmod,
+                                old_val[["ri"]][i],
+                                c(old_val[["react"]][i], old_val[["ci"]][i]),
+                                c(1, vwl[i]))
+                changeMatrixRow(lpmod,
+                                old_val[["ri"]][i]+object@fnc,
+                                c(old_val[["react"]][i], old_val[["ci"]][i]),
+                                c(1, vwu[i]))
+            }
+            
+            #changeObjCoefs(lpmod, old_val[["ci"]], rep(1, length(react)))
+        }
+    
+        return(invisible(TRUE))
+    }
+)

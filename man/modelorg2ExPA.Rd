@@ -28,8 +28,8 @@
     Default: \code{<model_id>.expa}.
   }
   \item{exIntReact}{
-    An object of class \code{\link{reactId}}, character or integer, giving id's
-    of internal reactions to exclude in the ExPA file.\cr
+    An object of class \code{\linkS4class{reactId}}, character or integer,
+    giving id's of internal reactions to exclude in the ExPA file.\cr
     Default: \code{NULL}.
   }
   \item{filepath}{

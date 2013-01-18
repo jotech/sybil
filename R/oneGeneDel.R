@@ -1,7 +1,7 @@
 #  oneGeneDel.R
 #  FBA and friends with R.
 #
-#  Copyright (C) 2010-2012 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
+#  Copyright (C) 2010-2013 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
 #  Institute for Informatics, Heinrich-Heine-University, Duesseldorf, Germany.
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
@@ -34,7 +34,10 @@
 # singleGeneDeletion() contained in the COBRA Toolbox.
 
 
-oneGeneDel <- function(model, geneList, ...) {
+oneGeneDel <- function(model, geneList,
+                       lb = rep(0, length(geneList)),
+                       ub = rep(0, length(geneList)),
+                       checkOptSolObj = FALSE, ...) {
 
     if (!is(model, "modelorg")) {
         stop("needs an object of class modelorg!")
@@ -59,10 +62,30 @@ oneGeneDel <- function(model, geneList, ...) {
 
     #geneList <- sort(geneList)
 
-    optsol <- optimizer(model = model,
-                        delete = matrix(geneList, ncol = 1),
-                        geneFlag = TRUE,
-                        ...)
+
+    # ------------------------------------------------------------------------ #
+
+    fd <- sybil:::.generateFluxdels(model, geneList)
+
+    sol <- optimizer(model = model,
+                     react = fd[["react"]], lb = lb, ub = ub, ...)
+
+
+    # ------------------------------------------------------------------------ #
+
+    optsol <- new("optsol_genedel")
+    opt <- makeOptsolMO(model, sol)
+    as(optsol, "optsol_optimizeProb") <- opt
+    
+    chlb(optsol)      <- as.numeric(lb)
+    chub(optsol)      <- as.numeric(ub)
+    dels(optsol)      <- matrix(allGenes(model)[geneList], ncol = 1)
+    fluxdels(optsol)  <- fd[["fd"]]
+    hasEffect(optsol) <- fd[["heff"]]
+
+    if (isTRUE(checkOptSolObj)) {
+        checkOptSol(optsol, onlywarn = TRUE)
+    }
 
     return(optsol)
 

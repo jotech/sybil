@@ -10,8 +10,10 @@
 }
 
 \usage{
-  doubleGeneDel(model, geneList1, geneList2, allComb = FALSE,
-                exLethal = TRUE, tol = SYBIL_SETTINGS("TOLERANCE"), ...)
+  doubleGeneDel(model, geneList1, geneList2, lb = NULL, ub = NULL,
+                allComb = FALSE, exLethal = TRUE,
+                tol = SYBIL_SETTINGS("TOLERANCE"),
+                checkOptSolObj = FALSE, ...)
 }
 
 \arguments{
@@ -26,8 +28,22 @@
     A character vector containing the set of genes to be deleted.\cr
     Default: \code{allGenes(model)}.
   }
+  \item{lb}{
+    A numeric vector containing the lower bounds for the reaction rates of
+    reactions (variables) affected by the genes given in arguments
+    \code{geneList1} and \code{geneList2}. If set to \code{NULL}, all reactions
+    affected will be constrained to zero.\cr
+    Default: \code{NULL}.
+  }
+  \item{ub}{
+    A numeric vector containing the upper bounds for the reaction rates of
+    reactions (variables) affected by the genes given in arguments
+    \code{geneList1} and \code{geneList2}. If set to \code{NULL}, all reactions
+    affected will be constrained to zero.\cr
+    Default: \code{NULL}.
+  }
   \item{allComb}{
-    A single boolean value. If set to \code{TRUE}, every possible pairwise
+    A single Boolean value. If set to \code{TRUE}, every possible pairwise
     combination of genes given in arguments \code{geneList1} and
     \code{geneList2} will be knocked-out. If set to \code{FALSE}, arguments
     \code{geneList1} and \code{geneList2} must have the same length. The
@@ -37,7 +53,7 @@
     Default: \code{FALSE}.
   }
   \item{exLethal}{
-    A single boolean value. If set to \code{TRUE}, lethal genes are removed from
+    A single Boolean value. If set to \code{TRUE}, lethal genes are removed from
     the analysis. A unique set of genes in \code{geneList1} and \code{geneList2}
     will be scanned for lethal genes. A particular gene \eqn{i} is considered as
     lethal, if the deletion of this gene results in a zero flux rate in the
@@ -46,8 +62,13 @@
   }
   \item{tol}{
     A single numeric value, containing an absolute threshold value for a gene
-    beeing lethal or not.\cr
+    being lethal or not.\cr
     Default: \code{SYBIL_SETTINGS("TOLERANCE")}.
+  }
+  \item{checkOptSolObj}{
+    A single logical value. If set to \code{TRUE}, a warning will be generated,
+    if not all optimizations ended successful.\cr
+    Default: \code{FALSE}.
   }
   \item{\dots}{
     Further arguments passed to \code{\link{optimizer}}.  Important ones are

@@ -25,7 +25,8 @@
 
 \section{Objects from the Class}{
   Objects can be created by calls of the form
-  \code{new("optsol_optimizeProb", ...)}.
+  \code{new("optsol_optimizeProb", ...)}, or via the constructor function
+  \code{\link{makeOptsolMO}}.
 }
 
 \section{Slots}{
@@ -95,7 +96,10 @@
       represents reaction \code{i} in the original network. 
     }
     \item{\code{fluxdist}:}{Object of class \code{"fluxDistribution"}
-      containing the solutons flux distributions.
+      containing the solutions flux distributions.
+    }
+    \item{\code{alg_par}:}{Object of class \code{"list"}
+      containing a named list containing algorithm specific parameters.
     }
   }
 }

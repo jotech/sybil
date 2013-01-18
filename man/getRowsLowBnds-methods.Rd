@@ -34,7 +34,7 @@
     }
     \item{\code{signature(lp = "optObj_cplexAPI", i = "numeric")}}{
       method to use with package \pkg{optObj_cplexAPI}. This method returns
-      allways \code{FALSE}.
+      always \code{FALSE}.
     }
     \item{\code{signature(lp = "optObj_glpkAPI", i = "numeric")}}{
       method to use with package \pkg{optObj_glpkAPI}.

@@ -12,6 +12,8 @@
 \alias{algorithm}
 \alias{algorithm<-,optsol-method}
 \alias{algorithm<-}
+\alias{alg_par,optsol-method}
+\alias{alg_par<-,optsol-method}
 \alias{fldind,optsol-method}
 \alias{fldind}
 \alias{fldind<-,optsol-method}
@@ -89,7 +91,7 @@
 \description{
   The class \code{optsol} provides data structures to store and access the
   results of optimizations. This class is extended by other classes and will
-  not be useed as is. The representation of class \code{optsol} is used as
+  not be used as is. The representation of class \code{optsol} is used as
   superclass.
 }
 
@@ -156,7 +158,10 @@
       represents reaction \code{i} in the original network. 
     }
     \item{\code{fluxdist}:}{Object of class \code{"fluxDistribution"}
-      containing the solutons flux distributions.
+      containing the solutions flux distributions.
+    }
+    \item{\code{alg_par}:}{Object of class \code{"list"}
+      containing a named list containing algorithm specific parameters.
     }
   }
 }
@@ -168,6 +173,12 @@
     }
     \item{\code{algorithm}:}{\code{signature(object = "optsol")}:
       gets the \code{algorithm} slot.
+    }
+    \item{alg_par}{\code{signature(object = "optsol")}:
+      gets the \code{alg_par} slot.
+    }
+    \item{alg_par<-}{\code{signature(object = "optsol")}:
+      sets the \code{alg_par} slot.
     }
     \item{\code{checkStat}:}{\code{signature(opt = "optsol")}:
       returns the indices of problems with a non optimal solution status.
@@ -192,7 +203,7 @@
     }
     \item{\code{histogram}:}{
       \code{signature(x = "optsol")}: plots a histogram of the
-      values of the objective function in optimal state.
+      values of the objective function given in the model in optimal state.
     }
     \item{\code{length}:}{\code{signature(x = "optsol")}:
       returns the number of optimizations.
@@ -260,12 +271,12 @@
       gets the \code{mod_key} slot.
     }
     \item{\code{mod_obj}:}{\code{signature(object = "optsol_fluxdel")}:
-      returns allways the cross-product of the objective coefficients in slot
+      returns always the cross-product of the objective coefficients in slot
       \code{obj_coef} and the part of the flux distribution in slot
       \code{fluxdist} containing the values representing fluxes in the entire
       metabolic network (slot \code{fldind}). If slot \code{obj_coef} is
       \code{NA}, the content of slot \code{lp_obj} is returned.
-       In contrast, method \code{lp_obj} allways returns the value of the
+       In contrast, method \code{lp_obj} always returns the value of the
        objective function of the used algorithm after optimization.
     }
     \item{\code{nfluxes}:}{\code{signature(object = "optsol")}:

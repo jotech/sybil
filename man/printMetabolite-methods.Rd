@@ -43,7 +43,7 @@
     Default: \code{FALSE}.
   }
   \item{printOut}{
-    A single boolean value. If set to \code{TRUE}, the desired reactions will
+    A single Boolean value. If set to \code{TRUE}, the desired reactions will
     be printed via the \code{\link{cat}} function.\cr
     Default: \code{TRUE}.
   }

@@ -18,6 +18,10 @@
 \alias{nr}
 \alias{nr<-,sysBiolAlg-method}
 \alias{nr<-}
+\alias{alg_par,sysBiolAlg-method}
+\alias{alg_par}
+\alias{alg_par<-,sysBiolAlg-method}
+\alias{alg_par<-}
 \alias{problem,sysBiolAlg-method}
 \alias{problem}
 
@@ -41,18 +45,21 @@
       containing the problem object.
     }
     \item{\code{algorithm}:}{Object of class \code{"character"}
-      giving the name of the algorithm.
+      containing the name of the algorithm.
     }
     \item{\code{nr}:}{Object of class \code{"integer"}
-      giving the number of rows of the problem object.
+      containing the number of rows of the problem object.
     }
     \item{\code{nc}:}{Object of class \code{"integer"}
-      giving the number of columns of the problem object
+      containing the number of columns of the problem object
     }
     \item{\code{fldind}:}{Object of class \code{"integer"}
       pointers to columns (variables) representing a flux (reaction) in the
       original network. The variable \code{fldind[i]} in the problem object
-      represents reaction \code{i} in the original network. 
+      represents reaction \code{i} in the original network.
+    }
+    \item{\code{alg_par}:}{Object of class \code{"list"}
+      containing a named list of algorithm specific parameters.
     }
   }
 }
@@ -64,6 +71,12 @@
     }
     \item{algorithm<-}{\code{signature(object = "sysBiolAlg")}:
       sets the \code{algorithm} slot.
+    }
+    \item{alg_par}{\code{signature(object = "sysBiolAlg")}:
+      gets the \code{alg_par} slot.
+    }
+    \item{alg_par<-}{\code{signature(object = "sysBiolAlg")}:
+      sets the \code{alg_par} slot.
     }
     \item{fldind}{\code{signature(object = "sysBiolAlg")}:
       gets the \code{fldind} slot.
@@ -122,7 +135,7 @@
       A named data frame or list containing parameters for the specified
       solver.  Parameters can be set as data frame or list:
       \code{solverParm = list(parm1 = val1, parm2 = val2)} with \code{parm1} and
-      \code{parm2} beeing the names of two different parameters and \code{val1}
+      \code{parm2} being the names of two different parameters and \code{val1}
       and \code{val2} the corresponding values. For possible parameters and
       values see the documentation of the used solver package
       (e.g. \pkg{glpkAPI}).\cr
@@ -194,8 +207,17 @@
     \item{ctype}{
       A character vector of length \code{nCols} giving the variable type. If set
       to \code{NULL}, no specific variable type is set, which usually means, all
-      variables are treated as continous variables. See \code{\link{loadLPprob}}
-      for details.\cr
+      variables are treated as continuous variables.
+      See \code{\link{loadLPprob}} for details.\cr
+      Default: \code{NULL}.
+    }
+    \item{retAlgPar}{
+      A single boolean flag, if algorithm specific parameters should be saved
+      in the object extending class \code{sysBiolAlg}.\cr
+      Default: \code{TRUE}.
+    }
+    \item{algPar}{
+      A named list containing algorithm specific parameters.\cr
       Default: \code{NULL}.
     }
   }

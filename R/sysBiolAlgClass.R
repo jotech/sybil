@@ -1,7 +1,7 @@
 #  sysBiolAlgClass.R
 #  FBA and friends with R.
 #
-#  Copyright (C) 2010-2012 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
+#  Copyright (C) 2010-2013 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
 #  Institute for Informatics, Heinrich-Heine-University, Duesseldorf, Germany.
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
@@ -32,7 +32,8 @@ setClass(Class = "sysBiolAlg",
              algorithm = "character",
              nr        = "integer",
              nc        = "integer",
-             fldind    = "integer"
+             fldind    = "integer",
+             alg_par   = "list"
          ),
          contains = "VIRTUAL",
          validity = sybil:::.validsysBiolAlg
@@ -74,26 +75,29 @@ setMethod(f = "initialize",
                                 solverParm = SYBIL_SETTINGS("SOLVER_CTRL_PARM"),
                                 sbalg, pType = "lp", scaling = NULL, fi, nCols,
                                 nRows, mat, ub, lb, obj, rlb, rtype,
-                                lpdir = "max", rub = NULL, ctype = NULL) {
+                                lpdir = "max", rub = NULL, ctype = NULL,
+                                retAlgPar = TRUE, algPar = list(NULL)) {
 
               if ( (!missing(solver)) ||
                    (!missing(method)) ||
                    (!missing(sbalg)) ) {
 
-                  stopifnot(is(solver, "character"),
-                            is(method, "character"),
-                            is(sbalg,  "character"),
-                            is(pType,  "character"),
-                            is(fi,     "numeric"),
-                            is(nCols,  "numeric"),
-                            is(nRows,  "numeric"),
-                            is(mat,    "Matrix"),
-                            is(ub,     "numeric"),
-                            is(lb,     "numeric"),
-                            is(obj,    "numeric"),
-                            is(rlb,    "numeric"),
-                            is(rtype,  "character"),
-                            is(lpdir,  "character"))
+                  stopifnot(is(solver,    "character"),
+                            is(method,    "character"),
+                            is(sbalg,     "character"),
+                            is(pType,     "character"),
+                            is(fi,        "numeric"),
+                            is(nCols,     "numeric"),
+                            is(nRows,     "numeric"),
+                            is(mat,       "Matrix"),
+                            is(ub,        "numeric"),
+                            is(lb,        "numeric"),
+                            is(obj,       "numeric"),
+                            is(rlb,       "numeric"),
+                            is(rtype,     "character"),
+                            is(lpdir,     "character"),
+                            is(retAlgPar, "logical"),
+                            is(algPar,    "list"))
 
 
                   # ---------------------------------------------
@@ -143,7 +147,12 @@ setMethod(f = "initialize",
                   .Object@nr        <- as.integer(nRows)
                   .Object@nc        <- as.integer(nCols)
                   .Object@fldind    <- as.integer(fi)
-
+                  if (isTRUE(retAlgPar)) {
+                      .Object@alg_par <- algPar
+                  }
+                  else {
+                      .Object@alg_par <- list(NULL)
+                  }
                   validObject(.Object)
 
               }
@@ -225,6 +234,21 @@ setReplaceMethod("fldind", signature = (object = "sysBiolAlg"),
 )
 
 
+# alg_par
+setMethod("alg_par", signature(object = "sysBiolAlg"),
+          function(object) {
+              return(object@alg_par)
+          }
+)
+
+setReplaceMethod("alg_par", signature = (object = "sysBiolAlg"),
+                 function(object, value) {
+                     object@alg_par <- value
+                     return(object)
+                 }
+)
+
+
 #------------------------------------------------------------------------------#
 #                               other methods                                  #
 #------------------------------------------------------------------------------#
@@ -247,7 +271,7 @@ setMethod("optimizeProb", signature(object = "sysBiolAlg"),
              lb = NULL,
              ub = NULL,
              obj_coef = NULL,
-             lpdir = NA,
+             lpdir = NULL,
              resetChanges = TRUE,
              #prCmd = NULL, poCmd = NULL,
              prCmd = NA, poCmd = NA,
@@ -292,7 +316,7 @@ setMethod("optimizeProb", signature(object = "sysBiolAlg"),
         }
 
         # check argument lpdir
-        if ( (length(lpdir) > 1L) || (is.na(lpdir)) ) {
+        if ( (length(lpdir) > 1L) || (is.null(lpdir)) ) {
             ld <- FALSE
         }
         else {
@@ -300,44 +324,18 @@ setMethod("optimizeProb", signature(object = "sysBiolAlg"),
             lpdir <- ifelse(lpdir == "max", "max", "min")
         }
 
-    
-        # -------------------------------------------------------------- #
-        # modifications to problem object
-        # -------------------------------------------------------------- #
-    
-        fi    <- fldind(object)
-        lpmod <- problem(object)
 
-        if (isTRUE(del)) {
-            # store default lower and upper bounds
-            lowb_tmp <- getColsLowBnds(lpmod, fi[react])
-            uppb_tmp <- getColsUppBnds(lpmod, fi[react])
-    
-            # change bounds of fluxes in react
-            check <- changeColsBnds(lpmod, fi[react], lb, ub)
-        }
-    
-        if (isTRUE(obj)) {
-            # store default objective function
-            obj_tmp <- getObjCoefs(lpmod, fi[react])
-            
-            # change objective function
-            check <- changeObjCoefs(lpmod, fi[react], obj_coef)
-        }
-
-        if (isTRUE(ld)) {
-            # store default optimization direction
-            ld_tmp <- getObjDir(lpmod)
-            
-            # change objective function
-            check <- setObjDir(lpmod, lpdir)
-        }
-    
-    
         # -------------------------------------------------------------- #
         # optimization
         # -------------------------------------------------------------- #
     
+        # modifications to problem object
+        tmp_val <- applyChanges(object, del = del, obj = obj, ld = ld,
+                                react = react, lb = lb, ub = ub,
+                                obj_coef = obj_coef, lpdir = lpdir)
+
+        lpmod <- problem(object)
+
         # do some kind of preprocessing
         preP <- sybil:::.ppProcessing(lpprob  = lpmod,
                                       ppCmd   = prCmd,
@@ -357,26 +355,9 @@ setMethod("optimizeProb", signature(object = "sysBiolAlg"),
                                        ppCmd = poCmd,
                                        loopvar = poCil)
     
-    
-        # -------------------------------------------------------------- #
         # reset modifications
-        # -------------------------------------------------------------- #
-    
         if (isTRUE(resetChanges)) {
-            # reset the default bounds
-            if (isTRUE(del)) {
-                check <- changeColsBnds(lpmod, fi[react], lowb_tmp, uppb_tmp)
-            }
-        
-            # reset the default objective function
-            if (isTRUE(obj)) {
-                check <- changeObjCoefs(lpmod, fi[react], obj_tmp)
-            }
-    
-            # reset the default optimization direction
-            if (isTRUE(ld)) {
-                check <- setObjDir(lpmod, ld_tmp)
-            }
+            resetChanges(object, old_val = tmp_val)
         }
 
 
@@ -395,3 +376,78 @@ setMethod("optimizeProb", signature(object = "sysBiolAlg"),
 )
 
 
+#------------------------------------------------------------------------------#
+
+setMethod("applyChanges", signature(object = "sysBiolAlg"),
+    function(object, del, obj, ld,
+             react    = NULL,
+             lb       = NULL,
+             ub       = NULL,
+             obj_coef = NULL,
+             lpdir    = NULL) {
+
+        tmp_val <- list("react" = react, "lb" = NULL, "ub" = NULL,
+                        "obj_coef" = NULL, "lpdir" = NULL)
+
+        fi    <- fldind(object)
+        lpmod <- problem(object)
+
+        if (isTRUE(del)) {
+            # store default lower and upper bounds
+            tmp_val[["lb"]] <- getColsLowBnds(lpmod, fi[react])
+            tmp_val[["ub"]] <- getColsUppBnds(lpmod, fi[react])
+    
+            # change bounds of fluxes in react
+            check <- changeColsBnds(lpmod, fi[react], lb, ub)
+        }
+    
+        if (isTRUE(obj)) {
+            # store default objective function
+            tmp_val[["obj_coef"]] <- getObjCoefs(lpmod, fi[react])
+            
+            # change objective function
+            check <- changeObjCoefs(lpmod, fi[react], obj_coef)
+        }
+
+        if (isTRUE(ld)) {
+            # store default optimization direction
+            tmp_val[["lpdir"]] <- getObjDir(lpmod)
+            
+            # change objective function
+            check <- setObjDir(lpmod, lpdir)
+        }
+
+        return(tmp_val)
+    }
+)
+
+
+#------------------------------------------------------------------------------#
+
+setMethod("resetChanges", signature(object = "sysBiolAlg"),
+    function(object, old_val) {
+
+        fi    <- fldind(object)
+        lpmod <- problem(object)
+
+        if ( (!is.null(old_val[["lb"]])) || (!is.null(old_val[["ub"]])) ) {
+            check <- changeColsBnds(lpmod,
+                                    fi[old_val[["react"]]],
+                                    old_val[["lb"]], old_val[["ub"]])
+        }
+    
+        # reset the default objective function
+        if (!is.null(old_val[["obj_coef"]])) {
+            check <- changeObjCoefs(lpmod,
+                                    fi[old_val[["react"]]],
+                                    old_val[["obj_coef"]])
+        }
+
+        # reset the default optimization direction
+        if (!is.null(old_val[["lpdir"]])) {
+            check <- setObjDir(lpmod, old_val[["lpdir"]])
+        }
+
+        return(invisible(TRUE))
+    }
+)

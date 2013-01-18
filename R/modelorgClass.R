@@ -1,7 +1,7 @@
 #  modelorgClass.R
 #  FBA and friends with R.
 #
-#  Copyright (C) 2010-2012 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
+#  Copyright (C) 2010-2013 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
 #  Institute for Informatics, Heinrich-Heine-University, Duesseldorf, Germany.
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
@@ -91,12 +91,9 @@ setMethod(f = "initialize",
           definition = function(.Object, id, name) {
 
               if ( (!missing(id)) || (!missing(name)) ) {
-                  key <- paste(sample(letters, size = 2),
-                             sample(c(letters, 0:9), size = 8, replace = FALSE),
-                             collapse = "", sep = "")
                   .Object@mod_id   <- as.character(id)
                   .Object@mod_name <- as.character(name)
-                  .Object@mod_key  <- as.character(key)
+                  .Object@mod_key  <- as.character(sybil:::.generateModKey())
               }
 
               return(.Object)
@@ -552,13 +549,17 @@ setMethod("show", signature(object = "modelorg"),
 
 setMethod("optimizeProb", signature(object = "modelorg"),
     function(object, 
+             algorithm = SYBIL_SETTINGS("ALGORITHM"),
              gene = NULL,
              react = NULL,
              lb = NULL,
              ub = NULL,
              retOptSol = TRUE,
-             MoreArgs = list(),
-             ...) {
+             obj_coef = NULL,
+             lpdir = NULL,
+             mtfobj = NULL,
+             prCmd = NA, poCmd = NA,
+             prCil = NA, poCil = NA, ...) {
 
 
         if (!is.null(gene)) {
@@ -584,14 +585,35 @@ setMethod("optimizeProb", signature(object = "modelorg"),
         # run optimization
         # -------------------------------------------------------------- #
 
-        lpmod <- sysBiolAlg(model = object, ...)
+        if (algorithm == "mtf") {
+            if (is.null(mtfobj)) {
+                lpmod <- sysBiolAlg(model = object, algorithm = "mtf",
+                                    react = react, lb = lb, ub = ub, ...)
+            }
+            else {
+                lpmod <- sysBiolAlg(model = object,
+                                    algorithm = "mtf", wtobj = mtfobj, ...)
+            }
+        }
+        else {
+            lpmod <- sysBiolAlg(model = object, algorithm = algorithm, ...)
+        }
         
-        MoreArgs[["object"]]          <- lpmod
-        MoreArgs[["react"]]           <- react
-        MoreArgs[["lb"]]              <- lb
-        MoreArgs[["ub"]]              <- ub
-        
-        sol <- do.call("optimizeProb", args = MoreArgs)
+#        MoreArgs[["object"]]          <- lpmod
+#        MoreArgs[["react"]]           <- react
+#        MoreArgs[["lb"]]              <- lb
+#        MoreArgs[["ub"]]              <- ub
+#        
+#        sol <- do.call("optimizeProb", args = MoreArgs)
+        sol <- optimizeProb(lpmod,
+                            react = react,
+                            lb = lb,
+                            ub = ub,
+                            obj_coef = obj_coef,
+                            lpdir = lpdir,
+                            resetChanges = FALSE,
+                            prCmd = prCmd, poCmd = poCmd,
+                            prCil = prCil, poCil = poCil)
 
 
         # -------------------------------------------------------------- #
@@ -611,22 +633,23 @@ setMethod("optimizeProb", signature(object = "modelorg"),
                           lp_dir       = factor(getObjDir(problem(lpmod))),
                           lp_num_rows  = nr(lpmod),
                           lp_num_cols  = nc(lpmod),
-                          lp_ok        = as.integer(sol$ok),
+                          lp_ok        = as.integer(sol[["ok"]]),
                           lp_obj       = sol$obj,
-                          lp_stat      = as.integer(sol$stat),
+                          lp_stat      = as.integer(sol[["stat"]]),
                           obj_coef     = obj_coef(object),
                           obj_func     = printObjFunc(object),
                           fldind       = fldind(lpmod),
-                          fluxdist     = fluxDistribution(fluxes = sol$fluxes,
-                                                      nrow = length(sol$fluxes),
-                                                      ncol = 1L))
+                          fluxdist     = fluxDistribution(fluxes = sol[["fluxes"]],
+                                                    nrow = length(sol[["fluxes"]]),
+                                                    ncol = 1L),
+                          alg_par      = alg_par(lpmod))
  
             if (is(sol$preP, "ppProc")) {
-                preProc(optsol) <- sol$preP
+                preProc(optsol) <- sol[["preP"]]
             }
     
             if (is(sol$postP, "ppProc")) {
-                postProc(optsol) <- sol$postP
+                postProc(optsol) <- sol[["postP"]]
             }
     
             check <- validObject(optsol, test = TRUE)
@@ -682,7 +705,7 @@ setMethod("printObjFunc", signature(object = "modelorg"),
 setMethod("printReaction", signature(object = "modelorg"),
     function(object, react, printOut = TRUE, ...) {
   	
-        check <- checkReactId(object, react = react, needId = TRUE)
+        check <- checkReactId(object, react = react)
         if (is(check, "reactId")) {
             cind <- react_pos(check)
         }
@@ -829,7 +852,7 @@ setMethod("shrinkMatrix", signature(X = "modelorg"),
         # look for reactions
         if (is.null(i)) {
             # translate reaction id's to indices
-            cj <- checkReactId(X, react = j, needId = TRUE)
+            cj <- checkReactId(X, react = j)
             if (!is(cj, "reactId")) {
                 stop("check argument j")
             }

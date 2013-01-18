@@ -100,7 +100,10 @@
       represents reaction \code{i} in the original network. 
     }
     \item{\code{fluxdist}:}{Object of class \code{"fluxDistribution"}
-      containing the solutons flux distributions.
+      containing the solutions flux distributions.
+    }
+    \item{\code{alg_par}:}{Object of class \code{"list"}
+      containing a named list containing algorithm specific parameters.
     }
   }
 }

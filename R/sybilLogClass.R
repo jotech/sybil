@@ -1,7 +1,7 @@
 #  sybilLogClass.R
 #  FBA and friends with R.
 #
-#  Copyright (C) 2010-2012 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
+#  Copyright (C) 2010-2013 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
 #  Institute for Informatics, Heinrich-Heine-University, Duesseldorf, Germany.
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
@@ -501,7 +501,7 @@ setMethod(f = "logOptimizationTH",
           signature = "sybilLog",
           definition = function(object) {
 
-    th <- "# no.        | lp_ok | lp_stat | lp_obj      | constrained fluxes\n"
+    th <- "opt no.  | ret | stat | obj value | dir | obj c | flux no. \n"
     
     if (object@verblevel > 2) {
         cat(th)
@@ -519,53 +519,43 @@ setMethod(f = "logOptimizationTH",
 
 
 # results of optimization
-setMethod(f = "logOptimizationNE",
-          signature = "sybilLog",
-          definition = function(object, del, i) {
-
-    ne   <- sprintf("  %-10i | %-30s|", i, "no effect")
-    fdel <- paste(del, collapse = " ")
-
-    if (object@verblevel > 2) {
-        cat(ne, fdel, "\n")
-    }
-
-    if (object@loglevel > 2) {
-        if (is(object@fh, "file")) {
-            cat(ne, fdel, "\n", file = object@fh, append = TRUE)
-        }
-    }
-
-    return(TRUE)
-}
-)
-
-
-# results of optimization
 setMethod(f = "logOptimization",
           signature = "sybilLog",
-          definition = function(object, ok, stat, obj, del, i) {
+          definition = function(object, ok, stat, obj, dir, objc, del, i) {
 
-    fi    <- sprintf("  %-10i", i)
-    fok   <- sprintf("%-5i", ok)
-    fstat <- sprintf("%-7i", stat)
-    fobj  <- sprintf("%11s", sprintf("%.8f", obj))
-    fdel  <- paste(del, collapse = " ")
+    if ( (object@verblevel > 2) || (object@loglevel > 2) ) {
+        fi    <- sprintf("  %-6s", paste("[", i, "]", sep = ""))
+        fok   <- sprintf("%-3i", ok)
+        fstat <- sprintf("%-4i", stat)
+        fobj  <- sprintf("%9.3f", obj)
+        if (is.null(dir)) {
+            fdir  <- "   "
+        }
+        else {
+            fdir  <- sprintf("%3s", dir)
+        }
+        if (is.null(objc)) {
+            fobjc  <- "     "
+        }
+        else {
+            fobjc  <- sprintf("%5.1f", objc)
+        }
+        fdel  <- paste(del, collapse = " ")
+    
+        prstr <- paste(fi, fok, fstat, fobj, fdir, fobjc, fdel, sep = " | ")
 
-    if (object@verblevel > 2) {
-        cat(fi, fok, fstat, fobj, fdel, sep = " | ")
-        cat("\n")
-    }
+        if (object@verblevel > 2) {
+            cat(prstr, "\n", sep = "")
+        }
 
-    if (object@loglevel > 2) {
-        if (is(object@fh, "file")) {
-            cat(fi, fok, fstat, fobj, fdel, sep = " | ",
-                file = object@fh, append = TRUE)
-            cat("\n", file = object@fh, append = TRUE)
+        if (object@loglevel > 2) {
+            if (is(object@fh, "file")) {
+                cat(prstr, "\n", sep = "", file = object@fh, append = TRUE)
+            }
         }
     }
 
-    return(TRUE)
+    return(invisible(TRUE))
 }
 )
 

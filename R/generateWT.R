@@ -1,7 +1,7 @@
 #  generateWT.R
 #  FBA and friends with R.
 #
-#  Copyright (C) 2010-2012 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
+#  Copyright (C) 2010-2013 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
 #  Institute for Informatics, Heinrich-Heine-University, Duesseldorf, Germany.
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
@@ -28,7 +28,7 @@
 #
 #
 
-.generateWT <- function(model, ...) {
+.generateWT <- function(model, react = NULL, lb = NULL, ub = NULL, ...) {
 
     ca <- match.call()
     if ("solver" %in% names(ca)) {
@@ -43,14 +43,29 @@
                              probType = "lp",
                              loadPackage = FALSE)
     
-    tmp <- optimizeProb(model,
-                        retOptSol = FALSE,
-                        algorithm = "fba",
-                        lpdir = "max",
-                        solver = me$sol,
-                        method = me$met,
-                        solverParm = as.data.frame(NA))
-    
+
+    if (is(react, "list")) {
+        message("calculating fba solutions ... ", appendLF = FALSE)
+        suppressMessages(
+        tmp <- optimizer(model, algorithm = "fba",
+                         lpdir = rep("max", length(react)),
+                         react = react, lb = lb, ub = ub, verboseMode = 0, 
+                         solver = me[["sol"]], method = me[["met"]],
+                         solverParm = as.data.frame(NA))
+        )
+        message("OK")
+    }
+    else {
+        tmp <- optimizeProb(model,
+                            react = react, lb = lb, ub = ub,
+                            retOptSol = FALSE,
+                            algorithm = "fba",
+                            lpdir = "max",
+                            solver = me[["sol"]],
+                            method = me[["met"]],
+                            solverParm = as.data.frame(NA))
+    }
+
     return(tmp)
 
 }

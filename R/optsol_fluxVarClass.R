@@ -1,7 +1,7 @@
 #  optsol_fluxVarClass.R
 #  FBA and friends with R.
 #
-#  Copyright (C) 2010-2012 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
+#  Copyright (C) 2010-2013 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
 #  Institute for Informatics, Heinrich-Heine-University, Duesseldorf, Germany.
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
@@ -50,7 +50,7 @@ setMethod("react", signature(object = "optsol_fluxVar"),
 
 setReplaceMethod("react", signature = (object = "optsol_fluxVar"),
                  function(object, value) {
-                     object@ctrlr <- value
+                     object@react <- value
                      return(object)
                  }
 )
@@ -86,8 +86,8 @@ setMethod("plotRangeVar", signature(object = "optsol_fluxVar"),
 setMethod("blReact", signature(object = "optsol_fluxVar"),
           function(object, tol = SYBIL_SETTINGS("TOLERANCE")) {
               
-              bl <- abs(minSol(object, "mod_obj")) < tol &
-                    abs(maxSol(object, "mod_obj")) < tol
+              bl <- abs(minSol(object, "lp_obj")) < tol &
+                    abs(maxSol(object, "lp_obj")) < tol
               
               return(bl)
           }
@@ -119,7 +119,7 @@ setMethod("minSol", signature(object = "optsol_fluxVar"),
                                 "))", sep = "")
               slottype <- eval(parse(text = command))
 
-              if (is.na(match("matrix", slottype))) {
+              if (is.na(match("Matrix", slottype))) {
                   command <- paste(deparse(substitute(slot)),
                                    "(",
                                    deparse(substitute(object)),
@@ -162,7 +162,7 @@ setMethod("maxSol", signature(object = "optsol_fluxVar"),
                                 "))", sep = "")
               slottype <- eval(parse(text = command))
 
-              if (is.na(match("matrix", slottype))) {
+              if (is.na(match("Matrix", slottype))) {
                   command <- paste(deparse(substitute(slot)),
                                    "(",
                                    deparse(substitute(object)),

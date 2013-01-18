@@ -1,7 +1,7 @@
 #  optsol_optimizeProbClass.R
 #  FBA and friends with R.
 #
-#  Copyright (C) 2010-2012 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
+#  Copyright (C) 2010-2013 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
 #  Institute for Informatics, Heinrich-Heine-University, Duesseldorf, Germany.
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
@@ -36,6 +36,49 @@ setClass("optsol_optimizeProb",
         ),
         contains = "optsol"
 )
+
+
+#------------------------------------------------------------------------------#
+#                              user constructor                                #
+#------------------------------------------------------------------------------#
+
+makeOptsolMO <- function(mod, sol) {
+
+    # mod is of class modelorg
+    # sol is the return value of optimizer()
+    
+    stopifnot(is(mod, "modelorg"), is(sol, "list"))
+
+    opt <- new("optsol_optimizeProb",
+        mod_id       = mod_id(mod),
+        mod_key      = mod_key(mod),
+        solver       = sol[["solver"]],
+        method       = sol[["method"]],
+        algorithm    = sol[["algorithm"]],
+        num_of_prob  = as.integer(length(sol[["obj"]])),
+        lp_num_cols  = as.integer(sol[["lp_num_cols"]]),
+        lp_num_rows  = as.integer(sol[["lp_num_rows"]]),
+        lp_obj       = as.numeric(sol[["obj"]]),
+        lp_ok        = as.integer(sol[["ok"]]),
+        lp_stat      = as.integer(sol[["stat"]]),
+        lp_dir       = sol[["lp_dir"]],
+        obj_coef     = obj_coef(mod),
+        obj_func     = printObjFunc(mod),
+        fldind       = as.integer(sol[["fldind"]]),
+        fluxdist     = sol[["fluxdist"]],
+        alg_par      = sol[["alg_par"]])
+
+
+        if (!is.null(sol$prAna)) {
+            preProc(opt) <- sol[["prAna"]]
+        }
+
+        if (!is.null(sol$poAna)) {
+            postProc(opt) <- sol[["poAna"]]
+        }
+
+    return(opt)
+}
 
 
 #------------------------------------------------------------------------------#

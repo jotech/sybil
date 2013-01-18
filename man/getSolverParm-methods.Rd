@@ -32,7 +32,7 @@
     \item{\code{signature(lp = "optObj_clpAPI")}}{
       method to use with package \pkg{optObj_clpAPI}. This method is currently
       unused. It is not possible to provide parameters for package \pkg{clpAPI}.
-      Allways \code{FALSE} will be returned.
+      Always \code{FALSE} will be returned.
     }
     \item{\code{signature(lp = "optObj_cplexAPI")}}{
       method to use with package \pkg{optObj_cplexAPI}. This method writes

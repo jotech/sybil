@@ -3,14 +3,17 @@
 
 \encoding{utf8}
 
-\title{One Flux Deletion Experiment}
+\title{Single Flux Deletion Experiment}
 
 \description{
   Single reaction (flux) deletion analysis.
 }
 
 \usage{
-  oneFluxDel(model, react = c(1:react_num(model)), ...)
+  oneFluxDel(model, react = c(1:react_num(model)),
+             lb = rep(0, length(react)),
+             ub = rep(0, length(react)),
+             checkOptSolObj = FALSE, ...)
 }
 
 \arguments{
@@ -18,9 +21,28 @@
     An object of class \code{\linkS4class{modelorg}}.
   }
   \item{react}{
-    An object of class \code{\link{reactId}} or character or integer containing
-    reaction id's to constrain to zero one by one.\cr
+    An object of class \code{\linkS4class{reactId}} or character or integer
+    containing reaction id's to constrain to zero one by one.\cr
     Default: all reactions present in argument \code{model}.
+  }
+  \item{lb}{
+    A numeric vector of the same length as \code{react} containing the lower
+    bounds for the reaction rates of reactions (variables) given in argument
+    \code{react}.\cr
+    Default: \code{0} for all reactions in \code{react}, zero flux through all
+    reactions.
+  }
+  \item{ub}{
+    A numeric vector of the same length as \code{react} containing the lower
+    bounds for the reaction rates of reactions (variables) given in argument
+    \code{react}.\cr
+    Default: \code{0} for all reactions in \code{react}, zero flux through all
+    reactions.
+  }
+  \item{checkOptSolObj}{
+    A single logical value. If set to \code{TRUE}, a warning will be generated,
+    if not all optimizations ended successful.\cr
+    Default: \code{FALSE}.
   }
   \item{\dots}{
     Further arguments passed to \code{\link{optimizer}}.  Important ones are

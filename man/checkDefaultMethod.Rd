@@ -10,7 +10,7 @@
 \description{
   The function \code{checkDefaultMethod} returns the default method
   for a desired solver, or a default solver -- method pair. A \dQuote{solver}
-  is allways the name of a R package offering facilities for solving
+  is always the name of a R package offering facilities for solving
   optimization problems.
 }
 
@@ -32,7 +32,7 @@
     \code{\link{optObj}}.
   }
   \item{loadPackage}{
-    A single boolean value. If set to \code{TRUE}, load the given solver
+    A single Boolean value. If set to \code{TRUE}, load the given solver
     package via \code{\link{require}}.
   }
 }

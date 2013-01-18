@@ -1,7 +1,7 @@
 #  multiDel.R
 #  FBA and friends with R.
 #
-#  Copyright (C) 2010-2012 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
+#  Copyright (C) 2010-2013 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
 #  Institute for Informatics, Heinrich-Heine-University, Duesseldorf, Germany.
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
@@ -84,31 +84,13 @@ multiDel <- function(model, nProc = 2,
     #--------------------------------------------------------------#
 
 
-    # load library 'multicore'
-    checkPackage <- require("parallel")
-    if(!isTRUE(checkPackage)) {
-        checkPackage <- require("multicore")
-        if (!isTRUE(checkPackage)) {
-            stop("neither package parallel nor multicore found.")
-        }
-        else {
-            pp <- "multicore"
-            Pmclapply <- multicore::mclapply
-        }
+    # load library 'parallel'
+    if(!isTRUE(require("parallel"))) {
+        stop("package parallel not found.")
     }
-    else {
-        pp <- "parallel"
-        Pmclapply <- parallel::mclapply
-    }
-
 
     # number of cores
-    #ncore <- multicore:::detectCores()
-    ncore <- switch(pp,
-        "parallel" = { parallel::detectCores() },
-        "multicore" = { multicore:::detectCores() },
-        { stop("can not determine number of cores") }
-    )
+    ncore <- parallel::detectCores()
     
     numCo <- ifelse(nProc > ncore, as.integer(ncore), as.integer(nProc))
 
@@ -144,7 +126,7 @@ multiDel <- function(model, nProc = 2,
 
     sol <- switch(todo,
         "oneGeneDel" = {
-            Pmclapply(dL1,
+            parallel::mclapply(dL1,
                       function(x) oneGeneDel(model,
                                              geneList = x,
                                              verboseMode = 0, ...),
@@ -152,33 +134,33 @@ multiDel <- function(model, nProc = 2,
 
         },
         "doubleGeneDel" = {
-            Pmclapply(cdL, function(x) doubleGeneDel(model,
+            parallel::mclapply(cdL, function(x) doubleGeneDel(model,
                                                      geneList1 = x[[1]],
                                                      geneList2 = x[[2]],
                                                      verboseMode = 0, ...),
                       mc.cores = nProc)
         },
         "oneFluxDel" = {
-            Pmclapply(dL1, function(x) oneFluxDel(model,
+            parallel::mclapply(dL1, function(x) oneFluxDel(model,
                                                   react = x,
                                                   verboseMode = 0, ...),
                       mc.cores = nProc)
         },
         "doubleFluxDel" = {
-            Pmclapply(cdL, function(x) doubleFluxDel(model,
+            parallel::mclapply(cdL, function(x) doubleFluxDel(model,
                                                      react1 = x[[1]],
                                                      react2 = x[[2]],
                                                      verboseMode = 0, ...),
                       mc.cores = nProc)
         },
         "fluxVar" = {
-            Pmclapply(dL1, function(x) fluxVar(model,
+            parallel::mclapply(dL1, function(x) fluxVar(model,
                                                react = x,
                                                verboseMode = 0, ...),
                       mc.cores = nProc)
         },
         "geneDeletion" = {
-            Pmclapply(dL1, function(x) geneDeletion(model,
+            parallel::mclapply(dL1, function(x) geneDeletion(model,
                                                     genes = x,
                                                     verboseMode = 0, ...),
                       mc.cores = nProc)

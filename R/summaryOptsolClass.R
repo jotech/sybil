@@ -1,7 +1,7 @@
 #  summaryOptsolClass.R
 #  FBA and friends with R.
 #
-#  Copyright (C) 2010-2012 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
+#  Copyright (C) 2010-2013 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
 #  Institute for Informatics, Heinrich-Heine-University, Duesseldorf, Germany.
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
@@ -35,7 +35,7 @@ setClass("summaryOptsol",
         mod_key       = "character",     # model key
         nzeros        = "integer",       # number of zeros in fld
         nnonzero      = "integer",       # number of non-zeros in fld
-        mod_obj       = "numeric",       # objective coefficients of org model %*% flux
+        mod_obj       = "numeric",       # objective coefficients of org. model %*% flux
         ex_met        = "character",     # metabolite id of exchange reaction
         ex_val        = "Matrix",        # flux value
         react_id      = "list",          # id's of limiting reactions
@@ -60,7 +60,7 @@ summaryOptsol <- function(opt,
               (perc <= 1 || perc >= 0))
 
     if (any(is.na(fluxes(opt)))) {
-        cat("\noptimal values of model objective function:\n")
+        #cat("\noptimal values of model objective function:\n")
         os <- summary(mod_obj(opt))
     }
     else {

@@ -119,17 +119,17 @@
   \item{ctype}{
     A character vector of length \code{nCols} giving the variable type. If set
     to \code{NULL}, no specific variable type is set, which usually means, all
-    variables are treated as continous variables.\cr
+    variables are treated as continuous variables.\cr
     Default: \code{NULL}.
     \tabular{lll}{
-      \code{"C"}: \tab continous variable  \cr
+      \code{"C"}: \tab continuous variable  \cr
       \code{"B"}: \tab binary variable     \cr
       \code{"I"}: \tab integer variable    \cr
-      \code{"S"}: \tab semi-continous variable  \cr
+      \code{"S"}: \tab semi-continuous variable  \cr
       \code{"N"}: \tab semi-integer variable    \cr
     }
     Values \code{"S"} and \code{"N"} are not available for every solver
-    software. Check documentation of the solver software if semi-continous and
+    software. Check documentation of the solver software if semi-continuous and
     semi-integer variables are supported.
     If \code{ctype[j]} is not \code{"C"}, \code{"B"}, \code{"I"}, \code{"S"},
     or \code{"N"}, the value of \code{ctype[j]} will be set to \code{"C"}.

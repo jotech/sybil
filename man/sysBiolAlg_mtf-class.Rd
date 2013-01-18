@@ -5,6 +5,9 @@
 
 \docType{class}
 
+\alias{changeMaxObj,sysBiolAlg_mtf-method}
+\alias{changeMaxObj}
+
 \alias{sysBiolAlg_mtf-class}
 \alias{sysBiolAlg_mtf}
 \alias{mtf}
@@ -29,22 +32,28 @@
 
 \section{Slots}{
   \describe{
+    \item{\code{maxobj}:}{Object of class \code{"numeric"}
+      containing optimized objective values.
+    }
     \item{\code{problem}:}{Object of class \code{"optObj"}
       containing the problem object.
     }
     \item{\code{algorithm}:}{Object of class \code{"character"}
-      giving the name of the algorithm.
+      containing the name of the algorithm.
     }
     \item{\code{nr}:}{Object of class \code{"integer"}
-      giving the number of rows of the problem object.
+      containing the number of rows of the problem object.
     }
     \item{\code{nc}:}{Object of class \code{"integer"}
-      giving the number of columns of the problem object
+      containing the number of columns of the problem object
     }
     \item{\code{fldind}:}{Object of class \code{"integer"}
       pointers to columns (variables) representing a flux (reaction) in the
       original network. The variable \code{fldind[i]} in the problem object
-      represents reaction \code{i} in the original network. 
+      represents reaction \code{i} in the original network.
+    }
+    \item{\code{alg_par}:}{Object of class \code{"list"}
+      containing a named list containing algorithm specific parameters.
     }
   }
 }
@@ -54,7 +63,12 @@
 }
 
 \section{Methods}{
-  No methods defined with class "sysBiolAlg_mtf" in the signature.
+  \describe{
+    \item{changeMaxObj}{\code{signature(object = "sysBiolAlg_mtf")}:
+      change current objective value to the \eqn{j}th value given in slot
+      \code{maxobj}. Argument \code{j} must be in \code{[1:length(maxobj)]}.
+    }
+  }
 }
 
 \details{
@@ -66,13 +80,22 @@
     \item{wtobj}{
       A single numeric value giving the optimal value. If missing, a default
       value is computed based on FBA. If given, arguments \code{solver} and
-      \code{method} are used, but \code{solverParm} is not.
+      \code{method} are used, but \code{solverParm} is not.\cr
+      Default: \code{NULL}.
     }
-    \item{costcoefbw}{
-      A numeric vector containing cost coefficients for all variables (backward
-      direction). If set to \code{NULL}, all cost coefficients are set to
-      \code{1}, so that all variables have the same impact on the objective
-      function.\cr
+    \item{react}{
+      Arguments \code{react}, \code{lb} and \code{ub} are used, if argument
+      \code{wtobj} is \code{NULL}, meaning: no previous objective value is
+      given. Objective values will be calculated via \code{\link{fba}} using
+      the parameters given in \code{react}, \code{lb} and \code{ub}.\cr
+      Default: \code{NULL}.
+    }
+    \item{lb}{
+      See argument \code{react}.\cr
+      Default: \code{NULL}.
+    }
+    \item{ub}{
+      See argument \code{react}.\cr
       Default: \code{NULL}.
     }
     \item{costcoeffw}{
@@ -80,6 +103,12 @@
       direction). If set to \code{NULL}, all cost coefficients are set to
       \code{1}, so that all variables have the same impact on the objective
       function.\cr
+      Default: \code{NULL}.
+    }
+    \item{costcoefbw}{
+      A numeric vector containing cost coefficients for all variables (backward
+      direction). If set to \code{NULL}, all cost coefficients are set to the
+      values given in \code{costcoeffw}.\cr
       Default: \code{NULL}.
     }
     \item{scaling}{
@@ -123,10 +152,10 @@
       \mbox{\boldmath$c$\unboldmath}^{\mathrm{T}}
       \mbox{\boldmath$v$\unboldmath}_{\mathrm{wt}}
   }{c^T v_wt}
-  beeing the previously computed optimized value of the objective function
+  being the previously computed optimized value of the objective function
   (argument \code{wtobj}).
   The variable \eqn{\bold{S}}{S} denotes the stoichiometric matrix,
-  \eqn{\alpha_i}{a_i} and \eqn{\beta_i}{b_i} beeing the lower and upper bounds
+  \eqn{\alpha_i}{a_i} and \eqn{\beta_i}{b_i} being the lower and upper bounds
   for flux (variable) \eqn{i}.  The total number of variables of the
   optimization problem is denoted by \eqn{n}.
   The optimization can be executed by using \code{\link{optimizeProb}}.

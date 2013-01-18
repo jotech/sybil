@@ -1,7 +1,7 @@
 #  getsybilenv.R
 #  FBA and friends with R.
 #
-#  Copyright (C) 2010-2012 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
+#  Copyright (C) 2010-2013 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
 #  Institute for Informatics, Heinrich-Heine-University, Duesseldorf, Germany.
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
@@ -71,13 +71,13 @@ getsybilenv <- function(part) {
 
     # ------------------------------------------------------------------------ #
 
-    printalgorithm <- function() {
+    printpurpose <- function() {
         cat("\n# --------------------------------------------------------- #\n")
-        cat("algorithms supported by functions:\n")
-        fkt <- names(sybil:::.SYBILenv[["algorithm"]])
+        cat("algorithms for this purpose:\n")
+        fkt <- names(sybil:::.SYBILenv[["purpose"]])
         for(i in seq(along = fkt)) {
             cat(fkt[i], ":\n", sep = "")
-            cat(paste(sybil:::.SYBILenv[["algorithm"]][[fkt[i]]]), sep = ", ")
+            cat(paste(sybil:::.SYBILenv[["purpose"]][[fkt[i]]]), sep = ", ")
             cat("\n\n")
         }
         cat("\n")
@@ -90,7 +90,7 @@ getsybilenv <- function(part) {
         printsolvers()
         printmethods()
         printptype()
-        printalgorithm()
+        printpurpose()
         #print(sybil:::.SYBILenv[["solverCtrlParm"]])
     }
     else {

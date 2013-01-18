@@ -10,8 +10,7 @@
   Performs flux variability analysis for a given model.
 }
 \usage{
-  fluxVar(model, react = c(1:react_num(model)),
-          exex = FALSE, fld = FALSE, verboseMode = 2, ...)
+  fluxVar(model, react = c(1:react_num(model)), exex = FALSE, ...)
 }
 
 \arguments{
@@ -29,20 +28,12 @@
     will be used, except for the exchange reactions.\cr
     Default: \code{FALSE}
   }
-  \item{fld}{
-    Boolean.  Save the resulting flux distribution.\cr
-    Default: \code{FALSE}
-  }
-  \item{verboseMode}{
-    An integer value indicating the amount of output to stdout:
-    0: nothing, 1: status messages, 2: like 1 plus a progress indicator,
-    3: a table containing the reaction id's and the corresponding
-    min max values.\cr
-    Default: \code{2}.
-  }
   \item{\dots}{
-    Further arguments passed to \code{\link{sysBiolAlg}}.
-    See class \code{\linkS4class{sysBiolAlg_fv}} for details.
+    Further arguments passed to \code{\link{optimizer}}. Argument
+    \code{algorithm} is set to \code{"\link[=sysBiolAlg_fv-class]{fv}"},
+    possible arguments are \code{fld}, arguments for pre and post processing
+    commands, \code{verboseMode} and further arguments passed to the constructor
+    for objects of class \code{\linkS4class{sysBiolAlg_fv}}.
   }
 }
 
@@ -52,7 +43,10 @@
 }
 
 \value{
-  An object of class \code{\linkS4class{optsol_fluxVar}}.
+  An object of class \code{\linkS4class{optsol_fluxVar}}. The first \eqn{1} to
+  \eqn{n} (with \eqn{n} being the number of elements in argument \code{react})
+  solutions are from the minimizations, and the last \eqn{n+1} to \eqn{2n}
+  solutions are from the maximizations.
 }
 
 \references{

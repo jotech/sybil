@@ -10,7 +10,8 @@
 }
 
 \usage{
-  doubleFluxDel(model, react1, react2, allComb = FALSE, exex = FALSE, ...)
+  doubleFluxDel(model, react1, react2, lb = NULL, ub = NULL,
+                allComb = FALSE, exex = FALSE, checkOptSolObj = FALSE, ...)
 }
 
 \arguments{
@@ -18,17 +19,29 @@
     An object of class \code{\linkS4class{modelorg}}.
   }
   \item{react1}{
-    An object of class \code{\link{reactId}} or character or integer containing
-    reaction id's to constrain to zero.\cr
+    An object of class \code{\linkS4class{reactId}} or character or integer
+    containing reaction id's to constrain to zero.\cr
     Default: \code{react_id(model)}.
   }
   \item{react2}{
-    An object of class \code{\link{reactId}} or character or integer containing
-    reaction id's to constrain to zero.\cr
+    An object of class \code{\linkS4class{reactId}} or character or integer
+    containing reaction id's to constrain to zero.\cr
     Default: \code{react_id(model)}.
   }
+  \item{lb}{
+    A numeric vector containing the lower bounds for the reaction rates of
+    reactions (variables) given in arguments \code{react1} and \code{react2}.
+    If set to \code{NULL}, all reactions will be constrained to zero.\cr
+    Default: \code{NULL}.
+  }
+  \item{ub}{
+    A numeric vector containing the upper bounds for the reaction rates of
+    reactions (variables) given in arguments \code{react1} and \code{react2}.
+    If set to \code{NULL}, all reactions will be constrained to zero.\cr
+    Default: \code{NULL}.
+  }
   \item{allComb}{
-    A single boolean value. If set to \code{TRUE}, every possible pairwise
+    A single Boolean value. If set to \code{TRUE}, every possible pairwise
     combination of reactions given in arguments \code{react1} and \code{react2}
     will be constrained to zero flux. If set to \code{FALSE}, arguments
     \code{react1} and \code{react2} must have the same length. The deletions
@@ -37,12 +50,17 @@
     Default: \code{FALSE}.
   }
   \item{exex}{
-    A single boolean value. If set to \code{TRUE}, exchange reactions will be
+    A single Boolean value. If set to \code{TRUE}, exchange reactions will be
     excluded from the analysis. They are identified by the function
     \code{\link{findExchReact}}.
     Default: \code{FALSE}.
   }
-  \item{\dots}{
+   \item{checkOptSolObj}{
+    A single logical value. If set to \code{TRUE}, a warning will be generated,
+    if not all optimizations ended successful.\cr
+    Default: \code{FALSE}.
+  }
+ \item{\dots}{
     Further arguments passed to \code{\link{optimizer}}.  Important ones are
     \code{algorithm} in order to set the algorithm to use or \code{solverParm}
     in order to set parameter values for the optimization software.

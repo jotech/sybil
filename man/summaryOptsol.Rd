@@ -6,7 +6,7 @@
 }
 
 \description{
-  Generates a quick overview of results of simulations strored in objects
+  Generates a quick overview of results of simulations stored in objects
   of class \code{\linkS4class{optsol}}.
 }
 
@@ -53,7 +53,7 @@
 \value{
   An object of class \code{\linkS4class{summaryOptsol}} if a flux distribution
   exists in argument \code{opt}, otherwise a \code{\link{summary}} of the
-  objective values is returned.
+  objective values (\code{\link{mod_obj}}) is returned.
 }
 
 \author{

@@ -52,7 +52,7 @@
       containing the exit code of the lp solver.
     }
     \item{\code{exit_num}:}{Object of class \code{"integer"}
-      containing the number of apperance of a specific exit code.
+      containing the number of appearance of a specific exit code.
     }
     \item{\code{exit_meaning}:}{Object of class \code{"character"}
       containing the meaning of the exit code.
@@ -64,7 +64,7 @@
       containing the solution status of the lp problem.
     }
     \item{\code{status_num}:}{Object of class \code{"integer"}
-      containing the number of apperance of a specific solution status.
+      containing the number of appearance of a specific solution status.
     }
     \item{\code{status_meaning}:}{Object of class \code{"character"}
       containing the meaning of the solution status.

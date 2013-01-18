@@ -22,8 +22,8 @@
 \description{
   Structure of the class \code{"fluxDistribution"}. Objects of that class are
   used by class \code{"\linkS4class{optsol}"} in order to store flux
-  distributions. Flux distributions are stored columnwise; each flux corresponds
-  to one row and the optimizations correspond to the columns.
+  distributions. Flux distributions are stored column by column; each flux
+  corresponds to one row and the optimizations correspond to the columns.
 }
 
 \section{Objects from the Class}{

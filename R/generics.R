@@ -1,7 +1,7 @@
 #  generics.R
 #  FBA and friends with R.
 #
-#  Copyright (C) 2010-2012 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
+#  Copyright (C) 2010-2013 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
 #  Institute for Informatics, Heinrich-Heine-University, Duesseldorf, Germany.
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
@@ -58,11 +58,22 @@ setGeneric(name = "algorithm<-",
            def  = function(object, value) { standardGeneric("algorithm<-") }
 )
 
+setGeneric(name = "alg_par",
+           def  = function(object) { standardGeneric("alg_par") }
+)
+setGeneric(name = "alg_par<-",
+           def  = function(object, value) { standardGeneric("alg_par<-") }
+)
+
 setGeneric(name = "allGenes",
            def  = function(object) { standardGeneric("allGenes") }
 )
 setGeneric(name = "allGenes<-",
            def  = function(object, value) { standardGeneric("allGenes<-") }
+)
+
+setGeneric(name = "applyChanges",
+           def  = function(object, del, obj, ld, react, lb, ub, obj_coef, lpdir) { standardGeneric("applyChanges") }
 )
 
 setGeneric(name = "backupProb",
@@ -90,6 +101,10 @@ setGeneric(name = "changeColsBndsObjCoefs",
 
 setGeneric(name = "changeMatrixRow",
            def  = function(lp, i, j, val) { standardGeneric("changeMatrixRow") }
+)
+
+setGeneric(name = "changeMaxObj",
+           def  = function(object, ...) { standardGeneric("changeMaxObj") }
 )
 
 setGeneric(name = "changeObjCoefs",
@@ -355,10 +370,6 @@ setGeneric(name = "hasEffect<-",
            def  = function(object, value) { standardGeneric("hasEffect<-") }
 )
 
-setGeneric(name = "hasId",
-           def  = function(object) { standardGeneric("hasId") }
-)
-
 setGeneric(name = "ind",
            def  = function(object) { standardGeneric("ind") }
 )
@@ -428,10 +439,7 @@ setGeneric(name = "logMessage",
            def  = function(object, appendEllipsis, ...) { standardGeneric("logMessage") }
 )
 setGeneric(name = "logOptimization",
-           def  = function(object, ok, stat, obj, del, i) { standardGeneric("logOptimization") }
-)
-setGeneric(name = "logOptimizationNE",
-           def  = function(object, del, i) { standardGeneric("logOptimizationNE") }
+           def  = function(object, ...) { standardGeneric("logOptimization") }
 )
 setGeneric(name = "logOptimizationTH",
            def  = function(object) { standardGeneric("logOptimizationTH") }
@@ -725,6 +733,10 @@ setGeneric(name = "probType",
            def  = function(object) { standardGeneric("probType") }
 )
 
+setGeneric(name = "rate",
+           def  = function(object) { standardGeneric("rate") }
+)
+
 setGeneric(name = "react",
            def  = function(object) { standardGeneric("react") }
 )
@@ -783,6 +795,10 @@ setGeneric(name = "react_single<-",
 
 setGeneric(name = "readProb",
            def  = function(lp, fname, ff = "lp", ...) { standardGeneric("readProb") }
+)
+
+setGeneric(name = "resetChanges",
+           def  = function(object, old_val) { standardGeneric("resetChanges") }
 )
 
 setGeneric(name = "rev2irrev",

@@ -45,7 +45,7 @@
     is the stoichiometric coefficient of the metabolite in \code{met[i]}.
   }
   \item{reversible}{
-    A boolean value, indicating if the reaction is reversible or not.\cr
+    A Boolean value, indicating if the reaction is reversible or not.\cr
     Default: \code{FALSE}.
   }
   \item{lb}{

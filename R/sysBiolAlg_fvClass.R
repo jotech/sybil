@@ -1,7 +1,7 @@
 #  sysBiolAlg_fvClass.R
 #  FBA and friends with R.
 #
-#  Copyright (C) 2010-2012 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
+#  Copyright (C) 2010-2013 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
 #  Institute for Informatics, Heinrich-Heine-University, Duesseldorf, Germany.
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
@@ -75,6 +75,8 @@ setMethod(f = "initialize",
                                             lpdir      = lpdir,
                                             rub        = NULL,
                                             ctype      = NULL,
+                                            algPar     = list("percentage" = percentage,
+                                                              "Zopt"       = Zopt),
                                             ...)
 
                   # objective value
@@ -101,7 +103,8 @@ setMethod(f = "initialize",
                           }
                       }
                       else {
-                          obj <- Zopt
+                          #obj <- Zopt
+                          obj <- Zopt * (percentage/100)
                       }
 
                       # add a row to the problem
@@ -113,6 +116,7 @@ setMethod(f = "initialize",
                                     type, obj, obj,
                                     list(oind), list(oval))
                       .Object@nr <- .Object@nr + 1L
+                      .Object@alg_par[["Zopt"]] <- obj
 
                   }
               }

@@ -30,4 +30,3 @@
 
 \author{Benjamin Braasch}
 
-\keyword{change}

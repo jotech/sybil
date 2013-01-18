@@ -2,11 +2,11 @@
 \alias{multiDel}
 
 \title{
-  Parallel (Multicore) Support for sybil
+  Parallel Support for sybil
 }
 
 \description{
-  Multicore support for the functions \code{\link{oneGeneDel}},
+  Parallel computation support for the functions \code{\link{oneGeneDel}},
   \code{\link{doubleGeneDel}}, \code{\link{oneFluxDel}},
   \code{\link{doubleFluxDel}} and \code{\link{fluxVar}}.
 }
@@ -43,13 +43,12 @@
 }
 
 \details{
-  The function loads the package \pkg{parallel} if available, otherwise it tries
-  to load \pkg{multicore}. The argument \code{nProc} should be the number of
-  cores to use. This number is veryfied via a call to \code{detectCores} (of
-  \pkg{parallel} or \pkg{multicore}) and is set to the return value of
-  \code{detectCores}, if \code{nProc > detectCores()} evaluates to \code{TRUE}.
-  The arguments \code{del1} and \code{del2} are split into lists, each list
-  element containing \code{nProc/del1} elements. These are passed to
+  The function loads the package \pkg{parallel} if available.  Argument
+  \code{nProc} should be the number of cores to use.  This number is veryfied
+  via a call to \code{detectCores} (of \pkg{parallel}) and is set to the return
+  value of \code{detectCores}, if \code{nProc > detectCores()} evaluates to
+  \code{TRUE}.  Arguments \code{del1} and \code{del2} are split into lists,
+  each list element containing \code{nProc/del1} elements. These are passed to
   \code{\link{mclapply}}.
 }
 

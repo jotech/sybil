@@ -3,7 +3,6 @@
 \docType{class}
 \encoding{utf8}
 
-\alias{reactId}
 \alias{reactId-class}
 \alias{react_pos<-,reactId-method}
 \alias{react_pos,reactId-method}
@@ -11,8 +10,6 @@
 \alias{react_pos}
 \alias{react_id<-,reactId-method}
 \alias{react_id,reactId-method}
-\alias{hasId}
-\alias{hasId,reactId-method}
 \alias{mod_id,reactId-method}
 \alias{mod_id<-,reactId-method}
 \alias{mod_key,reactId-method}
@@ -20,7 +17,7 @@
 \alias{length,reactId-method}
 \alias{[,reactId,ANY,ANY,ANY-method}
 
-\title{Strukture of Class "reactId"}
+\title{Structure of Class "reactId"}
 
 \description{
   Structure of the class \code{"reactId"}. Objects of that class are
@@ -66,10 +63,6 @@
       Object of class \code{"character"} containing the reaction id's
       corresponding to the indices given in slot \code{react_pos}.
     }
-    \item{\code{has_id}:}{
-      Object of class \code{"logical"}, \code{TRUE} if slot \code{react_id} is
-      not empty, otherwise \code{FALSE}.
-    }
     \item{\code{react_num}:}{
       Object of class \code{"integer"} containing the number of reaction id's.
     }
@@ -104,10 +97,6 @@
     }
     \item{\code{length}}{
       \code{signature(object = "reactId")}: returns the number of reaction id's.
-    }
-    \item{\code{hasId}}{
-      \code{signature(object = "reactId")}: returns \code{TRUE} if slot
-      \code{react_id} is not empty, otherwise \code{FALSE}.
     }
     \item{\code{[}:}{
       \code{signature(x = "reactId")}: access like a vector.

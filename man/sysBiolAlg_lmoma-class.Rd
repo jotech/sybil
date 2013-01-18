@@ -32,18 +32,21 @@
       containing the problem object.
     }
     \item{\code{algorithm}:}{Object of class \code{"character"}
-      giving the name of the algorithm.
+      containing the name of the algorithm.
     }
     \item{\code{nr}:}{Object of class \code{"integer"}
-      giving the number of rows of the problem object.
+      containing the number of rows of the problem object.
     }
     \item{\code{nc}:}{Object of class \code{"integer"}
-      giving the number of columns of the problem object
+      containing the number of columns of the problem object
     }
     \item{\code{fldind}:}{Object of class \code{"integer"}
       pointers to columns (variables) representing a flux (reaction) in the
       original network. The variable \code{fldind[i]} in the problem object
-      represents reaction \code{i} in the original network. 
+      represents reaction \code{i} in the original network.
+    }
+    \item{\code{alg_par}:}{Object of class \code{"list"}
+      containing a named list containing algorithm specific parameters.
     }
   }
 }
@@ -163,8 +166,8 @@
           a_j <= v_j,del <= b_j  for j = 1, ..., n
           mu_wt = c^T v_wt
   }
-  with \eqn{\bold{S}}{S} beeing the stoichiometric matrix, \eqn{\alpha_i}{a_i}
-  and \eqn{\beta_i}{b_i} beeing the lower and upper bounds for flux (variable)
+  with \eqn{\bold{S}}{S} being the stoichiometric matrix, \eqn{\alpha_i}{a_i}
+  and \eqn{\beta_i}{b_i} being the lower and upper bounds for flux (variable)
   \eqn{i} (\eqn{j} for the deletion strain).
   The total number of variables of the optimization problem is denoted
   by \eqn{n}.

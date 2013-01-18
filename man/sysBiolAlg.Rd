@@ -46,7 +46,7 @@
   If argument \code{algorithm} is set to \code{"foo"} and \code{prefix} is set
   to \code{"sysBiolAlg"} (default), \code{sysBiolAlg} will try to build an
   instance of class \code{sysBiolAlg_foo}.  If no such class definition exists,
-  an error will be returned. For the name of the class, the values of arguemts
+  an error will be returned. For the name of the class, the values of arguments
   \code{prefix} and \code{algorithm} are stick together separated by the value
   of argument \code{sep}: \code{prefix_algorithm}.
   

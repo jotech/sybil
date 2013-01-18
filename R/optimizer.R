@@ -1,7 +1,7 @@
 #  optimizer.R
 #  FBA and friends with R.
 #
-#  Copyright (C) 2010-2012 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
+#  Copyright (C) 2010-2013 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
 #  Institute for Informatics, Heinrich-Heine-University, Duesseldorf, Germany.
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
@@ -29,11 +29,14 @@
 #
 
 
-optimizer <- function(model, lb, ub,
-                      delete, geneFlag,
+optimizer <- function(model, react,
+                      lb = NULL,
+                      ub = NULL,
+                      obj_coef = NULL,
+                      lpdir = NULL,
                       algorithm = SYBIL_SETTINGS("ALGORITHM"),
+                      mtfobj = NULL,
                       setToZero = FALSE,
-                      checkOptSolObj = FALSE,
                       rebuildModel = FALSE,
                       fld = "none",
                       prCmd = NA, poCmd = NA,
@@ -63,54 +66,76 @@ optimizer <- function(model, lb, ub,
     # check arguments
 
     if (!is(model, "modelorg")) {
-        stop("needs an object of class modelorg!")
+        stop("needs an object of class modelorg")
     }
 
-    if (!is(delete, "matrix")) {
-        stop("needs an object of class matrix!")
+    if (!is(react, "list")) {
+        stop("needs an object of class list")
     }
 
-    if (missing(lb)) {
-        lb <- rep(0, nrow(delete))
-    }
+    # number of optimizations
+    nObj  <- length(react)
 
-    if (missing(ub)) {
-        ub <- rep(0, nrow(delete))
+    # parameters modifying the model
+    if (!is.null(lb)) {
+        stopifnot(length(lb) == nObj, is(lb, "numeric"))
     }
-
-    if (!checkAlgorithm(alg = algorithm, fkt = "optimizer")) {
-        stop(sQuote(algorithm), " is not a valid algorithm")
+    if (!is.null(ub)) {
+        stopifnot(length(ub) == nObj, is(ub, "numeric"))
     }
-
+    if (!is.null(obj_coef)) {
+        stopifnot(length(obj_coef) == nObj, is(obj_coef, "numeric"))
+    }
+    if (!is.null(lpdir)) {
+        stopifnot(length(lpdir) == nObj, is(lpdir, "character"))
+    }
+    
+    # flux distribution
     if (isTRUE(fld)) {
-        fld <- "all"
+        fdist <- "all"
     }
-    if (identical(fld, FALSE)) {
-        fld <- "none"
+    else if (identical(fld, FALSE)) {
+        fdist <- "none"
     }
-
-#    if ((isTRUE(rebuildModel)) && (isTRUE(copyModel))) {
-#        stop("use 'rebuildModel' xor 'copyModel'")
-#    }
+    else {
+        fdist <- fld
+    }
 
 
     #--------------------------------------------------------------------------#
     # prepare problem object
     #--------------------------------------------------------------------------#
 
-    lpmod <- sysBiolAlg(model, algorithm = algorithm, ...)
+    if (algorithm == "mtf") {
+        if (fdist == "none") {
+            fdist <- "fluxes" 
+        }
+        if (is.null(mtfobj)) {
+            lpmod  <- sysBiolAlg(model, algorithm = "mtf",
+                                 react = react, lb = lb, ub = ub, ...)
+        }
+        else {
+            stopifnot(is(mtfobj, "numeric"), length(mtfobj) == nObj)
+            lpmod  <- sysBiolAlg(model, algorithm = "mtf", wtobj = mtfobj, ...)
+        }
+    }
+    else {
+        lpmod  <- sysBiolAlg(model, algorithm = algorithm, ...)
+    }
+
+    # check, if we use an algorithm performing genetic perturbations
+    pert <- checkAlgorithm(algorithm, "pert")
 
 
     #--------------------------------------------------------------------------#
     # data structures for simulation results
     #--------------------------------------------------------------------------#
 
-    nObj  <- nrow(delete)
     obj   <- numeric(nObj)
     mobj  <- numeric(nObj)
     ok    <- integer(nObj)
     stat  <- integer(nObj)
-    flux <- switch(fld,
+    flux <- switch(fdist,
         "all" = {
             Matrix::Matrix(0, nrow = nc(lpmod), ncol = nObj)
         },
@@ -121,17 +146,10 @@ optimizer <- function(model, lb, ub,
             NA
         }
     )
-#     if (isTRUE(fld)) {
-#         flux <- Matrix::Matrix(0, nrow = nc(lpmod), ncol = nObj)
-#     }
-#     else {
-#         flux <- NA
-#     }
 
-    if (isTRUE(geneFlag)) {
-        heff  <- logical(nObj)
-        fdels <- vector("list", nObj)
-    }
+
+    #--------------------------------------------------------------------------#
+    # pre and post processing
 
     runPrPl  <- logical(nObj)
     runPoPl  <- logical(nObj)
@@ -161,7 +179,7 @@ optimizer <- function(model, lb, ub,
 
 
 #------------------------------------------------------------------------------#
-#                    flux/gene deletions with linearMOMA                       #
+#                             optimizations                                    #
 #------------------------------------------------------------------------------#
 
     message("calculating ", nObj, " optimizations ... ", appendLF = FALSE)
@@ -171,13 +189,8 @@ optimizer <- function(model, lb, ub,
         #progr <- txtProgressBar(min = 2, max = nObj, initial = 2, style = 3)
     }
 
-    logComment(logObj, "compute mutant strains")
     logOptimizationTH(logObj)
 
-
-#------------------------------------------------------------------------------#
-#                        flux/gene deletions with FBA                          #
-#------------------------------------------------------------------------------#
 
     fi <- fldind(lpmod)
 
@@ -186,23 +199,6 @@ optimizer <- function(model, lb, ub,
         if (verboseMode == 2) {
             progr <- sybil:::.progressBar(i, nObj, progr)
             #setTxtProgressBar(progr, i)
-        }
-
-        if (isTRUE(geneFlag)) {
-            # get the reactions for gene i
-            tmp_del <- geneDel(model, delete[i, ])
-
-            if (is.null(tmp_del)) {
-                fdels[[i]] <- NA
-            }
-            else {
-                # deletion of gene i has an effect (tmp_del is not empty)
-                heff[i]    <- TRUE
-                fdels[[i]] <- tmp_del
-            }
-        }
-        else {
-            tmp_del <- delete[i, ]
         }
 
         # pre/post processing
@@ -227,23 +223,28 @@ optimizer <- function(model, lb, ub,
         # solution i
         if (isTRUE(rebuildModel)) {
             sol <- optimizeProb(model,
+                                react = react[[i]],
+                                lb = rep(lb[i], length(react[[i]])),
+                                ub = rep(ub[i], length(react[[i]])),
                                 retOptSol = FALSE,
-                                react = tmp_del,
-                                lb = rep(lb[i], length(tmp_del)),
-                                ub = rep(ub[i], length(tmp_del)),
-                                algorithm = algorithm,
-                                MoreArgs = list(lpdir = getObjDir(problem(lpmod)),
-                                                prCmd = prCmd_tmp,
-                                                poCmd = poCmd_tmp,
-                                                prCil = runPrPcn,
-                                                poCil = runPoPcn),
-                                ...)
+                                obj_coef = obj_coef[i],
+                                lpdir = lpdir[i],
+                                #lpdir = getObjDir(problem(lpmod)),
+                                prCmd = prCmd_tmp, poCmd = poCmd_tmp,
+                                prCil = runPrPcn, poCil = runPoPcn,
+                                algorithm = algorithm, ...)
         }
         else {
+            if (algorithm == "mtf") {
+                changeMaxObj(lpmod, i)
+            }
+
             sol <- optimizeProb(lpmod,
-                                react = tmp_del,
-                                lb = rep(lb[i], length(tmp_del)),
-                                ub = rep(ub[i], length(tmp_del)),
+                                react = react[[i]],
+                                lb = rep(lb[i], length(react[[i]])),
+                                ub = rep(ub[i], length(react[[i]])),
+                                obj_coef = obj_coef[i],
+                                lpdir = lpdir[i],
                                 prCmd = prCmd_tmp, poCmd = poCmd_tmp,
                                 prCil = runPrPcn, poCil = runPoPcn)
         }
@@ -254,25 +255,23 @@ optimizer <- function(model, lb, ub,
         #obj[i]  <- sol$obj
         ok[i]   <- sol$ok
         stat[i] <- sol$stat
-        if (fld == "none") {
-            obj[i] <- crossprod(obj_coef(model), sol$fluxes[fi])
+        if (fdist == "none") {
+            if (isTRUE(pert)) {
+                obj[i] <- crossprod(obj_coef(model), sol$fluxes[fi])
+            }
+            else {
+                obj[i] <- sol$obj
+            }
         }
         else {
             obj[i] <- sol$obj
-            if (fld == "fluxes") {
+            if (fdist == "fluxes") {
                 flux[,i] <- sol$fluxes[fi]
             }
             else {
                 flux[,i] <- sol$fluxes
             }
         }
-#         if (isTRUE(fld)) {
-#             flux[,i] <- sol$fluxes
-#             obj[i]  <- sol$obj
-#         }
-#         else {
-#             obj[i] <- crossprod(obj_coef(model), sol$fluxes[fi])
-#         }
 
         # pre/post processing
         if (isTRUE(did_pr)) {
@@ -292,7 +291,7 @@ optimizer <- function(model, lb, ub,
             did_po <- FALSE
         }
 
-        logOptimization(logObj, sol$ok, sol$stat, obj[i], tmp_del, i)
+        logOptimization(logObj, sol$ok, sol$stat, obj[i], lpdir[i], obj_coef[i], react[[i]], i)
 
         remove(sol)
         #close(progr)
@@ -305,107 +304,73 @@ optimizer <- function(model, lb, ub,
 #                               save the results                               #
 #------------------------------------------------------------------------------#
 
-    if (fld == "fluxes") {
+    # slot fldind
+    if (fdist == "fluxes") {
         fli <- 1:length(fi)
     }
-    else if(fld == "none") {
+    else if(fdist == "none") {
         fli <- NA
     }
     else {
         fli <- fi
     }
 
-    if (isTRUE(geneFlag)) {
-        optsol <- new("optsol_genedel",
-            mod_id       = mod_id(model),
-            mod_key      = mod_key(model),
-            solver       = solver(problem(lpmod)),
-            method       = method(problem(lpmod)),
-            algorithm    = algorithm(lpmod),
-            num_of_prob  = as.integer(nObj),
-            lp_num_cols  = nc(lpmod),
-            lp_num_rows  = nr(lpmod),
-            lp_obj       = as.numeric(obj),
-            lp_ok        = as.integer(ok),
-            lp_stat      = as.integer(stat),
-            lp_dir       = factor(getObjDir(problem(lpmod))),
-            obj_coef     = obj_coef(model),
-            obj_func     = printObjFunc(model),
-            fldind       = as.integer(fli),
-            fluxdist     = fluxDistribution(flux),
-    
-            chlb         = as.numeric(lb),
-            chub         = as.numeric(ub),
-            dels         = delete,
-    
-            fluxdels     = fdels,
-            hasEffect    = heff
-        )
-    }
-    else {
-        optsol <- new("optsol_fluxdel",
-            mod_id       = mod_id(model),
-            mod_key      = mod_key(model),
-            solver       = solver(problem(lpmod)),
-            method       = method(problem(lpmod)),
-            algorithm    = algorithm(lpmod),
-            num_of_prob  = as.integer(nObj),
-            lp_num_cols  = nc(lpmod),
-            lp_num_rows  = nr(lpmod),
-            lp_obj       = as.numeric(obj),
-            lp_ok        = as.integer(ok),
-            lp_stat      = as.integer(stat),
-            lp_dir       = factor(getObjDir(problem(lpmod))),
-            obj_coef     = obj_coef(model),
-            obj_func     = printObjFunc(model),
-            fldind       = as.integer(fli),
-            fluxdist     = fluxDistribution(flux),
-    
-            chlb         = as.numeric(lb),
-            chub         = as.numeric(ub),
-            dels         = delete
-        )
-    }    
-
-
+    # pre and post processing
     if (isTRUE(do_pr)) {
         prAna <- ppProc(prPcmd)
         pa(prAna) <- prPpa
         ind(prAna) <- runPrP
-        preProc(optsol) <- prAna
+    }
+    else {
+        prAna <- NULL
     }
 
     if (isTRUE(do_po)) {
         poAna <- ppProc(poPcmd)
         pa(poAna) <- poPpa
         ind(poAna) <- runPoP
-        postProc(optsol) <- poAna
+    }
+    else {
+        poAna <- NULL
+    }
+
+    # solution list
+    optsol <- list(solver       = solver(problem(lpmod)),
+                   method       = method(problem(lpmod)),
+                   algorithm    = algorithm(lpmod),
+                   lp_num_cols  = nc(lpmod),
+                   lp_num_rows  = nr(lpmod),
+                   obj          = obj,
+                   ok           = ok,
+                   stat         = stat,
+                   lp_dir       = factor(getObjDir(problem(lpmod))),
+                   fldind       = fli,
+                   fluxdist     = fluxDistribution(flux),
+                   prAna        = prAna,
+                   poAna        = poAna,
+                   alg_par      = alg_par(lpmod))
+
+
+#------------------------------------------------------------------------------#
+
+    if (isTRUE(setToZero)) {
+        do_again <- checkSolStat(stat, solver(problem(lpmod)))
+        num_new  <- length(do_again)
+        optsol$lp_obj[do_again] <- as.numeric(0)
+
+        message("setting ", num_new, " objective values to zero")
+
+        for (i in seq(along = do_again)) {
+            logOptimization(logObj, optsol$lp_ok[do_again[i]],
+                            optsol$lp_stat[do_again[i]], 0,
+                            react[[do_again[i]]], do_again[i])
+        }
     }
 
 
 #------------------------------------------------------------------------------#
 #                           return solution object                             #
 #------------------------------------------------------------------------------#
-
-
-    if (isTRUE(setToZero)) {
-        do_again <- checkStat(optsol)
-        num_new  <- length(do_again)
-        lp_obj(optsol)[do_again] <- as.numeric(0)
-
-        message("setting ", num_new, " objective values to zero")
-
-        for (i in seq(along = do_again)) {
-            logOptimization(logObj, lp_ok(optsol)[do_again[i]],
-                            lp_stat(optsol)[do_again[i]], 0,
-                            deleted(optsol, do_again[i]), do_again[i])
-        }
-    }
-
-
-    if (isTRUE(checkOptSolObj)) {
-        checkOptSol(optsol, onlywarn = TRUE)
-    }
 
     delProb(problem(lpmod))
     remove(lpmod)

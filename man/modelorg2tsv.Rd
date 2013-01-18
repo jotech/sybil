@@ -56,7 +56,7 @@
     system boundary) will be added to the model. These metabolites participate
     in reactions, transporting metabolites across the system boundary.
     The metabolite id will be the same as for the metabolite inside the system,
-    but the compartiment type is set to the value of argument
+    but the compartment type is set to the value of argument
     \code{extMetFlag}.
     
     For example, most models contain a transport reaction for glucose:
@@ -68,7 +68,7 @@
     
     \code{glc[c] <==> glc[b]}
     
-    with the letter \code{b} beeing the default value for \code{extMetFlag}.\cr
+    with the letter \code{b} being the default value for \code{extMetFlag}.\cr
     Default: \code{FALSE}.
   }
   \item{onlyReactionList}{
@@ -88,7 +88,7 @@
     Default: \code{SYBIL_SETTINGS("PATH_TO_MODEL")}.
   }
   \item{\dots}{
-    Further arguments passed to \code{\link{write.table}}, e.g. the boolean
+    Further arguments passed to \code{\link{write.table}}, e.g. the Boolean
     argument \code{quote} can be used here.
   }
 }

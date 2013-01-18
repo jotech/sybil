@@ -71,11 +71,8 @@ Among other functions, \pkgname currently provides efficient methods for
 flux-balance analysis (FBA), minimization of metabolic adjustment (MOMA),
 regulatory on/off minimization (ROOM), flux variability Analysis and robustness
 Analysis.
-
 The package \pkgname{} makes use of the sparse matrix implementation in the
-R-package \pkg{Matrix} available from
-CRAN\footnote{\url{http://cran.r-project.org/}\label{cranfoot}}, or, from
-R version 2.14.0 on, is already included in your R installation.
+R-package \pkg{Matrix}.
 
 
 % ---------------------------------------------------------------------------- %
@@ -86,7 +83,8 @@ The package \pkgname{} itself depends on an existing installation of the
 package \pkg{Matrix}.  In order to run optimizations, at least one of the
 following additional R-packages and the corresponding libraries are required:
 \pkg{glpkAPI}, \pkg{cplexAPI}, \pkg{clpAPI} or \pkg{lpSolveAPI}.
-These packages are also available from CRAN\footref{cranfoot}.
+These packages are available from
+CRAN\footnote{\url{http://cran.r-project.org/}\label{cranfoot}}.
 Additionally, \pkg{sybilGUROBI}---supporting the Gurobi
 optimizer\footnote{\url{http://www.gurobi.com}}---is available on request.
 
@@ -478,7 +476,7 @@ These files are located in the directory \Comp{extdata/} in the package
 mp  <- system.file(package = "sybil", "extdata")
 @
 Now the model files can be read in by using the command \Comp{readTSVmod()}:
-<<>>=
+<<print=true>>=
 mod <- readTSVmod(prefix = "Ec_core", fpath = mp, quoteChar = "\"")
 @
 If the fields in the input files for function \Comp{readTSVmod()} are quoted,
@@ -495,11 +493,8 @@ file names used in the above example. All have the same base name
 \item the list of reactions (must be there): \Comp{<prefix>\_react}\,.
 \end{itemize}
 The file name suffix depends on the field delimiter. If the fields are
-tab-delimited, the default is \Comp{.tsv}. Function \Comp{readTSVmod()} returns
-an object of class \Comp{modelorg}:
-<<>>=
-mod
-@
+tab-delimited, the default is \Comp{.tsv}\,. Function \Comp{readTSVmod()}
+returns an object of class \Comp{modelorg}.
 Models (instances of class \Comp{modelorg}, see section~\ref{classmod}) can be
 converted to files in tabular form with the command \Comp{modelorg2tsv}:
 <<eval=FALSE>>=
@@ -522,14 +517,12 @@ same model as used in the text files before.
 
 The current set of exchange reactions in the model can be accessed with the
 function \Comp{findExchReact()}.
-<<>>=
+<<print=true>>=
 ex <- findExchReact(Ec_core)
-ex
 @
 The subset of uptake reactions can be retrieved by method \Comp{uptReact}.
-<<>>=
+<<print=true>>=
 upt <- uptReact(ex)
-upt
 ex[upt]
 @
 Function \Comp{findExchReact()} returns an object of class \Comp{reactId\_Exch}
@@ -557,15 +550,14 @@ network---(\Comp{"fluxes"}) and results of pre- and post processing commands, if
 given (\Comp{"preP"} and \Comp{"postP"}). Also, a vector of integers will be
 returned (\Comp{"fldind"}). The flux value \Comp{fluxes[fldind[i]]} is the flux
 value of reaction \Comp{i} in the model (see section~\ref{mtf}).
-<<>>=
-optimizeProb(Ec_core, algorithm = "fba", retOptSol = FALSE)
+<<print=true>>=
+optL <- optimizeProb(Ec_core, algorithm = "fba", retOptSol = FALSE)
 @
 Perform FBA, return an object of class \Comp{optsol\_optimizeProb}
 (extends class \Comp{optsol}, see section~\ref{classopt}, this is the default
 behavior).
-<<>>=
+<<print=true>>=
 opt <- optimizeProb(Ec_core, algorithm = "fba", retOptSol = TRUE)
-opt
 @
 The variable \Comp{opt} contains an object of class \Comp{optsol\_optimizeProb},
 a data structure storing all results of the optimization and providing methods
@@ -589,7 +581,8 @@ Usually, an FBA solution is not unique. There can be many equivalent flux
 distributions supporting the same objective value. A method to decide for one
 out of these solutions is to compute the flux distribution minimizing the total
 absolute flux (MTF) but still supporting the objective value of the FBA
-solution. At first, an objective value calculated via FBA is required:
+solution. At first, an objective value, for example calculated via FBA, is
+required:
 <<>>=
 fba <- optimizeProb(Ec_core, algorithm = "fba")
 @
@@ -632,16 +625,16 @@ metabolic network.
 fl <- getFluxDist(mtf)
 length(fl)
 @
-The flux distribution for the exchange reactions can be retrieved in a similar
-way.
-<<>>=
-ex <- findExchReact(Ec_core)
-getFluxDist(mtf, ex)
+The flux distribution of the exchange reactions can be retrieved in a similar
+way (variable \Comp{ex} contains the exchange reactions of the \emph{E. coli}
+model, see section~\ref{envir}).
+<<print=true>>=
+fd <- getFluxDist(mtf, ex)
+getNetFlux(fd)
 @
-Function \Comp{findExchReact()} returns all exchange reactions present in a
-metabolic network (section~\ref{envir}).  The value for the objective function
-given in the model (here: biomass production) can be accessed by method
-\Comp{mod\_obj}:
+Function \Comp{getNetFlux()} the absolute flux values of the exchange reactions
+grouped by flux direction.  The value of the objective function given in the
+model (here: biomass production) can be accessed by method \Comp{mod\_obj}:
 <<>>=
 mod_obj(mtf)
 @
@@ -654,9 +647,8 @@ which is of course the same value as for the FBA algorithm.
 
 To compute the metabolic phenotypes of \emph{in silico} knock-out mutants,
 argument \Comp{gene} of method \Comp{optimizeProb} can be used.
-<<>>=
+<<print=true>>=
 ko <- optimizeProb(Ec_core, gene = "b2276", lb = 0, ub = 0)
-ko
 @
 Argument \Comp{gene} gets a character vector of gene locus tags present in the
 used model. The flux boundaries of reactions affected by the genes given in
@@ -677,10 +669,9 @@ phenotype. An alternative is the MOMA algorithm described in
 phenotype and the mutant phenotype (argument \Comp{algorithm = "lmoma"} computes
 a linearized version of the MOMA algorithm; \Comp{algorithm = "moma"} runs the
 quadratic formulation).
-<<>>=
+<<print=true>>=
 ko <- optimizeProb(Ec_core, gene = "b2276", lb = 0, ub = 0,
                    algorithm = "lmoma", wtflux = getFluxDist(mtf))
-ko
 @
 The variable \Comp{ko} contains the solution of the linearized version of the
 MOMA algorithm. A wild-type flux distribution can be set via argument
@@ -731,40 +722,38 @@ function & purpose \\
 \end{table}
 Function \Comp{oneGeneDel()} simulates all possible single gene knock-out
 mutants in a metabolic model (default algorithm is FBA).
-<<>>=
+<<print=true>>=
 opt <- oneGeneDel(Ec_core)
 @
 The function \Comp{oneGeneDel} gets an argument \Comp{geneList}, a character
 vector containing the gene id's to knock out.  If \Comp{geneList} is missing,
 all genes are taken into account.  The example model contains 137 independent
 genes, so 137 optimizations will be performed.
-<<>>=
-opt
-@
-The result in \Comp{opt} is an object of class \Comp{optsol\_geneDel},
-extending class \Comp{optsol\_optimizeProb} (see section~\ref{fba}).
-Method \Comp{checkOptSol} gives an overview about the results and status of
-the optimizations. Additionally, class \Comp{optsol} contains a
-method \Comp{histogram}, plotting the values of the objective function
-(section~\ref{classopt}).
+
+The result stored in the variable \Comp{opt} is an object of class
+\Comp{optsol\_geneDel}, extending class \Comp{optsol\_optimizeProb}
+(see section~\ref{fba}).  Method \Comp{checkOptSol} gives an overview about the
+results and status of the optimizations. Additionally, class \Comp{optsol}
+contains a method \Comp{histogram}, plotting the values of the objective
+function given in the model (section~\ref{classopt}).
 <<>>=
 checkOptSol(opt)
 @
 Plot the histogram:
+\begin{center}
 <<fig=TRUE>>=
 histogram(opt, col = "lightgray", nint = 20)
 @
-
-\noindent
+\end{center}
 Argument \Comp{algorithm} can be used here to use MOMA to compute the mutant
 flux distributions. Additionally, a wild-type solution can be provided.
+\begin{center}
 <<fig=TRUE>>=
 opt <- oneGeneDel(Ec_core, algorithm = "lmoma", wtflux = getFluxDist(mtf))
 checkOptSol(opt)
 histogram(opt, col = "lightgray", nint = 20)
 @
-
-\noindent
+\end{center}
 In order to perform all possible double-knock-out mutants, or $n$-knock-out
 mutants, the function \Comp{geneDeletion} can be used. Perform single gene
 deletions (in principle the same as before with \Comp{oneGeneDel}).
@@ -795,10 +784,12 @@ by \citet{Palsson:2006fk} and \citet{Price:2004fk}.
 rbc <- readTSVmod(reactList = "rbc.tsv", fpath = mp, quoteChar = "\"")
 @
 Perform flux variability analysis.
+\begin{center}
 <<fig=TRUE>>=
 opt <- fluxVar(rbc, verboseMode = 0)
 plot(opt)
 @
+\end{center}
 
 
 % ---------------------------------------------------------------------------- %
@@ -811,10 +802,12 @@ minimum value the flux of the control reaction can reach \citep{Palsson:2006fk}.
 The example below shows a flux variability analysis based upon the metabolic
 model of the core energy metabolism of \emph{E.\,coli} using the exchange flux
 of Oxygen as control reaction.
+\begin{center}
 <<fig=TRUE>>=
 opt <- robAna(Ec_core, "EX_o2(e)", verboseMode = 0)
 plot(opt)
 @
+\end{center}
 
 
 % ---------------------------------------------------------------------------- %
@@ -830,7 +823,7 @@ metabolism of \emph{E.\,coli}:
 opt <- oneGeneDel(Ec_core, algorithm = "fba", fld = "all")
 @
 Generate a summary:
-<<>>=
+<<print=true>>=
 sum <- summaryOptsol(opt, Ec_core)
 @
 The function \Comp{summaryOptsol()} returns an object of class
@@ -839,9 +832,7 @@ simulations) and the corresponding object of class \Comp{modelorg} (the entire
 metabolic network). The generated object of class \Comp{summaryOptsol} contains
 some information about the flux distribution, substrates, products and limiting
 reactions.
-<<>>=
-sum
-@
+
 The method \Comp{printExchange()} prints a subset of the flux distribution for
 the exchange reactions in the model. Each column represents the environment of
 one optimization. The symbol \Comp{"-"} indicates that the corresponding
@@ -857,12 +848,12 @@ printExchange(sum, j = c(1:50), dense = TRUE)
 \subsection{Parallel computing}
 
 The package \pkgname{} provides basic support for the R-package \pkg{parallel}
-(\pkg{multicore} for R version prior 2.14.0) in the function \Comp{multidel}.
-The following example shows the computation of all possible triple-knock-out
-mutants using the model of the core energy metabolism of \emph{E.\,coli}.
-The set of genes included in the analysis will be reduced to genes, which are
-not lethal. A gene $i$ is considered as ``lethal'', if in a single-gene-knockout
-the deletion of gene $i$ results in a maximum growth ratio of zero.
+in function \Comp{multidel()}.  The following example shows the computation of
+all possible triple-knock-out mutants using the model of the core energy
+metabolism of \emph{E.\,coli}.  The set of genes included in the analysis will
+be reduced to genes, which are not lethal.  A gene $i$ is considered as
+``lethal'', if in a single-gene-knockout the deletion of gene $i$ results in a
+maximum growth ratio of zero.
 <<>>=
 ref    <- optimizeProb(Ec_core)
 opt    <- oneGeneDel(Ec_core)
@@ -905,11 +896,9 @@ mapply(checkOptSol, opt)
 
 Method \Comp{optimizeProb} provides a basic mechanism to run commands before
 and or after solving the optimization problem. In order to retrieve the reduced
-costs after the optimization, use argument \Comp{poCmd} of method
-\Comp{optimizeProb} of class \Comp{sysBiolAlg} (see also
-section~\ref{classsba}).
+costs after the optimization, use argument \Comp{poCmd}.
 <<>>=
-opt <- optimizeProb(Ec_core, MoreArgs = list(poCmd = list("getRedCosts")))
+opt <- optimizeProb(Ec_core, poCmd = list("getRedCosts"))
 postProc(opt)
 @
 
@@ -1117,7 +1106,7 @@ parameter to \Comp{"lmoma"}, results in a linearized version of the MOMA
 algorithm described in \citet{Segre:2002fk} ("moma" will run the original
 version). The linearized version of MOMA, like it is implemented in the COBRA
 Toolbox \citep{Becker:2007uq,Schellenberger:2011fk}, can be used in functions
-like \Comp{oneGeneDel()} via the boolean argument \Comp{COBRAflag}.
+like \Comp{oneGeneDel()} via the Boolean argument \Comp{COBRAflag}.
 Setting the parameter \Comp{"ALGORITHM"} to \Comp{"room"} will run a regulatory
 on/off minimization as described in \citet{Shlomi:2005fk}.
 See also section~\ref{komut} for details on gene deletion analysis.
@@ -1159,11 +1148,12 @@ Change a reaction id:
 react_id(Ec_core)[13] <- "biomass"
 @
 Plot an image of the stoichiometric matrix $S$:
+\begin{center}
 <<fig=TRUE>>=
-image(S(Ec_core))
+cg <- gray(0:8/8)
+image(S(Ec_core), col.regions = c(cg, rev(cg)))
 @
-
-\noindent
+\end{center}
 Matrices in objects of class \Comp{modelorg} are stored in formats provided by
 the \pkg{Matrix}-package\footnote{http://CRAN.R-project.org/package=Matrix}.
 
@@ -1204,10 +1194,8 @@ help("optsol")
 @
 for the list of available methods to access the
 data (figure~\ref{optsol-class}). A simple demonstration would be:
-<<>>=
-data(Ec_core)
+<<print=true>>=
 os <- optimizeProb(Ec_core)
-os
 is(os)
 @
 Retrieve objective value.
@@ -1261,9 +1249,8 @@ Bounds
 In order to solve this lp problem with \pkgname{}, an object of class
 \Comp{optObj} has to be created. The constructor function has the same name as
 the class it builds.
-<<>>=
+<<print=true>>=
 lp <- optObj(solver = "glpkAPI", method = "exact")
-lp
 @
 The first argument is the used solver software, in this case it is GLPK. The
 second optional argument gives the method, how the solver software has to solve
@@ -1287,9 +1274,8 @@ is thus available maybe not for all problem types.
 
 Initialize the new problem object. Each solver software needs to create
 specific data structures to hold the problem and solution data.
-<<>>=
+<<print=true>>=
 lp <- initProb(lp)
-lp
 @
 Slot \Comp{oobj} holds a pointer to the problem object of GLPK. Now, we need to
 allocate space for the problem data and load the data into the problem object.
@@ -1307,9 +1293,8 @@ data into the problem object.
 lp
 @
 All data are now set in the problem object, so it can be solved.
-<<>>=
+<<print=true>>=
 status <- solveLp(lp)
-status
 @
 Translate the status code in a text string.
 <<>>=
@@ -1365,7 +1350,6 @@ constructor of the class extending class \Comp{sysBiolAlg}. The base class
 directly. The constructor function builds an instance of a class extending the
 base class:
 <<>>=
-data(Ec_core)
 ec <- sysBiolAlg(Ec_core, algorithm = "fba")
 is(ec)
 @

@@ -67,11 +67,7 @@
     }
     \item{\code{lp_obj}:}{Object of class \code{"numeric"}
       containing the optimal values of the objective function after
-      optimization. If no flux distribution is available, slot \code{lp_obj}
-      contains the cross-product of the objective coefficients in slot
-      \code{obj_coef} and the part of the flux distribution in slot
-      \code{fluxdist} containing the values representing fluxes in the entire
-      metabolic network (slot \code{fldind}).
+      optimization.
     }
     \item{\code{lp_ok}:}{Object of class \code{"integer"}
       containing the exit code of the optimization.
@@ -98,7 +94,10 @@
       represents reaction \code{i} in the original network. 
     }
     \item{\code{fluxdist}:}{Object of class \code{"fluxDistribution"}
-      containing the solutons flux distributions.
+      containing the solutions flux distributions.
+    }
+    \item{\code{alg_par}:}{Object of class \code{"list"}
+      containing a named list containing algorithm specific parameters.
     }
   }
 }

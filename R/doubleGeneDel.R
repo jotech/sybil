@@ -1,7 +1,7 @@
 #  doubleGeneDel.R
 #  FBA and friends with R.
 #
-#  Copyright (C) 2010-2012 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
+#  Copyright (C) 2010-2013 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
 #  Institute for Informatics, Heinrich-Heine-University, Duesseldorf, Germany.
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
@@ -33,9 +33,10 @@
 # doubleGeneDeletion() contained in the COBRA Toolbox.
 
 
-doubleGeneDel <- function(model, geneList1, geneList2,
+doubleGeneDel <- function(model, geneList1, geneList2, lb = NULL, ub = NULL,
                           allComb = FALSE, exLethal = TRUE,
-                          tol = SYBIL_SETTINGS("TOLERANCE"), ...) {
+                          tol = SYBIL_SETTINGS("TOLERANCE"),
+                          checkOptSolObj = FALSE, ...) {
 
     if (!is(model, "modelorg")) {
         stop("needs an object of class modelorg!")
@@ -106,7 +107,8 @@ doubleGeneDel <- function(model, geneList1, geneList2,
                               algorithm = "fba", solver = slv, lpdir = "max")
 
         unSol <- oneGeneDel(model, geneList = unGenes, solver = slv,
-                            lpdir = "max", fld = "none", algorithm = "fba")
+                            lpdir = rep("max", length(unGenes)),
+                            fld = "none", algorithm = "fba")
 
         # solution id of lethal genes
         letid <- lethal(unSol, wtobj$obj)
@@ -160,7 +162,7 @@ doubleGeneDel <- function(model, geneList1, geneList2,
 
     if (isTRUE(allComb)) {
   
-        # Compute boolean matrix with TRUE in the upper triangonal
+        # Compute Boolean matrix with TRUE in the upper triangonal
         # (the maximum number of comparisons)
         tmpMAT <- upper.tri(matrix(nrow = num_genes,
                                    ncol = num_genes), diag = FALSE)
@@ -217,14 +219,54 @@ doubleGeneDel <- function(model, geneList1, geneList2,
 #------------------------------------------------------------------------------#
 #                               run optimization                               #
 #------------------------------------------------------------------------------#
-  
+
     deletions <- which(tmpMAT == TRUE, arr.ind = TRUE)
+ 
+    kogenesID <- cbind(geneList1[deletions[,"row"]],
+                       geneList2[deletions[,"col"]])
+    kogenes   <- lapply(seq_len(nrow(kogenesID)), function(x) kogenesID[x, ])
+
+    fd <- sybil:::.generateFluxdels(model, kogenes)
+
+    if (is.null(lb)) {
+        lb <- rep(0, length(kogenes))
+    }
+    else {
+        if (length(lb) != length(kogenes)) {
+            stop("lb must be of length ", length(kogenes))
+        }
+    }
+    if (is.null(ub)) {
+        ub <- rep(0, length(kogenes))
+    }
+    else {
+        if (length(ub) != length(kogenes)) {
+            stop("ub must be of length ", length(kogenes))
+        }
+    }
+
+    sol <- optimizer(model = model,
+                     react = fd[["react"]],
+                     lb    = lb,
+                     ub    = ub,
+                     ...)
+
+
+    # ------------------------------------------------------------------------ #
+
+    optsol <- new("optsol_genedel")
+    opt <- makeOptsolMO(model, sol)
+    as(optsol, "optsol_optimizeProb") <- opt
     
-    optsol <- optimizer(model = model,
-                        delete = cbind(geneList1[deletions[,"row"]],
-                                       geneList2[deletions[,"col"]]),
-                        geneFlag = TRUE,
-                        ...)
+    chlb(optsol)      <- as.numeric(lb)
+    chub(optsol)      <- as.numeric(ub)
+    dels(optsol)      <- matrix(allGenes(model)[kogenesID], ncol = 2)
+    fluxdels(optsol)  <- fd[["fd"]]
+    hasEffect(optsol) <- fd[["heff"]]
+
+    if (isTRUE(checkOptSolObj)) {
+        checkOptSol(optsol, onlywarn = TRUE)
+    }
 
     return(optsol)
 

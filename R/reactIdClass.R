@@ -1,7 +1,7 @@
 #  reactIdClass.R
 #  FBA and friends with R.
 #
-#  Copyright (C) 2010-2012 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
+#  Copyright (C) 2010-2013 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
 #  Institute for Informatics, Heinrich-Heine-University, Duesseldorf, Germany.
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
@@ -35,31 +35,10 @@ setClass("reactId",
               mod_key   = "character",
               react_pos = "integer",
               react_id  = "character",
-              has_id    = "logical",
               react_num = "integer"
          ),
          validity = sybil:::.validreactId
 )
-
-
-#------------------------------------------------------------------------------#
-#                              user constructor                                #
-#------------------------------------------------------------------------------#
-
-reactId <- function(pos, react = NULL, mod_id = "") {
-
-    if (missing(pos)) {
-        stop("creating an object of class ", sQuote("reactId"),
-             " needs argument ", sQuote("pos"))
-    }
-    
-    obj <- new("reactId",
-               mod_id = as.character(mod_id),
-               pnt = as.integer(pos),
-               id = react)
-
-    return(obj)
-}
 
 
 #------------------------------------------------------------------------------#
@@ -72,22 +51,12 @@ setMethod(f = "initialize",
 
               if ( (!missing(mod_id)) || (!missing(pnt)) ) {
               
-                  if (is.null(id)) {
-                      rid <- vector(mode = "character", length = 0L)
-                      hid <- FALSE
-                  }
-                  else {
-                      rid <- as.character(id)
-                      hid <- TRUE
-                  }
-
                   nr  <- length(pnt)
                   
                   .Object@mod_id    <- as.character(mod_id)
                   .Object@mod_key   <- as.character(mod_key)
                   .Object@react_pos <- as.integer(pnt)
-                  .Object@react_id  <- as.character(rid)
-                  .Object@has_id    <- as.logical(hid)
+                  .Object@react_id  <- as.character(id)
                   .Object@react_num <- as.integer(nr)
                   validObject(.Object)
               }
@@ -167,27 +136,14 @@ setReplaceMethod("react_id", signature = (object = "reactId"),
 
 setMethod("show", signature(object = "reactId"),
     function(object) {
-        if ( (isTRUE(hasId(object))) && (length(object) > 0) ) {
-            wcn <- trunc(log10(length(object))) + 3
-            cn  <- paste("[", 1:length(object), "]", sep = "")
-            cat(sprintf(paste("%", wcn, "s  ", "%-11s%s\n", sep = ""),
-                "# " ,"position", "reaction id"))
-            cat(sprintf(paste("%", wcn, "s  ", "%-11s%s", sep = ""),
-                cn, react_pos(object), react_id(object)), sep = "\n")
-            cat("\nnumber of reactions: ", length(object), "\n", sep = "")
-        }
-        else {
-            show(react_pos(object))
-        }
+        wcn <- trunc(log10(length(object))) + 3
+        cn  <- paste("[", 1:length(object), "]", sep = "")
+        cat(sprintf(paste("%", wcn, "s  ", "%-11s%s\n", sep = ""),
+            "# " ,"position", "reaction id"))
+        cat(sprintf(paste("%", wcn, "s  ", "%-11s%s", sep = ""),
+            cn, react_pos(object), react_id(object)), sep = "\n")
+        cat("\nnumber of reactions: ", length(object), "\n", sep = "")
     }
-)
-
-
-# id or not id
-setMethod("hasId", signature(object = "reactId"),
-          function(object) {
-              return(object@has_id)
-          }
 )
 
 
@@ -207,21 +163,24 @@ setMethod("[", signature(x = "reactId"),
             return(x)
         }
 
-        if (max(i) > length(x)) {
+        if (is(i, "character")) {
+            ind <- match(i, react_id(x))
+        }
+#        else if (is(i, "reactId")) {
+#            ind <- which(react_pos(x) %in% react_pos(i))
+#        }
+        else {
+            ind <- i
+        }
+
+        if (max(ind, na.rm = TRUE) > length(x)) {
             stop("subscript out of bounds")
         }
 
-        if (isTRUE(x@has_id)) {
-            xid <- x@react_id[i]
-        }
-        else {
-            xid <- NULL
-        }
-        
         newRI <- new("reactId",
                      mod_id = x@mod_id,
-                     pnt    = x@react_pos[i],
-                     id     = xid)
+                     pnt    = x@react_pos[ind],
+                     id     = x@react_id[ind])
 
         return(newRI)
 

@@ -1,7 +1,7 @@
 #  bracket_pairs.R
 #  FBA and friends with R.
 #
-#  Copyright (C) 2010-2012 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
+#  Copyright (C) 2010-2013 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
 #  Institute for Informatics, Heinrich-Heine-University, Duesseldorf, Germany.
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
@@ -37,7 +37,7 @@
 # string, the second value is the position of the closing bracket and the
 # third element is the length of the text between the brackets (excluding
 # the brackets).
-# Argument rule is a character vector, each element beeing one letter of
+# Argument rule is a character vector, each element being one letter of
 # the original text string.
 
 .bracket_pairs <- function(rule) {

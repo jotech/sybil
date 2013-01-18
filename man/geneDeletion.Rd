@@ -14,7 +14,8 @@
 }
 
 \usage{
-  geneDeletion(model, genes, combinations = 1, ...)
+  geneDeletion(model, genes, combinations = 1,
+               lb = NULL, ub = NULL, checkOptSolObj = FALSE, ...)
 }
 
 \arguments{
@@ -30,6 +31,25 @@
     taken at a time while building all combinations of the elements in
     \code{genes} (see Details below).\cr
     Default: \code{1}.
+  }
+  \item{lb}{
+    A numeric vector containing the lower bounds for the reaction rates of
+    reactions (variables) affected by the genes given in argument
+    \code{genes}. If set to \code{NULL}, all reactions affected will be
+    constrained to zero.\cr
+    Default: \code{NULL}.
+  }
+  \item{ub}{
+    A numeric vector containing the upper bounds for the reaction rates of
+    reactions (variables) affected by the genes given in argument
+    \code{genes}. If set to \code{NULL}, all reactions affected will be
+    constrained to zero.\cr
+    Default: \code{NULL}.
+  }
+  \item{checkOptSolObj}{
+    A single logical value. If set to \code{TRUE}, a warning will be generated,
+    if not all optimizations ended successful.\cr
+    Default: \code{FALSE}.
   }
   \item{\dots}{
     Further arguments passed to \code{\link{optimizer}}.  Important ones are
@@ -57,6 +77,12 @@
   
   If argument \code{genes} is empty, the number of unique genes present in
   \code{model} is used.
+
+  The required length of arguments \code{lb} and \code{ub} (if not \code{NULL})
+  depends on the values given in arguments \code{genes} and \code{combinations}.
+  If \code{genes} is a matrix, \code{lb} and \code{ub} must be of length equal
+  to the number of columns in \code{genes}. If genes is a vector, \code{lb} and
+  \code{ub} must be of length equal to \code{length(genes) * combinations}.
 }
 
 \value{

@@ -115,10 +115,6 @@
       Object of class \code{"character"} containing the reaction id's
       corresponding to the indices given in slot \code{react_pos}.
     }
-    \item{\code{has_id}:}{
-      Object of class \code{"logical"}, \code{TRUE} if slot \code{react_id} is
-      not empty, otherwise \code{FALSE}.
-    }
     \item{\code{react_num}:}{
       Object of class \code{"integer"} containing the number of reaction id's.
     }

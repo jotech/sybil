@@ -1,7 +1,7 @@
 #  optsolClass.R
 #  FBA and friends with R.
 #
-#  Copyright (C) 2010-2012 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
+#  Copyright (C) 2010-2013 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
 #  Institute for Informatics, Heinrich-Heine-University, Duesseldorf, Germany.
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
@@ -46,7 +46,8 @@ setClass("optsol",
         obj_coef     = "numeric",          # objective coefficients in model
         obj_func     = "character",        # objective function (printObjFunc)
         fldind       = "integer",          # indices of fluxes
-        fluxdist     = "fluxDistribution"  # the flux distribution
+        fluxdist     = "fluxDistribution", # the flux distribution
+        alg_par      = "list"              # parameters to the algorithm
     ),
     contains = "VIRTUAL",
     #validity = sybil:::.validoptsol
@@ -352,6 +353,21 @@ setReplaceMethod("fluxes", signature = (object = "optsol"),
 )
 
 
+# alg_par
+setMethod("alg_par", signature(object = "optsol"),
+          function(object) {
+              return(object@alg_par)
+          }
+)
+
+setReplaceMethod("alg_par", signature = (object = "optsol"),
+                 function(object, value) {
+                     object@alg_par <- value
+                     return(object)
+                 }
+)
+
+
 #------------------------------------------------------------------------------#
 #                               other methods                                  #
 #------------------------------------------------------------------------------#
@@ -391,26 +407,27 @@ setMethod("checkStat", signature(opt = "optsol"),
 
 # get part of the flux distribution
 setMethod("getFluxDist", signature(lp = "optsol"),
-          function(lp, react = NULL, drop = TRUE) {
+          function(lp, react = NULL, opt = NULL, drop = TRUE) {
           
               if (num_of_fluxes(fluxdist(lp)) == 1) {
                   return(fluxes(lp))
               }
               
+              # cr: row indices (reactions)
+              # nr: row names (reaction id's, or row indices)
+              # cc: column indices (optimizations)
+              # nc: number of optimization
+                  
               if (is.null(react)) {
-                  fl <- fluxes(lp)[fldind(lp), , drop = drop]
+                  cr <- fldind(lp)
+                  nr <- cr
               }
               else {
                   if (is(react, "reactId")) {
                       stopifnot(identical(mod_id(lp), mod_id(react)))
                       
                       cr <- fldind(lp)[react_pos(react)]
-                      if (isTRUE(hasId(react))) {
-                          nr <- react_id(react)
-                      }
-                      else {
-                          nr <- cr
-                      }
+                      nr <- react_id(react)
                   }
                   else if (is(react, "numeric")) {
                       if (max(react) > nvar(fluxdist(lp))) {
@@ -424,16 +441,40 @@ setMethod("getFluxDist", signature(lp = "optsol"),
                   else {
                       stop("react must be numeric or of class reactId")
                   }
-              
-                  fl <- fluxes(lp)[cr, , drop = drop]
-                  if (is.null(dim(fl))) {
-                      names(fl) <- nr
+              }
+
+              if (is.null(opt)) {
+                  cc <- 1:ncol(fluxes(lp))
+                  nc <- cc
+              }
+              else {
+                  if (is(opt, "numeric")) {
+                      if (max(opt) > ncol(fluxes(lp))) {
+                          stop("opt must be in [1,", ncol(fluxes(lp)),"]")
+                      }
+                      else {
+                          cc <- opt
+                          nc <- cc
+                      }
                   }
                   else {
-                      rownames(fl) <- nr
-                      #colnames(fl) <- paste("[", 1:num_of_prob(lp), "]", sep = "")
+                      stop("opt must be numeric")
                   }
               }
+
+              
+              fl <- fluxes(lp)[cr, cc, drop = drop]
+              if (is.null(dim(fl))) {
+                  if (length(nr) == length(fl)) {
+                      names(fl) <- nr
+                  }
+              }
+              else {
+                  rownames(fl) <- nr
+                  colnames(fl) <- nc
+                  #colnames(fl) <- paste("[", 1:num_of_prob(lp), "]", sep = "")
+              }
+
               return(fl)
           }
 )
@@ -452,6 +493,10 @@ setMethod("show", signature(object = "optsol"),
             cat(sprintf("%-42s%s\n", "solution status:", getMeanStatus(lp_stat(object), solver(object))))
             cat(sprintf("%s%-14s%f\n", "value of objective function ", paste("(", algorithm(object), "):", sep = ""), lp_obj(object)))
             cat(sprintf("%-42s%f\n", "value of objective function (model):", mod_obj(object)))
+            if ( (algorithm(object) == "moma") && (!is.null(alg_par(object)[["wtflux"]])) ) {
+                cat(sprintf("%-42s%f\n", "euclidean distance between wt and v:",
+                            sqrt(crossprod(alg_par(object)[["wtflux"]] - getFluxDist(object)))))
+            }
         }
         else {
             cat(sprintf("%-42s%s\n", "number of problems to solve:", num_of_prob(object)))
@@ -472,13 +517,9 @@ setMethod("length", signature = signature(x = "optsol"),
 
 # draw a histogramm (package lattice)
 setMethod("histogram", signature(x = "optsol"),
-          function(x,
-                   main = "",
-                   xlab = "value of objective function",
-                   ...) {
+          function(x, xlab = "value of objective function", ...) {
 
-
-              histogram(lp_obj(x), main = main, xlab = xlab, ...)
+              histogram(x = mod_obj(x), xlab = xlab, ...)
               
           }
 )

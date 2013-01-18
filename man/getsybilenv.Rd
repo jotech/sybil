@@ -27,8 +27,8 @@
       \item{\code{"ptype"}}{
         methods required for a particular problem type.
       }
-      \item{\code{"algorithm"}}{
-        algorithms used in systems biology to use with particular functions.
+      \item{\code{"purpose"}}{
+        algorithms used in systems biology to use with a particular purpose.
       }
     }
   }
@@ -37,10 +37,10 @@
 \details{
   Typical usages are
   \preformatted{
-    getsybilenv(PART)
+    getsybilenv(part)
     getsybilenv()
   }
-  If argument \code{part} is not given, all four elements described above where
+  If argument \code{part} is not given, all elements described above will be
   printed.
 }
 
@@ -51,8 +51,7 @@
 \author{Gabriel Gelius-Dietrich}
 
 \seealso{
-  \code{\link{addAlgorithm}}, \code{\link{addSolver}},
-  \code{\link{SYBIL_SETTINGS}}, \code{\link{checkDefaultMethod}} and
-  \code{\link{checkAlgorithm}}
+  \code{\link{addSolver}}, \code{\link{checkDefaultMethod}}
+  and \code{\link{SYBIL_SETTINGS}}.
 }
 

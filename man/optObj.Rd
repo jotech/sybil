@@ -50,7 +50,7 @@
   class \code{optObj_foo}. If \code{solver} does not contain a valid name of a
   solver package (this is checked by \code{\link{checkDefaultMethod}}), the
   default solver package will be used (see \code{\link{SYBIL_SETTINGS}}).
-  For the name of the class, the arguemts \code{prefix} and \code{solver} are
+  For the name of the class, the arguments \code{prefix} and \code{solver} are
   stick together separated by \code{sep} (default: a single underscore
   \code{"_"}): \code{prefix_solver}.
 }

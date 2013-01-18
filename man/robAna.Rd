@@ -65,8 +65,8 @@
            v_j = c_k
            a_i <= v_i <= b_i  for i = 1, ..., n, i != j
   }
-  with \eqn{\bold{S}}{S} beeing the stoichiometric matrix, \eqn{\alpha_i}{a_i}
-  and \eqn{\beta_i}{b_i} beeing the lower and upper bounds for flux (variable)
+  with \eqn{\bold{S}}{S} being the stoichiometric matrix, \eqn{\alpha_i}{a_i}
+  and \eqn{\beta_i}{b_i} being the lower and upper bounds for flux (variable)
   \eqn{i}.  The total number of variables of the optimization problem is denoted
   by \eqn{n}. The parameter \eqn{c_k} is varied \code{numP} times in the range
   of \eqn{v_{j,\mathrm{min}}}{v_i,min} to \eqn{v_{j,\mathrm{max}}}{v_i,max}.

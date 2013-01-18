@@ -6,24 +6,24 @@
 }
 
 \description{
-  Test, if a given algorithm can be used with a certain algorithm.
+  Test, if a given algorithm can has a certain purpose.
 }
 
 \usage{
-  checkAlgorithm(alg, fkt = "optimizer")
+  checkAlgorithm(alg, purpose)
 }
 
 \arguments{
   \item{alg}{
     A single character string containing the name of the algorithm.
   }
-  \item{fkt}{
-    A function name to test, if it can make use of the algorithm.
+  \item{purpose}{
+    Purpose of the new algorithm.
   }
 }
 
 \value{
-  Returns \code{TRUE} if successfull, otherwise \code{FALSE}.
+  Returns \code{TRUE} if successful, otherwise \code{FALSE}.
 }
 
 \author{

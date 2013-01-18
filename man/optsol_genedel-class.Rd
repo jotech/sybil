@@ -34,16 +34,14 @@
 \section{Slots}{
   \describe{
     \item{\code{fluxdels}:}{
-      Object of class \code{"list"} containing the positions of reaction id's
-      in the slot \code{react_id} of deleted reactions (fluxes).
+      Object of class \code{"list"} containing the reaction id's of constrained
+      reactions (fluxes).
       \code{fluxdels(optsol_genedel)[[i]][j] = l}: The deletion of gene \code{i}
       requires the deletion of a set of fluxes \code{1..k} (j \eqn{\le} k),
-      \code{j} beeing the j'th reaction of that set.
-      The value \code{l} points to the corresponding reaction id in the slot
-      \code{react_id}.
+      \code{j} being the j'th reaction of that set.
     }
     \item{\code{hasEffect}:}{
-      Object of class \code{"logical"} indicating weather deletion of
+      Object of class \code{"logical"} indicating whether deletion of
       gene \code{i} has an effect or not.
     }
     \item{\code{chlb}:}{Object of class \code{"numeric"}
@@ -53,9 +51,9 @@
       containing the new (changed) values for the columns upper bounds.
     }
     \item{\code{dels}:}{
-      Object of class \code{"matrix"} (one column) containing the position of
-      the reaction id's of deleted reactions (fluxes) in the slot
-      \code{react_id}.
+      Object of class \code{"matrix"} containing the gene id of constrained
+      genes. Each row of the matrix represents one set of simultaneously
+      constrained genes.
     }
     \item{\code{preProc}:}{Object of class \code{"ppProc"}
       containing the results of pre-processing.
@@ -122,7 +120,10 @@
       represents reaction \code{i} in the original network. 
     }
     \item{\code{fluxdist}:}{Object of class \code{"fluxDistribution"}
-      containing the solutons flux distributions.
+      containing the solutions flux distributions.
+    }
+    \item{\code{alg_par}:}{Object of class \code{"list"}
+      containing a named list containing algorithm specific parameters.
     }
   }
 }

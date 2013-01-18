@@ -6,7 +6,7 @@
 }
 
 \description{
-  Generates a skeletal strukture of new subclasses of class
+  Generates a skeletal structure of new subclasses of class
   \code{\linkS4class{sysBiolAlg}}, in particular for the
   constructor method \code{\link{initialize}}.
 }
@@ -45,8 +45,9 @@
 
 \details{
   The arguments \code{prefix} \code{algorithm} are stick together separated by
-  \code{sep} (default: a single underscore \code{"_"}) to get the new classname:
-  \code{prefix_algorithm}. The filename will be: \code{prefix_algorithmClass.R}.
+  \code{sep} (default: a single underscore \code{"_"}) to get the new class
+  name: \code{prefix_algorithm}. The filename will be:
+  \code{prefix_algorithmClass.R}.
   
   The class definition in the new file will extend class
   \code{\linkS4class{sysBiolAlg}} directly and will not add any

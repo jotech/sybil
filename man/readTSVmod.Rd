@@ -74,7 +74,7 @@
     Default: \code{"b"}.
   }
   \item{excludeComments}{
-    A boolean value. Sometimes, the reaction abbreviations and/or the metabolite
+    A Boolean value. Sometimes, the reaction abbreviations and/or the metabolite
     abbreviations contain comments in square brackets. If set to \code{TRUE},
     these comments will be removed. If set to \code{FALSE}, whitespaces included
     in comments in metabolite abbreviations will be removed. Comments in
@@ -85,7 +85,7 @@
     Default: \code{TRUE}.
   }
   \item{oneSubSystem}{
-    A boolean value. Ignore parameter \code{entrydelim} for the field
+    A Boolean value. Ignore parameter \code{entrydelim} for the field
     \sQuote{subsystem}, if every reaction belongs to exactly one sub system.\cr
     Default: \code{TRUE}.
   }
@@ -164,7 +164,7 @@
     used as \code{"<?[=-]arrowlength>"}. For example, if \code{arrowlength} is
     \code{"{1,2}"} the regular expression is \code{"<?[=-]{1,2}>"}, meaning the
     reaction arrow can consist of one or two signs. In any case, the completed
-    regular expression will allways used with argument \code{perl = TRUE}.\cr
+    regular expression will always used with argument \code{perl = TRUE}.\cr
     Default: \code{NULL}.
   }
   \item{quoteChar}{
@@ -197,7 +197,7 @@
   format description and examples, see package vignette).  The argument
   \code{prefix} is the part of the filenames, all three have in common (e.g. if
   they where produced by \code{\link{modelorg2tsv}}).
-  Alternativly, the arguments \code{reactList}, \code{metList} and
+  Alternatively, the arguments \code{reactList}, \code{metList} and
   \code{modDesc} can be used.  A file containing all reactions must be there,
   everything else is optional.
 
@@ -232,7 +232,7 @@
       \code{"compartment"}  \tab reaction compartment(s) (currently unused) \cr
       \code{"lowbnd"}       \tab lower bound                                \cr
       \code{"uppbnd"}       \tab upper bound                                \cr
-      \code{"obj_coef"}     \tab objective coeficient                       \cr
+      \code{"obj_coef"}     \tab objective coefficient                      \cr
       \code{"rule"}         \tab gene to reaction association               \cr
       \code{"subsystem"}    \tab subsystem of the reaction                  \cr
   }

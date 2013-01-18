@@ -47,9 +47,9 @@
       containing the new (changed) values for the columns upper bounds.
     }
     \item{\code{dels}:}{
-      Object of class \code{"matrix"} (one column) containing the position of
-      the reaction id's of deleted reactions (fluxes) in the slot
-      \code{react_id}.
+      Object of class \code{"matrix"} containing the reaction id's of
+      constrained reactions. Each row of the matrix represents one set of
+      simultaneously constrained reactions.
     }
     \item{\code{preProc}:}{Object of class \code{"ppProc"}
       containing the results of pre-processing.
@@ -116,7 +116,10 @@
       represents reaction \code{i} in the original network. 
     }
     \item{\code{fluxdist}:}{Object of class \code{"fluxDistribution"}
-      containing the solutons flux distributions.
+      containing the solutions flux distributions.
+    }
+    \item{\code{alg_par}:}{Object of class \code{"list"}
+      containing a named list containing algorithm specific parameters.
     }
   }
 }
@@ -173,7 +176,7 @@
     \item{\code{lethal}:}{
       \code{signature(object = "optsol_fluxdel")}(\code{wt, tol}): returns
       a logical vector of length \code{num_of_prob(object)}. Argument \code{wt}
-      is an optimal groth value, e.g. computed via FBA. If the absolute groth
+      is an optimal growth value, e.g. computed via FBA. If the absolute growth
       ratio (\code{mod_obj(object)/wt}) of knock-out \code{i} is less than
       \code{tol}, the deletion is considered as lethal.
       If \code{lethal(object)[i]} is \code{TRUE}, deletion [i] is lethal.

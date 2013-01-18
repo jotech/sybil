@@ -1,7 +1,7 @@
 #  optObj_cplexAPIClass.R
 #  FBA and friends with R.
 #
-#  Copyright (C) 2010-2012 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
+#  Copyright (C) 2010-2013 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
 #  Institute for Informatics, Heinrich-Heine-University, Duesseldorf, Germany.
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
@@ -624,11 +624,9 @@ setMethod("loadLPprob", signature(lp = "optObj_cplexAPI"),
 
 #------------------------------------------------------------------------------#
 
-setMethod("loadQobj", signature(lp = "optObj_cplexAPI"),
+setMethod("loadQobj", signature(lp = "optObj_cplexAPI", mat = "Matrix"),
 
     function(lp, mat) {
-
-        stopifnot(is(mat, "Matrix"))
 
         TMPmat <- as(mat, "CsparseMatrix")
         cplexAPI::copyQuadCPLEX(lp@oobj@env, lp@oobj@lp,
@@ -636,6 +634,18 @@ setMethod("loadQobj", signature(lp = "optObj_cplexAPI"),
                                 qmatcnt = colSums(mat != 0),
                                 qmatind = TMPmat@i,
                                 qmatval = TMPmat@x)
+
+    }
+)
+
+
+#------------------------------------------------------------------------------#
+
+setMethod("loadQobj", signature(lp = "optObj_cplexAPI", mat = "numeric"),
+
+    function(lp, mat) {
+
+        cplexAPI::copyQPsepCPLEX(lp@oobj@env, lp@oobj@lp, qsepvec = mat)
 
     }
 )

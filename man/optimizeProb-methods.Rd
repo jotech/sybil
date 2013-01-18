@@ -7,23 +7,29 @@
 \alias{optimizeProb-methods}
 \alias{optimizeProb,modelorg-method}
 \alias{optimizeProb,sysBiolAlg-method}
-\alias{optimizeProb,sysBiolAlg_room-method}
 
 \title{Optimize Problem Object}
 
 \description{
-  The function \code{optimizeProb} performs the optimization of a mathematical
+  The generic \code{optimizeProb} performs the optimization of a mathematical
   programming object.
 }
 
 \usage{
 \S4method{optimizeProb}{modelorg}(object,
+             algorithm = SYBIL_SETTINGS("ALGORITHM"),
              gene = NULL,
              react = NULL,
              lb = NULL,
              ub = NULL,
              retOptSol = TRUE,
-             MoreArgs = list(),
+             obj_coef = NULL,
+             lpdir = NULL,
+             mtfobj = NULL,
+             prCmd = NA,
+             poCmd = NA,
+             prCil = NA,
+             poCil = NA,
              ...)
 
 \S4method{optimizeProb}{sysBiolAlg}(object,
@@ -31,17 +37,8 @@
              lb = NULL,
              ub = NULL,
              obj_coef = NULL,
-             lpdir = NA,
+             lpdir = NULL,
              resetChanges = TRUE,
-             prCmd = NA,
-             poCmd = NA,
-             prCil = NA,
-             poCil = NA)
-
-\S4method{optimizeProb}{sysBiolAlg_room}(object,
-             react = NULL,
-             lb = NULL,
-             ub = NULL,
              prCmd = NA,
              poCmd = NA,
              prCil = NA,
@@ -58,12 +55,6 @@
     \item{\code{signature(object = "sysBiolAlg")}}{
       Run optimization with the given problem object.
     }
-    \item{\code{signature(object = "sysBiolAlg_room")}}{
-      Run optimization with the given problem object and take care on specific
-      needs for the ROOM algorithm.
-      See class \code{\linkS4class{sysBiolAlg_room}} for
-      details.
-    }
   }
 }
 
@@ -71,6 +62,12 @@
   \item{object}{
     An object of class \code{\linkS4class{modelorg}} or
     \code{\linkS4class{sysBiolAlg}}.
+  }
+  \item{algorithm}{
+    A single character string giving the name of the algorithm to use. See
+    parameter \code{"ALGORITHM"} in \code{\link{SYBIL_SETTINGS}} for possible
+    values.\cr
+    Default: \code{SYBIL_SETTINGS("ALGORITHM")}.
   }
   \item{gene}{
     A character or integer vector containing gene id's or indices of gene id's
@@ -85,9 +82,8 @@
     An object of class \code{\linkS4class{reactId}}, character or integer.
     Specifies the fluxes (variables) for which to change the upper and lower
     bound (see also arguments \code{lb} and \code{ub}) or objective coefficients
-    (see also argument \code{obj_coef}). For classes
-    \code{\linkS4class{sysBiolAlg}} and \code{\linkS4class{sysBiolAlg_room}} it
-    must be numeric.\cr
+    (see also argument \code{obj_coef}). For class
+    \code{\linkS4class{sysBiolAlg}}, it must be numeric.\cr
     Default: \code{NULL}.
   }
   \item{lb}{
@@ -110,9 +106,20 @@
     Default: \code{NULL}.
   }
   \item{lpdir}{
-    Character value, direction of optimization.  Can be set to \code{"min"} or
-    \code{"max"}.\cr
+    Character value, direction of optimization.  Can be set to \code{"min"} for
+    minimization or \code{"max"} for maximization.\cr
     Default: \code{SYBIL_SETTINGS("OPT_DIRECTION")}.
+  }
+  \item{mtfobj}{
+    Only used, if argument \code{algorithm} is set to \code{"mtf"}.
+    A single numeric value giving a previously calculated optimized value of the
+    objective function given in the model.
+    The objective function of the model will be fixed to this value during
+    optimization. If set to \code{NULL}, it will be computed by means of the
+    \code{"\link[=sysBiolAlg_fba-class]{fba}"} algorithm. If additionally
+    arguments \code{solver} and \code{method} are set, they will be used here
+    too.\cr
+    Default: \code{NULL}.
   }
   \item{resetChanges}{
     Boolean value. If set to \code{TRUE}, (default) modifications of the
@@ -146,10 +153,6 @@
     \code{\linkS4class{optsol_optimizeProb}} or
     just a list containing the results.\cr
     Default: \code{TRUE}.
-  }
-  \item{MoreArgs}{
-    Only for the \code{modelorg-method}: a named list containing further
-    arguments passed to \code{optimizeProb}. See Details below.
   }
   \item{\dots}{
     Only for the \code{modelorg-method}: further arguments passed to
@@ -189,7 +192,7 @@
   \preformatted{
     sensitivityAnalysis(LP_PROB)
   }
-  with \code{LP_PROB} beeing the placeholder for the variable name of the
+  with \code{LP_PROB} being the placeholder for the variable name of the
   problem object. The vector
   \preformatted{
     c("writeProb", "LP_PROB", "'Ec_core.lp'", "'lp'")
@@ -236,8 +239,9 @@
 \value{
   Calls to \code{optimizeProb} returns either an object of class
   \code{\linkS4class{optsol_optimizeProb}} of length one
-  if argument \code{retOptSol} is set to \code{TRUE}, or a list containing the
-  results of the optimization:
+  if argument \code{retOptSol} is set to \code{TRUE} and \code{object} is of
+  class \code{\linkS4class{modelorg}}, or a list containing the results of the
+  optimization:
   \item{ok}{
     Return value of the optimizer (e.g. \dQuote{solution process was
     successful} or \dQuote{time limit exceeded}).
@@ -297,28 +301,27 @@ optimizeProb(Ec_core, react = c("ATPM", "PFK"),
              lb = c(3, -3), ub = c(5, 6))
           
 ## do FBA, perform sensitivity analysis after optimization
-optimizeProb(Ec_core, MoreArgs = list(poCmd = list("sensitivityAnalysis")))
+optimizeProb(Ec_core, poCmd = list("sensitivityAnalysis"))
 
 ## do FBA, write the problem object to file in lp-format
 optimizeProb(Ec_core,
-             MoreArgs = list(poCmd = list(c("writeProb", "LP_PROB",
-                                            "'Ec_core.lp'", "'lp'"))))
+             poCmd = list(c("writeProb", "LP_PROB",
+                            "'Ec_core.lp'", "'lp'")))
 
 ## do FBA, use "cplexAPI" as lp solver. Get all lower bounds before
 ## solving the problem. After solving, perform a sensitivity
 ## analysis and retrieve the reduced costs
-optimizeProb(Ec_core, solver = "cplexAPI",
-             MoreArgs = list(
-             prCmd = list(c("getColsLowBnds", "LP_PROB", "1:77")),
-             poCmd = list("sensitivityAnalysis",
-                          c("getDjCPLEX",
-                            "LP_PROB@oobj@env",
-                            "LP_PROB@oobj@lp",
-                            "0", "react_num(Ec_core)-1"
-                          )
-                     )
-             )
-)
+opt <- optimizeProb(Ec_core, solver = "cplexAPI",
+                    prCmd = list(c("getColsLowBnds", "LP_PROB", "1:77")),
+                    poCmd = list("sensitivityAnalysis",
+                                 c("getDjCPLEX",
+                                 "LP_PROB@oobj@env",
+                                 "LP_PROB@oobj@lp",
+                                 "0", "react_num(Ec_core)-1")))
+## get lower bounds
+preProc(opt)
+## get results of sensitivity analysis
+postProc(opt)
 }
 }
 

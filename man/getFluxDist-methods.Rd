@@ -28,7 +28,7 @@
 
 \S4method{getFluxDist}{optObj_lpSolveAPI}(lp)
 
-\S4method{getFluxDist}{optsol}(lp, react = NULL, drop = TRUE)
+\S4method{getFluxDist}{optsol}(lp, react = NULL, opt = NULL, drop = TRUE)
 }
 
 \section{Methods}{
@@ -49,9 +49,9 @@
       method to use with objects of class \code{\linkS4class{optsol}}.
       Returns a subset of the flux distribution stored in slot \code{fluxdist}
       as object of class \code{\link[Matrix]{Matrix}}.
-      If argument \code{react} is set to \code{NULL} (default), the flux
-      distribution corresponding to the variable indices in slot \code{fldind}
-      will be returned.
+      If arguments \code{react} and \code{opt} are both set to \code{NULL}
+      (default), the flux distribution corresponding to the variable indices in
+      slot \code{fldind} will be returned.
     }
   }
 }
@@ -62,8 +62,13 @@
     \code{\linkS4class{optsol}}.
   }
   \item{react}{
-    Numeric vector object of class \code{\linkS4class{reactId}} indicating the
-    reactions (rows of the flux distribution) to return.\cr
+    Numeric vector or object of class \code{\linkS4class{reactId}} indicating
+    the reactions (rows of the flux distribution) to return.\cr
+    Default: \code{NULL}.
+  }
+  \item{opt}{
+    Numeric vector indicating the optimizations (columns of the flux
+    distribution) to return.\cr
     Default: \code{NULL}.
   }
   \item{drop}{
@@ -73,7 +78,8 @@
 }
 
 \value{
-  A numeric vector containing all primal values (the flux distribution).
+  A numeric matrix or vector containing all primal values
+  (the flux distribution).
 }
 
 \author{

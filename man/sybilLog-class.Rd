@@ -52,8 +52,6 @@
 \alias{logMessage}
 \alias{logOptimization,sybilLog-method}
 \alias{logOptimization}
-\alias{logOptimizationNE,sybilLog-method}
-\alias{logOptimizationNE}
 \alias{logOptimizationTH,sybilLog-method}
 \alias{logOptimizationTH}
 \alias{logStep<-,sybilLog-method}
@@ -99,20 +97,20 @@
       encoding of the log file. Default: \code{""}.
     }
     \item{\code{loglevel}:}{Object of class \code{"integer"}
-      controling the amount of details to log: If set to \code{0},
+      controlling the amount of details to log: If set to \code{0},
       nothing will be written to the logfile. If set to \code{> 0}, all
       warnings are logged; if set do \code{> 1}, also messages are logged.
       If \code{loglevel} is \code{> 2}, the used function call will be printed.
       Default: \code{0}.
     }
     \item{\code{verblevel}:}{Object of class \code{"integer"}
-      controling the amount of details to log: If set to \code{0},
+      controlling the amount of details to log: If set to \code{0},
       nothing will be written to the standard output connection.
       If set to \code{> 0}, all warnings are logged; if set do \code{> 1}, also
       messages are logged. Default: \code{0}.
     }
     \item{\code{lastStep}:}{Object of class \code{"list"}
-      which is a stack, containing character strings describing permormed steps.
+      which is a stack, containing character strings describing performed steps.
       See also \code{\link{sybilStack}}.
     }
     \item{\code{lstname}:}{Object of class \code{"list"}
@@ -120,7 +118,7 @@
     }
     \item{\code{didFoot}:}{Object of class \code{"logical"}
       which is \code{FALSE}, if the footer of the log file is not yet printed,
-      otherwise \code{TRUE}. This is usefull if the function which is logged,
+      otherwise \code{TRUE}. This is useful if the function which is logged,
       stops unexpected.
     }
   }
@@ -175,7 +173,7 @@
     }
 
     \item{\code{logCall}}{\code{signature(object = "sybilLog")} (\code{nog}):
-      writes all arguemts and values of the function call to be
+      writes all arguments and values of the function call to be
       logged to the log file. Nothing is printed to the standard
       output; \code{verblevel} has no meaning here; \code{verblevel}
       must be \code{> 2}.
@@ -230,22 +228,24 @@
       \code{loglevel} is \code{> 2} and to \code{stdout} if \code{verblevel} is
       \code{> 2}.
       \tabular{rr}{
-        \code{ok}   \tab (integer) return value of the used solver \cr
-        \code{stat} \tab (integer) soluton status \cr
-        \code{obj}  \tab (numeric) value of the objective function after
-                         optimization \cr
-        \code{del}  \tab (can be coerced to character) constrained fluxes \cr
-        \code{i}    \tab (integer) consecutive number \cr
+        \code{opt no.}   \tab (integer) a consecutive number \cr
+        \code{ret}       \tab (integer) return value of the used solver \cr
+        \code{stat}      \tab (integer) solution status after optimization \cr
+        \code{obj value} \tab (numeric) value of the objective function after
+                                        optimization \cr
+        \code{dir}       \tab if not given, it is a global value of the
+                              algorithm (here empty), otherwise the current
+                              setting of the direction of optimization \cr
+        \code{obj c}     \tab if not given, it is a globel value of the model
+                              (here empty), otherwise the current setting of the
+                              objective coefficients of the variables given in
+                              column \sQuote{flux no.} \cr
+        \code{flux no.}  \tab fluxes (variables) which are considered in the
+                              current optimization \cr
       }
     }
-    \item{\code{logOptimizationNE}}{\code{signature(object = "sybilLog")}:
-      add a row to the log file if \code{loglevel} is \code{> 2} and to
-      \code{stdout} if \code{verblevel} is \code{> 2} indicating that
-      no optimization was performed, usually if the deletion of a particular set
-      of genes has no effect.
-    }
     \item{\code{logOptimizationTH}}{\code{signature(object = "sybilLog")}:
-      add a row containing a table headder for results of an optimization to the
+      add a row containing a table header for results of an optimization to the
       log file if \code{loglevel} is \code{> 2} and to \code{stdout} if
       \code{verblevel} is \code{> 2}. This should be used prior
       \code{logOptimization}.

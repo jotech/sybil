@@ -1,7 +1,7 @@
 #  geneDeletion.R
 #  FBA and friends with R.
 #
-#  Copyright (C) 2010-2012 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
+#  Copyright (C) 2010-2013 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
 #  Institute for Informatics, Heinrich-Heine-University, Duesseldorf, Germany.
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
@@ -33,7 +33,8 @@
 # and doubleGeneDeletion() contained in the COBRA Toolbox.
 
 
-geneDeletion <- function(model, genes, combinations = 1, ...) {
+geneDeletion <- function(model, genes, combinations = 1,
+                         lb = NULL, ub = NULL, checkOptSolObj = FALSE, ...) {
 
     if (!is(model, "modelorg")) {
         stop("needs an object of class modelorg!")
@@ -79,10 +80,48 @@ geneDeletion <- function(model, genes, combinations = 1, ...) {
 #                               run optimization                               #
 #------------------------------------------------------------------------------#
 
-    optsol <- optimizer(model = model,
-                        delete = t(delGenes),
-                        geneFlag = TRUE,
-                        ...)
+    kogenes <- lapply(seq_len(ncol(delGenes)), function(x) delGenes[ , x])
+
+    fd <- sybil:::.generateFluxdels(model, kogenes)
+
+    if (is.null(lb)) {
+        lb <- rep(0, length(kogenes))
+    }
+    else {
+        if (length(lb) != length(kogenes)) {
+            stop("lb must be of length ", length(kogenes))
+        }
+    }
+    if (is.null(ub)) {
+        ub <- rep(0, length(kogenes))
+    }
+    else {
+        if (length(ub) != length(kogenes)) {
+            stop("ub must be of length ", length(kogenes))
+        }
+    }
+
+    sol <- optimizer(model = model,
+                     react = fd[["react"]],
+                     lb    = lb,
+                     ub    = ub,
+                     ...)
+
+    # ------------------------------------------------------------------------ #
+
+    optsol <- new("optsol_genedel")
+    opt <- makeOptsolMO(model, sol)
+    as(optsol, "optsol_optimizeProb") <- opt
+
+    chlb(optsol)      <- as.numeric(lb)
+    chub(optsol)      <- as.numeric(ub)
+    dels(optsol)      <- matrix(allGenes(model)[t(delGenes)], nrow = ncol(delGenes))
+    fluxdels(optsol)  <- fd[["fd"]]
+    hasEffect(optsol) <- fd[["heff"]]
+
+    if (isTRUE(checkOptSolObj)) {
+        checkOptSol(optsol, onlywarn = TRUE)
+    }
 
     return(optsol)
 

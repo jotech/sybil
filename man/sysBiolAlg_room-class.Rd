@@ -29,18 +29,20 @@
 \section{Slots}{
   \describe{
     \item{\code{wu}:}{Object of class \code{"numeric"}
-      giving the threshold for a significant flux change, see Details below.
+      containing the upper threshold for a significant flux change,
+      see Details below.
     }
     \item{\code{wl}:}{Object of class \code{"numeric"}
-      giving the threshold for a significant flux change, see Details below.
+      containing the lower threshold for a significant flux change,
+      see Details below.
     }
     \item{\code{fnc}:}{Object of class \code{"integer"}
-      giving the number of reactions in the entire metabolic network
+      containing the number of reactions in the entire metabolic network
       (argument \code{model} to the constructor function
       \code{\link{sysBiolAlg}}).
     }
     \item{\code{fnr}:}{Object of class \code{"integer"}
-      giving the number of metabolites in the entire metabolic network
+      containing the number of metabolites in the entire metabolic network
       (argument \code{model} to the constructor function
       \code{\link{sysBiolAlg}}).
     }
@@ -48,18 +50,21 @@
       containing the problem object.
     }
     \item{\code{algorithm}:}{Object of class \code{"character"}
-      giving the name of the algorithm.
+      containing the name of the algorithm.
     }
     \item{\code{nr}:}{Object of class \code{"integer"}
-      giving the number of rows of the problem object.
+      containing the number of rows of the problem object.
     }
     \item{\code{nc}:}{Object of class \code{"integer"}
-      giving the number of columns of the problem object
+      containing the number of columns of the problem object
     }
     \item{\code{fldind}:}{Object of class \code{"integer"}
       pointers to columns (variables) representing a flux (reaction) in the
       original network. The variable \code{fldind[i]} in the problem object
-      represents reaction \code{i} in the original network. 
+      represents reaction \code{i} in the original network.
+    }
+    \item{\code{alg_par}:}{Object of class \code{"list"}
+      containing a named list containing algorithm specific parameters.
     }
   }
 }
@@ -141,8 +146,8 @@
       s.t. Sv = 0
            a_i <= v_i <= b_i  for i = 1, ..., n
   }
-  with \eqn{\bold{S}}{S} beeing the stoichiometric matrix, \eqn{\alpha_i}{a_i}
-  and \eqn{\beta_i}{b_i} beeing the lower and upper bounds for flux (variable)
+  with \eqn{\bold{S}}{S} being the stoichiometric matrix, \eqn{\alpha_i}{a_i}
+  and \eqn{\beta_i}{b_i} being the lower and upper bounds for flux (variable)
   \eqn{i}.
   The total number of fluxes of the optimization problem is denoted by \eqn{n}.
   Here, \eqn{w} is the optimal wild type flux distribution. This can be set via
@@ -154,7 +159,7 @@
   \eqn{\delta}{delta} and \eqn{\epsilon}{epsilon} specifying absolute and
   relative ranges in tolerance [Shlomi et al. 2005].
   
-  The boolean argument \code{LPvariant} relax the binary contraints to
+  The Boolean argument \code{LPvariant} relax the binary contraints to
   \eqn{0 \leq y_i \leq 1}{0 <= y_i <= 1} so that the problem becomes a linear
   program.
   The optimization can be executed by using \code{\link{optimizeProb}}.
