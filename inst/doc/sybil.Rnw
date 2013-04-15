@@ -776,20 +776,26 @@ core energy metabolism of \emph{E.\,coli}. This model contains 137 genes.
 
 The function \Comp{fluxVar} performs a flux variability analysis with a given
 model \citep{Mahadevan:2003fk}. The minimum and maximum flux values for each
-reaction in the model are calculated, which still support a given optimal
-functional state $Z_{\mathrm{opt}}$. The example below is based upon the
-metabolic model of the human red blood cell
-by \citet{Palsson:2006fk} and \citet{Price:2004fk}.
-<<>>=
-rbc <- readTSVmod(reactList = "rbc.tsv", fpath = mp, quoteChar = "\"")
-@
-Perform flux variability analysis.
+reaction in the model are calculated, which still support a certain percentage
+of a given optimal functional state $Z_{\mathrm{opt}}$.
 \begin{center}
 <<fig=TRUE>>=
-opt <- fluxVar(rbc, verboseMode = 0)
+opt <- fluxVar(Ec_core, percentage = 80, verboseMode = 0)
 plot(opt)
 @
 \end{center}
+% The example below is based upon the metabolic model of the human red blood cell
+% by \citet{Palsson:2006fk} and \citet{Price:2004fk}.
+% <<>>=
+% rbc <- readTSVmod(reactList = "rbc.tsv", fpath = mp, quoteChar = "\"")
+% @
+% Perform flux variability analysis.
+% \begin{center}
+% <<fig=TRUE>>=
+% opt <- fluxVar(Ec_core, percentage = 1, verboseMode = 0)
+% plot(opt)
+% @
+% \end{center}
 
 
 % ---------------------------------------------------------------------------- %

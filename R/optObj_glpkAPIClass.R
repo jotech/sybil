@@ -47,10 +47,16 @@ setMethod("delProb", signature(lp = "optObj_glpkAPI"),
 
 setMethod("initProb", signature(lp = "optObj_glpkAPI"),
 
-    function(lp, ...) {
+    function(lp, to = FALSE, ...) {
 
         lp@oobj <- glpkAPI::initProbGLPK()
-        glpkAPI::termOutGLPK(glpkAPI::GLP_OFF)
+
+        if (isTRUE(to)) {
+            glpkAPI::termOutGLPK(glpkAPI::GLP_ON)
+        }
+        else {
+            glpkAPI::termOutGLPK(glpkAPI::GLP_OFF)
+        }
 
         return(lp)
     }

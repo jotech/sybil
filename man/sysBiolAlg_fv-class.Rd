@@ -71,15 +71,17 @@
     }
     \item{Zopt}{
       A single numeric value giving the optimal value to be fixed during all
-      other optimizations (see below). If \code{NULL} and \code{model}
-      has an objective function, a default value is computed based on FBA. If
-      given, arguments \code{solver}, \code{method} and \code{solverParm} are
-      used.\cr
+      other optimizations (see argument \code{fixObjVal}). If \code{Zopt} is set
+      to \code{NULL} and \code{model} has an objective function, a default value
+      is computed based on FBA. If given, arguments \code{solver}, \code{method}
+      and \code{solverParm} are used during FBA.\cr
       Default: \code{NULL}.
     }
     \item{fixObjVal}{
-      A single Boolean value. If set to \code{TRUE}, an optimal value will be
-      fixed during all other optimizations, otherwise not.\cr
+      A single Boolean value. If set to \code{TRUE} and if the model contains
+      an objective function, an optimal value of this objective function will be
+      fixed during all other optimizations. The optimal value can be controlled
+      by argument \code{Zopt}.\cr
       Default: \code{TRUE}.
     }
     \item{tol}{

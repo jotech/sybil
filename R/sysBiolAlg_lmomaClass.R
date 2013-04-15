@@ -44,6 +44,7 @@ setMethod(f = "initialize",
                                 COBRAflag = FALSE,
                                 wtobj = NULL,
                                 wtobjLB = TRUE,
+                                obj_coefD = NULL,
                                 scaling = NULL, ...) {
 
               if ( ! missing(model) ) {
@@ -99,6 +100,15 @@ setMethod(f = "initialize",
 
                   absMAX <- SYBIL_SETTINGS("MAXIMUM")
 
+
+                  if (is.null(obj_coefD)) {
+                      deltaobj <- rep(1, 2*nc)
+                  }
+                  else {
+                      stopifnot(length(obj_coefD) == 2*nc)
+                      deltaobj <- obj_coefD
+                  }
+                  
 
                   # ---------------------------------------------
                   # constraint matrix
@@ -201,7 +211,7 @@ setMethod(f = "initialize",
                   # objective function
                   # ---------------------------------------------
 
-                  cobj <- c(rep(0, 2*nc), rep(1, 2*nc))
+                  cobj <- c(rep(0, 2*nc), deltaobj)
 
 
                   # ---------------------------------------------

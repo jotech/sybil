@@ -78,7 +78,8 @@
     }
     \item{wtobj}{
       Only used if argument \code{COBRAflag} is set to \code{TRUE}:
-      A single numeric value giving the optimal value. If missing, a default
+      A single numeric value giving the optimized value of the objective
+      function of the wild type problem. If missing, a default
       value is computed based on FBA. If given, arguments \code{solver} and
       \code{method} are used, but \code{solverParm} is not.
     }
@@ -88,6 +89,12 @@
       treated as lower bound. If set to \code{FALSE}, \code{wtobj} serves as
       an upper bound.\cr
       Default: \code{TRUE}.
+    }
+    \item{obj_coefD}{
+      A numeric vector of length two times the number of reactions in the model
+      containing the non-zero part of the objective function. If set to
+      \code{NULL}, the vector is filled with ones.\cr
+      Default: \code{NULL}.
     }
     \item{scaling}{
       Scaling options used to scale the constraint matrix. If set to

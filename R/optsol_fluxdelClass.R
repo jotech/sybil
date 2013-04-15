@@ -102,7 +102,7 @@ setMethod("lethal", signature(object = "optsol_fluxdel"),
                   tol <- SYBIL_SETTINGS("TOLERANCE")
               }
               
-              letid <- which(mod_obj(object)/wt < tol)
+              letid <- which(abs(mod_obj(object)/wt) < tol)
               let   <- logical(num_of_prob(object))
               let[letid] <- TRUE
               

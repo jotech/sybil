@@ -39,7 +39,9 @@
       Always \code{FALSE} will be returned.
     }
     \item{\code{signature(lp = "optObj_cplexAPI")}}{
-      method to use with package \pkg{optObj_cplexAPI}.
+      method to use with package \pkg{optObj_cplexAPI}. In order to set
+      integer parameters (parameters of type \code{CPXINT}), the value must be
+      of type integer. For example, like \code{as.integer(42)} or \code{23L}.
     }
     \item{\code{signature(lp = "optObj_glpkAPI")}}{
       method to use with package \pkg{optObj_glpkAPI}.

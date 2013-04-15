@@ -47,10 +47,17 @@ setMethod("delProb", signature(lp = "optObj_clpAPI"),
 
 setMethod("initProb", signature(lp = "optObj_clpAPI"),
 
-    function(lp, ...) {
+    function(lp, to = NULL, ...) {
 
         lp@oobj <- clpAPI::initProbCLP()
-        clpAPI::setLogLevelCLP(lp@oobj, 0)
+
+        if (is.null(to)) {
+            clpAPI::setLogLevelCLP(lp@oobj, 0)
+        }
+        else {
+            stopifnot(is(to, "numeric"))
+            clpAPI::setLogLevelCLP(lp@oobj, to)
+        }
 
         return(lp)
     }

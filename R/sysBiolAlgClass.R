@@ -73,6 +73,7 @@ setMethod(f = "initialize",
                                 solver = SYBIL_SETTINGS("SOLVER"),
                                 method = SYBIL_SETTINGS("METHOD"),
                                 solverParm = SYBIL_SETTINGS("SOLVER_CTRL_PARM"),
+                                termOut = FALSE,
                                 sbalg, pType = "lp", scaling = NULL, fi, nCols,
                                 nRows, mat, ub, lb, obj, rlb, rtype,
                                 lpdir = "max", rub = NULL, ctype = NULL,
@@ -105,7 +106,7 @@ setMethod(f = "initialize",
                   # ---------------------------------------------
 
                   lp <- optObj(solver = solver, method = method, pType = pType)
-                  lp <- initProb(lp, nrows = nRows, ncols = nCols)
+                  lp <- initProb(lp, nrows = nRows, ncols = nCols, to = termOut)
 
                   # ---------------------------------------------
                   # set control parameters

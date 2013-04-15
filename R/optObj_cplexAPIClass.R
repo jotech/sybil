@@ -52,16 +52,23 @@ setMethod("delProb", signature(lp = "optObj_cplexAPI"),
 
 setMethod("initProb", signature(lp = "optObj_cplexAPI"),
 
-    function(lp, ...) {
+    function(lp, to = FALSE, ...) {
 
         #lp@oobj <- cplexAPI::openProbCPLEX()
         tmp <- cplexAPI::openProbCPLEX()
         lp@oobj <- new("cplexPointer",
                        en = tmp[["env"]],
                        pr = tmp[["lp"]])
-        cplexAPI::setIntParmCPLEX(lp@oobj@env,
-                                  cplexAPI::CPX_PARAM_SCRIND,
-                                  cplexAPI::CPX_OFF)
+        if (isTRUE(to)) {
+            cplexAPI::setIntParmCPLEX(lp@oobj@env,
+                                      cplexAPI::CPX_PARAM_SCRIND,
+                                      cplexAPI::CPX_ON)
+        }
+        else {
+            cplexAPI::setIntParmCPLEX(lp@oobj@env,
+                                      cplexAPI::CPX_PARAM_SCRIND,
+                                      cplexAPI::CPX_OFF)
+        }
 
         return(lp)
     }
@@ -545,6 +552,7 @@ setMethod("loadLPprob", signature(lp = "optObj_cplexAPI"),
             crub <- NULL
         }
         else {
+            #rng        <- rtype == "R"
             rng        <- rtype %in% "R"
             crub       <- numeric(nRows)
             crub[rng]  <- rlb[rng] - rlb[rng]

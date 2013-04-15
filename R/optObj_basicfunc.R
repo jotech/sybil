@@ -60,7 +60,8 @@ checkSolStat <- function(stat, solver = SYBIL_SETTINGS("SOLVER")) {
             out <- which(stat != 0)
         },
         "cplexAPI" = {
-            out <- which(stat != 1)
+            # CPLEX: 101 optimal integer solution
+            out <- which(stat != 1 & stat != 101)
         },
         {
             cmd <- paste(solver,"::checkSolutionStatus(stat)", sep = "")

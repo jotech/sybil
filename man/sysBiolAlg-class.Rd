@@ -141,6 +141,12 @@
       (e.g. \pkg{glpkAPI}).\cr
       Default: \code{SYBIL_SETTINGS("SOLVER_CTRL_PARM")}.
     }
+    \item{termOut}{
+      A single boolean, numeric or character value, controling the amount of
+      terminal output of the solver software. See also \code{\link{initProb}}
+      (argument \code{to}) for more details.\cr
+      Default: \code{FALSE}.
+    }
     \item{sbalg}{
       Single character string containing the name of the algorithm to use.
     }

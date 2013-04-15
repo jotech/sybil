@@ -1,8 +1,8 @@
 Package: sybil
 Type: Package
 Title: sybil - Efficient Constrained Based Modelling in R
-Version: 1.1.11
-Date: 2013-01-18
+Version: 1.1.14
+Date: 2013-04-15
 Authors@R: c(person("Gabriel", "Gelius-Dietrich", role = c("aut",
         "cre"), email = "geliudie@uni-duesseldorf.de"), person(c("C.",
         "Jonathan"), "Fritzemeier", role = "ctb"), person("Rajen",
@@ -50,10 +50,11 @@ Collate: generics.R validmodelorg.R validoptsol.R validreactId.R
         sysBiolAlgClass.R sysBiolAlg_fbaClass.R sysBiolAlg_fvClass.R
         sysBiolAlg_lmomaClass.R sysBiolAlg_momaClass.R
         sysBiolAlg_mtfClass.R sysBiolAlg_roomClass.R sybilLogClass.R
-Packaged: 2013-01-18 16:03:28 UTC; gabriel
+Packaged: 2013-04-15 10:43:37 UTC; gabriel
 Author: Gabriel Gelius-Dietrich [aut, cre], C. Jonathan Fritzemeier
         [ctb], Rajen Piernikarczyk [ctb], Marc Andre Daxer [ctb],
         Benjamin Braasch [ctb], Abdelmoneim Desouki [ctb]
 Maintainer: Gabriel Gelius-Dietrich <geliudie@uni-duesseldorf.de>
+NeedsCompilation: no
 Repository: CRAN
-Date/Publication: 2013-01-18 17:41:58
+Date/Publication: 2013-04-15 14:43:11

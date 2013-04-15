@@ -52,10 +52,17 @@ setMethod("delProb", signature(lp = "optObj_lpSolveAPI"),
 
 setMethod("initProb", signature(lp = "optObj_lpSolveAPI"),
 
-    function(lp, nrows = 0, ncols = 0) {
+    function(lp, to = NULL, nrows = 0, ncols = 0) {
 
         lp@oobj <- lpSolveAPI::make.lp(nrow = nrows, ncol = ncols)
         #reg.finalizer(lp@oobj, finalizeLpSolveProb, TRUE)
+
+        if (is.null(to)) {
+            setSolverParm(lp, list(verbose = "neutral"))
+        }
+        else {
+            setSolverParm(lp, list(verbose = as.character(to)))
+        }
 
         return(lp)
     }

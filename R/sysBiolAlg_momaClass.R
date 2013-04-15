@@ -40,21 +40,25 @@ setMethod(f = "initialize",
           signature = "sysBiolAlg_moma",
           definition = function(.Object,
                                 model,
-                                wtflux,
+                                wtflux = NULL,
+                                Qmat = NULL,
                                 scaling = NULL, ...) {
 
               if ( ! missing(model) ) {
 
-                  if (missing(wtflux)) {
+                  # wild type or given flux distribution
+                  if (is.null(wtflux)) {
                       tmp <- sybil:::.generateWT(model, ...)
-                      wtflux <- tmp$fluxes[tmp$fldind]
+                      wtsol <- tmp$fluxes[tmp$fldind]
+                  }
+                  else {
+                      wtsol <- wtflux
                   }
 
                   stopifnot(is(model, "modelorg"),
-                            is(wtflux, "numeric"))
+                            is(wtsol, "numeric"),
+                            length(wtsol) == react_num(model))
                   
-                  stopifnot(length(wtflux) == react_num(model))
-
                   #  the problem: minimize
                   #
                   #            |     
@@ -71,6 +75,14 @@ setMethod(f = "initialize",
                   nCols <- react_num(model)
                   nRows <- met_num(model)
 
+                  if (is.null(Qmat)) {
+                      Q <- rep(2, nCols)
+                  }
+                  else {
+                      Q <- Qmat
+                  }
+
+
                   # ---------------------------------------------
                   # build problem object
                   # ---------------------------------------------
@@ -85,18 +97,20 @@ setMethod(f = "initialize",
                                             mat        = S(model),
                                             ub         = uppbnd(model),
                                             lb         = lowbnd(model),
-                                            #obj        = -2 * wtflux,
-                                            obj        = -2 * wtflux,
+                                            #obj        = -2 * wtsol,
+                                            obj        = -2 * wtsol,
                                             rlb        = rep(0, nRows),
                                             rtype      = rep("E", nRows),
                                             lpdir      = "min",
                                             rub        = NULL,
                                             ctype      = NULL,
-                                            algPar     = list("wtflux" = wtflux),
+                                            algPar     = list("wtflux" = wtsol,
+                                                              "Qmat" = Q),
                                             ...)
 
                   # add quadratic part of objective function
-                  loadQobj(.Object@problem, rep(2, nCols))
+                  loadQobj(.Object@problem, Q)
+                  #loadQobj(.Object@problem, rep(2, nCols))
                   #loadQobj(.Object@problem, 2 * Diagonal(nCols))
 
 #                  # make problem object
@@ -115,7 +129,7 @@ setMethod(f = "initialize",
 #                             mat   = S(model),
 #                             ub    = uppbnd(model),
 #                             lb    = lowbnd(model),
-#                             obj   = -2 * wtflux,
+#                             obj   = -2 * wtsol,
 #                             rlb   = rep(0, nRows),
 #                             rub   = NULL,
 #                             rtype = rep("E", nRows),

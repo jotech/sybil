@@ -101,8 +101,24 @@ readTSVmod <- function(prefix, suffix,
     }
 
 
+    #--------------------------------------------------------------------------#
+    # some regular expressions
+    #--------------------------------------------------------------------------#
+
+    # delimiter for the compartment flag (round or square bracket)
+    #compartDelimL <- "\\["
+    #compartDelimR <- "\\]"
+    compartDelimL  <- "(\\[|\\()"
+    compartDelimR  <- "(\\]|\\))"
+    compartCharSet <- "(\\w+)"
+
+    # regular expression for the compartment flag
+    compartRegEx    <- paste(compartDelimL, compartCharSet, compartDelimR, sep = "")
+    compartRegExEnd <- paste(compartRegEx, "$", sep = "")
+
     # regular expression to identify external metabolites
-    extMetRegEx <- paste("\\[", extMetFlag, "\\]$", sep = "")
+    extMetRegEx <- paste(compartDelimL, extMetFlag, compartDelimR, sep = "")
+    #extMetRegEx <- paste("\\[", extMetFlag, "\\]$", sep = "")
 
     
     # regular expression to identify the reaction arrow
@@ -156,7 +172,9 @@ readTSVmod <- function(prefix, suffix,
 
                 USE_MET[j] <- TRUE
 
-                stoichpos <- regexpr("^\\(.+\\)", components[j], perl = TRUE)
+                # stoichiometric coefficient must be in round bracket
+                stoichpos <- regexpr("^\\([^)]+\\)", components[j], perl = TRUE)
+                #stoichpos <- regexpr("^\\(.+\\)", components[j], perl = TRUE)
                 if (stoichpos == 1) {
                     st_str <- substr(components[j], 2,
                                          (-1+attr(stoichpos, "match.length")))
@@ -173,21 +191,27 @@ readTSVmod <- function(prefix, suffix,
                         stoich <- 1
                     }
 
-                    CURR_MET[j] <- substr(components[j],
-                                          (1+attr(stoichpos, "match.length")),
-                                          nchar(components[j]))
+                    currentMet <- substr(components[j],
+                                         (1+attr(stoichpos, "match.length")),
+                                         nchar(components[j]))
                 }
                 else {
                     stoich <- 1
-                    CURR_MET[j] <- components[j]
+                    currentMet <- components[j]
                 }
+
+                
+                # put the compartment flag into a square bracket
+                CURR_MET[j] <- sub(compartRegExEnd, "[\\2]", currentMet, perl = TRUE)
+                #CURR_MET[j] <- currentMet
 
                 stoich <- ifelse(isTRUE(educts), (stoich * -1), stoich)
 
 
                 # cid contains the compartment abbreviation for the current
                 # metabolite (excluding '[]')
-                cidpos <- regexpr("\\[\\w+\\]$", components[j], perl = TRUE)
+                cidpos <- regexpr(compartRegExEnd, components[j], perl = TRUE)
+                #cidpos <- regexpr("\\[\\w+\\]$", components[j], perl = TRUE)
                 if (cidpos < 0) {
                     cid <- "unknown"
                 }
@@ -556,7 +580,8 @@ readTSVmod <- function(prefix, suffix,
     requatW <- gsub("\\s+", "", requatC, perl = TRUE)
 
     # check for possible transport reaction
-    transpR <- regexpr("^\\[\\w+\\]:", requatW, perl = TRUE)
+    transpR <- regexpr(paste("^", compartRegEx, ":", sep = ""), requatW, perl = TRUE)
+    #transpR <- regexpr("^\\[\\w+\\]:", requatW, perl = TRUE)
 
 
     # indices for the next metabolite, next nnz element
@@ -1128,7 +1153,8 @@ readTSVmod <- function(prefix, suffix,
         met_name(model) <- Rmet[1:NRmet]
     }
     else {
-        metAb <- sub("\\[\\w+\\]$", "", Rmet[1:NRmet], perl = TRUE)
+        metAb <- sub(compartRegExEnd, "", Rmet[1:NRmet], perl = TRUE)
+        #metAb <- sub("\\[\\w+\\]$", "", Rmet[1:NRmet], perl = TRUE)
         #metAb <- sub("^0+", "", metAb, perl = TRUE) # remove leading zeros
         metId <- match(metAb, metABBR)
         met_name(model) <- metNAME[metId]

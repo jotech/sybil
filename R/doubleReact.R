@@ -35,13 +35,34 @@
 # metabolites.
 
 
-doubleReact <- function(model, checkRev = TRUE) {
+doubleReact <- function(model, checkRev = TRUE, linInd = FALSE) {
 
   if (!is(model, "modelorg")) {
       stop("needs an object of class modelorg!")
   }
 
-  
+  # test, if there are any duplicated columns
+#  dup <- duplicated(as.matrix(S(model)), MARGIN = 2)
+#  if (sum(dup) == 0) {
+#      return(FALSE)
+#  }
+#  else {
+#      # mat:   stoichiometric matrix
+#      # nnzpc: number of non-zeros per column
+#      # remc:  reaction types (in terms of number of metabolites)
+#      mat   <- as(S(model), "CsparseMatrix")
+#      nnzpc <- mat@p[-1] - mat@p[-length(mat@p)]
+#      remc  <- sort(unique(nnzpc[dup]))
+#  }
+#  
+#  print(sum(dup))
+#  #print(nnzpc)
+#  print(remc)
+#  print(nnzpc[dup])
+#
+#  return(shrinkMatrix(model, j = (1:react_num(model))[dup]))
+#
+#  return(TRUE)
 #------------------------------------------------------------------------------#
 #                        reaction adjacency matrix                             #
 #------------------------------------------------------------------------------#
@@ -118,7 +139,8 @@ doubleReact <- function(model, checkRev = TRUE) {
           # A (temporary) list for identical reactions with
           # reactlength[i] metabolites
           double_react <- list()
-          clr <- 1
+          #clr <- 1
+          clr <- 0
 
           # walk through Stmp
           for (k in 1:(numr-1)) {
@@ -155,7 +177,27 @@ doubleReact <- function(model, checkRev = TRUE) {
                       # If they are the same, the stiochiometric coeficients
                       # are checked. If they are also the same, the two columns
                       # k and l (reactions) are considered to be the same.
-                      if (identical(Stmp[Stmp_rows[, k], k], Stmp[Stmp_rows[, l], l])) {
+
+                      if (isTRUE(linInd)) {
+                          # We only chack for linear independence, if all
+                          # stoichiometric coefficients heve the same sign,
+                          # otherwise (-1, 1) and (1, -1) are the same.
+                          a <- Stmp[Stmp_rows[, k], k]
+                          b <- Stmp[Stmp_rows[, l], l]
+                          if (identical(sign(a), sign(b))) {
+                              decomp     <- qr(cbind(Stmp[Stmp_rows[, k], k], Stmp[Stmp_rows[, l], l]))
+                              checkIdent <- decomp$rank != 2 # rank == 2 means 2 vectors are linear independent
+                          }
+                          else {
+                              checkIdent <- FALSE
+                          }
+                      }
+                      else {
+                          checkIdent <- identical(Stmp[Stmp_rows[, k], k], Stmp[Stmp_rows[, l], l])
+                      }
+
+                      #if (identical(Stmp[Stmp_rows[, k], k], Stmp[Stmp_rows[, l], l])) {
+                      if (isTRUE(checkIdent)) {
 
                           # check the reversibilities
                           if (checkRev == TRUE) {
@@ -189,8 +231,9 @@ doubleReact <- function(model, checkRev = TRUE) {
           # main list double
           if (length(double_react) != 0) {
               clm           <- clm + 1
-              double_react[[1]] <- reactlength[i]
-              double[[clm]] <- double_react
+              #double_react[[1]] <- reactlength[i]
+              #double[[clm]] <- double_react
+              double <- append(double, double_react)
           }
       }
   }

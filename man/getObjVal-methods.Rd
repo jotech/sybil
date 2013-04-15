@@ -33,7 +33,9 @@
       method to use with package \pkg{optObj_clpAPI}.
     }
     \item{\code{signature(lp = "optObj_cplexAPI")}}{
-      method to use with package \pkg{optObj_cplexAPI}.
+      method to use with package \pkg{optObj_cplexAPI}. For problems of type
+      \code{"mip"}: if no solution exists, the \pkg{cplexAPI} function
+      \code{getBestObjValCPLEX} will be used.
     }
     \item{\code{signature(lp = "optObj_glpkAPI")}}{
       method to use with package \pkg{optObj_glpkAPI}.

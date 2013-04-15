@@ -67,9 +67,17 @@
     }
     \item{wtflux}{
       A numeric vector holding an optimal wild type flux distribution for the
-      given model. If missing, a default value is computed based on FBA.
-      If given, arguments \code{solver} and \code{method} are used, but
-      \code{solverParm} is not.
+      given model. If set to \code{NULL}, a default value is computed based on
+      flux-balance analysis. If given, arguments \code{solver} and \code{method}
+      are used, but \code{solverParm} is not.
+      Default: \code{NULL}.
+    }
+    \item{Qmat}{
+      A numeric vector or matrix (of class \code{\linkS4class{Matrix}}) holding
+      the quadratic part of the objective function.  If set to \code{NULL}, a
+      quadratic unity matrix with number of columns and rows equal to the number
+      of reactions given in the model is used.
+      Default: \code{NULL}.
     }
     \item{scaling}{
       Scaling options used to scale the constraint matrix. If set to

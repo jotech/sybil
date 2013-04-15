@@ -11,18 +11,38 @@
 }
 
 \usage{
-  doubleReact(model, checkRev = TRUE)
+  doubleReact(model, checkRev = TRUE, linInd = FALSE)
 }
 
 \arguments{
-  \item{model}{An object of class \code{\linkS4class{modelorg}}.}
-  \item{checkRev}{Logical: Check reversibility of reactions (default: TRUE).}
+  \item{model}{
+    An object of class \code{\linkS4class{modelorg}}.
+  }
+  \item{checkRev}{
+    A single logical value. If set to \code{TRUE}, two reactions are identical,
+    if, additionally to the stoichiometric coefficients, the direction of the
+    reactions is the same (the corresponding value of slot
+    \code{\link{react_rev}} of the model).\cr
+    Default: \code{TRUE}.
+  }
+  \item{linInd}{
+    A single logical value. If set to \code{TRUE}, two reactions are identical,
+    if the vectors of stoichiometric coefficients are linear dependent.
+    For example, two reactions with coefficients \eqn{(1, 1, -1)} and
+    \eqn{(2, 2, -2)} are linear dependent. If the coefficients have different
+    signs, for example \eqn{(-1, 1)} and \eqn{(1, -1)} (the first reaction
+    being forward direction and the second one being backward direction), they
+    are not identical. If \code{linInd} is set to \code{FALSE}, the
+    stoichiometric must be identical, for two reactions considered to be
+    identical.
+    Default: \code{FALSE}.
+  }
 }
 
 \details{
-  In the first step, the stoichiometric matrix S is devided into
+  In the first step, the stoichiometric matrix S is divided into
   groups of reactions containing the same number of metabolites. After
-  that, the row indices of the non-zero elements of these matrixces are
+  that, the row indices of the non-zero elements of these matrices are
   compared. If identical pairs are found, we check the corresponding
   values in S. If they are also identical, the reversibility of the reactions
   are examined. If they are the same, the two reactions are called identical.
@@ -31,9 +51,9 @@
 \value{
   If no identical reactions were found, the return value is
   FALSE. Otherwise a list is returned, ordered by the number of
-  metabolites used in each reaction. The first element is the number of
-  metabolites. The following elements are one or more numerical vectors
-  containing the indices of the reactions.
+  metabolites used in each reaction. Each element is a numerical vector
+  containing the indices (column number fo the stoichiometrix matrix) of
+  identical reactions.
 }
 
 
@@ -44,8 +64,6 @@
   compared. Meaning, that if concerning to the values in S the reaction
   is in forward direction, but not when including the flux values,
   \code{doubleReact} will not find it.
-
-  There are some things left to do with the upper and lower bounds.
 }
 
 \examples{

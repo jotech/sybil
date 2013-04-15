@@ -51,7 +51,7 @@
 #                    # something time consuming
 #                }
 
-.progressDots <- function(x, i, total, symb = ".", num = 50, nl = "\n") {
+.progressDots <- function(x, i, total, symb = ".", num = 40, nl = "\n") {
 
   # x:     one dot per x loops
   # i:     loop variable

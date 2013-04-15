@@ -176,9 +176,9 @@
     \item{\code{lethal}:}{
       \code{signature(object = "optsol_fluxdel")}(\code{wt, tol}): returns
       a logical vector of length \code{num_of_prob(object)}. Argument \code{wt}
-      is an optimal growth value, e.g. computed via FBA. If the absolute growth
-      ratio (\code{mod_obj(object)/wt}) of knock-out \code{i} is less than
-      \code{tol}, the deletion is considered as lethal.
+      is an optimal (wild type) growth rate, e.g. computed via FBA. If the
+      absolute growth ratio (\code{mod_obj(object)/wt}) of knock-out \code{i}
+      is less than \code{tol}, the deletion is considered as lethal.
       If \code{lethal(object)[i]} is \code{TRUE}, deletion [i] is lethal.
     }
     \item{\code{deleted}:}{

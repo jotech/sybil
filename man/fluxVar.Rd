@@ -30,10 +30,11 @@
   }
   \item{\dots}{
     Further arguments passed to \code{\link{optimizer}}. Argument
-    \code{algorithm} is set to \code{"\link[=sysBiolAlg_fv-class]{fv}"},
+    \code{algorithm} is set to \code{"\link[=sysBiolAlg_fv-class]{fv}"}, further
     possible arguments are \code{fld}, arguments for pre and post processing
     commands, \code{verboseMode} and further arguments passed to the constructor
-    for objects of class \code{\linkS4class{sysBiolAlg_fv}}.
+    for objects of class \code{\linkS4class{sysBiolAlg_fv}}, see there for
+    details.
   }
 }
 
