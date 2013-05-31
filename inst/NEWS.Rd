@@ -7,6 +7,45 @@
 \newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 
 % ---------------------------------------------------------------------------- %
+\section{Changes in version 1.2.0 2013-05-31}{
+  \itemize{
+    \item suggests on \CRANpkg{glpkAPI} (version \eqn{\geq}{>=} 1.2.7)
+    \item suggests on \CRANpkg{clpAPI} (version \eqn{\geq}{>=} 1.2.3)
+    \item variable and constraint names can now be set in objects of class
+          \code{sysBiolAlg} and \code{optObj}
+    \item added a new parameter \code{USE_NAMES}
+    \item added arguments \code{cnames} and \code{rnames} to method
+          \code{loadLPprob} for classes extending class \code{optObj}
+    \item added argument \code{rnames} to method \code{addRowsToProb} for
+          classes extending class \code{optObj}
+    \item added arguments \code{cnames} and \code{rnames} to method
+          \code{initialize} of class \code{sysBiolAlg}
+    \item added arguments \code{useNames}, \code{cnames} and \code{rnames} to
+          method \code{initialize} of classes \code{sysBiolAlg_fba},
+          \code{sysBiolAlg_fv},\code{sysBiolAlg_lmoma},\code{sysBiolAlg_moma},
+          \code{sysBiolAlg_mtf} and \code{sysBiolAlg_room}.
+    \item in method \code{printMetabolite} of class \code{modelorg}:
+          metabolite id's beginning with a digit or period are prefixed by the
+          letter \code{"r"} and reaction id's beginning with a digit or period
+          are prefixed by the letter \code{"x"}
+    \item function \code{readTSVmod} checks input files for empty fields
+    \item added method \code{changeUptake} to class \code{modelorg} to change
+          media conditions in metabolic networks
+  }
+}
+
+
+% ---------------------------------------------------------------------------- %
+\section{Changes in version 1.1.15 2013-04-18}{
+  \itemize{
+    \item fixed a bug in functions \code{.generateWT} and \code{doubleGeneDel}
+          which accours if argument solver was given as variable name and not
+          as character value directly
+  }
+}
+
+
+% ---------------------------------------------------------------------------- %
 \section{Changes in version 1.1.14 2013-04-15}{
   \itemize{
     \item added argument \code{termOut} to method \code{initialize} of class

@@ -46,7 +46,7 @@
       method to use with package \pkg{optObj_glpkAPI}, argument \code{to} can
       be \code{TRUE} or \code{FALSE}, setting GLPK function
       \code{termOutGLPK} to \code{GLP_ON} or \code{GLP_OFF}. The amount of
-      is controlled by the GLPK parameter \code{MSG_LEV}.
+      output is controlled by the GLPK parameter \code{MSG_LEV}.
     }
     \item{\code{signature(lp = "optObj_lpSolveAPI")}}{
       method to use with package \pkg{optObj_lpSolveAPI}, argument \code{to} can

@@ -51,7 +51,14 @@ setMethod("initProb", signature(lp = "optObj_glpkAPI"),
 
         lp@oobj <- glpkAPI::initProbGLPK()
 
-        if (isTRUE(to)) {
+        if (is.null(to)) {
+            too <- FALSE
+        }
+        else {
+            too <- to
+        }
+        
+        if (isTRUE(too)) {
             glpkAPI::termOutGLPK(glpkAPI::GLP_ON)
         }
         else {
@@ -318,7 +325,7 @@ setMethod("addRowsToProb", signature(lp = "optObj_glpkAPI"),
     # "E" = fixed variable                 lb  = x  = ub
     # "R" = ranged constraint
 
-    function(lp, i, type, lb, ub, cind, nzval) {
+    function(lp, i, type, lb, ub, cind, nzval, rnames = NULL) {
 
         ord <- glpkAPI::addRowsGLPK(lp@oobj, length(i))
         gtype = integer(length(type))
@@ -336,6 +343,11 @@ setMethod("addRowsToProb", signature(lp = "optObj_glpkAPI"),
                                    cind[[k]], nzval[[k]])
         }
         out <- glpkAPI::setRowsBndsGLPK(lp@oobj, i, lb, ub, gtype)
+
+        # row names
+        if (!is.null(rnames)) {
+            glpkAPI::setRowsNamesGLPK(lp@oobj, i = i, rnames = rnames)
+        }
 
         return(out)
     }
@@ -480,7 +492,8 @@ setMethod("changeMatrixRow", signature(lp = "optObj_glpkAPI"),
 setMethod("loadLPprob", signature(lp = "optObj_glpkAPI"),
 
     function(lp, nCols, nRows, mat, ub, lb, obj, rlb, rtype,
-             lpdir = "max", rub = NULL, ctype = NULL) {
+             lpdir = "max", rub = NULL, ctype = NULL,
+             cnames = NULL, rnames = NULL) {
 
         stopifnot(is(mat, "Matrix"))
 
@@ -534,6 +547,19 @@ setMethod("loadLPprob", signature(lp = "optObj_glpkAPI"),
                                  ub = rub,
                                  type = crtype)
 
+        # row names
+        if (!is.null(rnames)) {
+            glpkAPI::setRowsNamesGLPK(lp@oobj, i = c(1:nRows), rnames = rnames)
+        }
+
+        # column names
+        if (!is.null(cnames)) {
+            glpkAPI::setColsNamesGLPK(lp@oobj, j = c(1:nCols), cnames = cnames)
+        }
+
+        if (!is.null(rnames) || !is.null(cnames)) {
+            glpkAPI::createIndexGLPK(lp@oobj)
+        }
     }
 )
 

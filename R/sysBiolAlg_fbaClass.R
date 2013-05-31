@@ -41,6 +41,9 @@ setMethod(f = "initialize",
           definition = function(.Object,
                                 model,
                                 lpdir = SYBIL_SETTINGS("OPT_DIRECTION"),
+                                useNames = SYBIL_SETTINGS("USE_NAMES"),
+                                cnames = NULL,
+                                rnames = NULL,
                                 scaling = NULL, ...) {
 
               if ( ! missing(model) ) {
@@ -52,6 +55,34 @@ setMethod(f = "initialize",
                   nCols <- react_num(model)
                   nRows <- met_num(model)
 
+                  # row and column names for the problem object
+                  if (isTRUE(useNames)) {
+                      if (is.null(cnames)) {
+                          colNames = sybil:::.makeLPcompatible(react_id(model),
+                                                               prefix = "x")
+                      }
+                      else {
+                          stopifnot(is(cnames, "character"),
+                                    length(cnames) == nCols)
+                          colNames = cnames
+                      }
+
+                      if (is.null(rnames)) {
+                          rowNames = sybil:::.makeLPcompatible(met_id(model),
+                                                               prefix = "r")
+                      }
+                      else {
+                          stopifnot(is(rnames, "character"),
+                                    length(rnames) == nRows)
+                          rowNames = rnames
+                      }
+                  }
+                  else {
+                      colNames = NULL
+                      rowNames = NULL
+                  }
+
+                  # generate problem object
                   .Object <- callNextMethod(.Object,
                                             sbalg      = "fba",
                                             pType      = "lp",
@@ -68,6 +99,8 @@ setMethod(f = "initialize",
                                             lpdir      = lpdir,
                                             rub        = NULL,
                                             ctype      = NULL,
+                                            cnames     = colNames,
+                                            rnames     = rowNames,
                                             ...)
 
 #

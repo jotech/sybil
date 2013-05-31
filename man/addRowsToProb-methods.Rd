@@ -18,19 +18,20 @@
 }
 
 \usage{
-\S4method{addRowsToProb}{optObj_clpAPI}(lp, i, type, lb, ub, cind, nzval)
+\S4method{addRowsToProb}{optObj_clpAPI}(lp, i, type, lb, ub, cind, nzval, rnames = NULL)
 
-\S4method{addRowsToProb}{optObj_cplexAPI}(lp, i, type, lb, ub, cind, nzval)
+\S4method{addRowsToProb}{optObj_cplexAPI}(lp, i, type, lb, ub, cind, nzval, rnames = NULL)
 
-\S4method{addRowsToProb}{optObj_glpkAPI}(lp, i, type, lb, ub, cind, nzval)
+\S4method{addRowsToProb}{optObj_glpkAPI}(lp, i, type, lb, ub, cind, nzval, rnames = NULL)
 
-\S4method{addRowsToProb}{optObj_lpSolveAPI}(lp, i, type, lb, ub, cind, nzval)
+\S4method{addRowsToProb}{optObj_lpSolveAPI}(lp, i, type, lb, ub, cind, nzval, rnames = NULL)
 }
 
 \section{Methods}{
   \describe{
     \item{\code{signature(lp = "optObj_clpAPI")}}{
-      method to use with package \pkg{optObj_clpAPI}.
+      method to use with package \pkg{optObj_clpAPI}. Parameter \code{rnames} is
+      currently unused.
     }
     \item{\code{signature(lp = "optObj_cplexAPI")}}{
       method to use with package \pkg{optObj_cplexAPI}.
@@ -71,11 +72,15 @@
   \item{nzval}{
     A list containing the new non-zero elements.
   }
+  \item{rnames}{
+    A character vector containing names for the new rows/constraints.\cr
+    Default: \code{NULL}.
+  }
 }
 
 \note{
-  Arguments \code{i}, \code{type}, \code{lb}, \code{cind} and \code{nzval}
-  must have the same length.
+  Arguments \code{i}, \code{type}, \code{lb}, \code{cind}, \code{nzval} and
+  \code{rnames} (if not \code{NULL}) must have the same length.
 }
 
 \author{

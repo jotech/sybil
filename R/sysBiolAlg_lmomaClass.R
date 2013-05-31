@@ -45,6 +45,9 @@ setMethod(f = "initialize",
                                 wtobj = NULL,
                                 wtobjLB = TRUE,
                                 obj_coefD = NULL,
+                                useNames = SYBIL_SETTINGS("USE_NAMES"),
+                                cnames = NULL,
+                                rnames = NULL,
                                 scaling = NULL, ...) {
 
               if ( ! missing(model) ) {
@@ -215,6 +218,54 @@ setMethod(f = "initialize",
 
 
                   # ---------------------------------------------
+                  # row and column names for the problem object
+                  # ---------------------------------------------
+
+                  if (isTRUE(useNames)) {
+                      if (is.null(cnames)) {
+                          cn <- c(paste("wt",  react_id(model), sep = "_"),
+                                  paste("del", react_id(model), sep = "_"),
+                                  paste("dM",  react_id(model), sep = "_"),
+                                  paste("dP",  react_id(model), sep = "_")
+                          )
+                          colNames = sybil:::.makeLPcompatible(cn, prefix = "x")
+                      }
+                      else {
+                          stopifnot(is(cnames, "character"),
+                                    length(cnames) == nCols)
+                          colNames = cnames
+                      }
+
+                      if (is.null(rnames)) {
+                          if (isTRUE(COBRAflag)) {
+                              rn <- c(paste("wt",  met_id(model), sep = "_"),
+                                      paste("del", met_id(model), sep = "_"),
+                                      paste("deltaM", 1:nc, sep = "_"),
+                                      paste("deltaP", 1:nc, sep = "_"),
+                                      "obj_wt"
+                              )
+                          }
+                          else {
+                              rn <- c(paste("del", met_id(model), sep = "_"),
+                                      paste("deltaM", 1:nc, sep = "_"),
+                                      paste("deltaP", 1:nc, sep = "_")
+                              )
+                          }
+                          rowNames = sybil:::.makeLPcompatible(rn, prefix = "r")
+                      }
+                      else {
+                          stopifnot(is(rnames, "character"),
+                                    length(rnames) == nRows)
+                          rowNames = rnames
+                      }
+                  }
+                  else {
+                      colNames = NULL
+                      rowNames = NULL
+                  }
+
+
+                  # ---------------------------------------------
                   # build problem object
                   # ---------------------------------------------
 
@@ -234,6 +285,8 @@ setMethod(f = "initialize",
                                             rtype      = rtype,
                                             lpdir      = "min",
                                             ctype      = NULL,
+                                            cnames     = colNames,
+                                            rnames     = rowNames,
                                             algPar     = list("wtflux" = wtflux,
                                                               "wtobj"  = wtobj),
                                             ...)

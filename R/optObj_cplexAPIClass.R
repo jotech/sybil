@@ -59,7 +59,15 @@ setMethod("initProb", signature(lp = "optObj_cplexAPI"),
         lp@oobj <- new("cplexPointer",
                        en = tmp[["env"]],
                        pr = tmp[["lp"]])
-        if (isTRUE(to)) {
+
+        if (is.null(to)) {
+            too <- FALSE
+        }
+        else {
+            too <- to
+        }
+        
+        if (isTRUE(too)) {
             cplexAPI::setIntParmCPLEX(lp@oobj@env,
                                       cplexAPI::CPX_PARAM_SCRIND,
                                       cplexAPI::CPX_ON)
@@ -337,7 +345,7 @@ setMethod("addRowsToProb", signature(lp = "optObj_cplexAPI"),
     # "E" = fixed variable                 lb  = x  = ub
     # "R" = ranged constraint
 
-    function(lp, i, type, lb, ub, cind, nzval) {
+    function(lp, i, type, lb, ub, cind, nzval, rnames = NULL) {
 
         cptype = character(length(type))
         for (l in seq(along = type)) {
@@ -351,10 +359,12 @@ setMethod("addRowsToProb", signature(lp = "optObj_cplexAPI"),
         }
 
         beg <- c(0, cumsum(unlist(lapply(cind, length))))
-        out <- cplexAPI::addRowsCPLEX(lp@oobj@env, lp@oobj@lp, 0,
-                                      length(i), length(unlist(nzval)), beg,
-                                      unlist(cind)-1, unlist(nzval),
-                                      lb, cptype)
+        out <- cplexAPI::addRowsCPLEX(env = lp@oobj@env, lp = lp@oobj@lp,
+                                      ncols = 0, nrows = length(i),
+                                      nnz = length(unlist(nzval)),
+                                      matbeg = beg, matind = unlist(cind)-1,
+                                      matval = unlist(nzval), rhs = lb,
+                                      sense = cptype, rnames = rnames)
 
         return(out)
     }
@@ -535,7 +545,8 @@ setMethod("changeMatrixRow", signature(lp = "optObj_cplexAPI"),
 setMethod("loadLPprob", signature(lp = "optObj_cplexAPI"),
 
     function(lp, nCols, nRows, mat, ub, lb, obj, rlb, rtype,
-             lpdir = "max", rub = NULL, ctype = NULL) {
+             lpdir = "max", rub = NULL, ctype = NULL,
+             cnames = NULL, rnames = NULL) {
 
         stopifnot(is(mat, "Matrix"))
 
@@ -605,14 +616,16 @@ setMethod("loadLPprob", signature(lp = "optObj_cplexAPI"),
                                nrows  = nRows,
                                rhs    = rlb,
                                sense  = crtype,
-                               rngval = crub)
+                               rngval = crub,
+                               rnames = rnames)
 
         # variables, bounds and objective function
         cplexAPI::newColsCPLEX(lp@oobj@env, lp@oobj@lp,
                                ncols  = nCols,
                                obj    = obj,
                                lb     = lb,
-                               ub     = ub)
+                               ub     = ub,
+                               cnames = cnames)
 
         # constraint matrix
         TMPmat <- as(mat, "TsparseMatrix")

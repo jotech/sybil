@@ -47,6 +47,9 @@ setMethod(f = "initialize",
                                 react = NULL, lb = NULL, ub = NULL,
                                 costcoefbw = NULL,
                                 costcoeffw = NULL,
+                                useNames = SYBIL_SETTINGS("USE_NAMES"),
+                                cnames = NULL,
+                                rnames = NULL,
                                 scaling = NULL,
                                 ...) {
 
@@ -172,6 +175,45 @@ setMethod(f = "initialize",
 
                   cobj <- c(rep(0, nc), bw, fw)
 
+
+                  # ---------------------------------------------
+                  # row and column names for the problem object
+                  # ---------------------------------------------
+
+                  if (isTRUE(useNames)) {
+                      if (is.null(cnames)) {
+                          cn <- c(react_id(model),
+                                  paste("bw", react_id(model), sep = "_"),
+                                  paste("fw", react_id(model), sep = "_")
+                          )
+                          colNames = sybil:::.makeLPcompatible(cn, prefix = "x")
+                      }
+                      else {
+                          stopifnot(is(cnames, "character"),
+                                    length(cnames) == nCols)
+                          colNames = cnames
+                      }
+
+                      if (is.null(rnames)) {
+                          rn <- c(met_id(model),
+                                  paste("bw", 1:nc, sep = "_"),
+                                  paste("fw", 1:nc, sep = "_"),
+                                  "obj_wt"
+                          )
+                          rowNames = sybil:::.makeLPcompatible(rn, prefix = "r")
+                      }
+                      else {
+                          stopifnot(is(rnames, "character"),
+                                    length(rnames) == nRows)
+                          rowNames = rnames
+                      }
+                  }
+                  else {
+                      colNames = NULL
+                      rowNames = NULL
+                  }
+
+
                   # ---------------------------------------------
                   # build problem object
                   # ---------------------------------------------
@@ -192,6 +234,8 @@ setMethod(f = "initialize",
                                             rtype      = rtype,
                                             lpdir      = "min",
                                             ctype      = NULL,
+                                            cnames     = colNames,
+                                            rnames     = rowNames,
                                             algPar     = list("wtobj" = wtobj,
                                                               "costcoefbw" = bw,
                                                               "costcoeffw" = fw),

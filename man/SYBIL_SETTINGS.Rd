@@ -6,6 +6,7 @@
 \alias{MAXIMUM}
 \alias{ALGORITHM}
 \alias{OPT_DIRECTION}
+\alias{USE_NAMES}
 \alias{PATH_TO_MODEL}
 \alias{SOLVER_CTRL_PARM}
 
@@ -128,6 +129,12 @@
     \item{\code{"OPT_DIRECTION"}}{
       Direction of optimization. Can be \code{"max"} or \code{"min"}.\cr
       Default: \code{"max"}.
+    }
+    \item{\code{"USE_NAMES"}}{
+      A logical value indicating if reaction id's and metabolite id's (or other
+      names) should be used as names for variables and constraints in objects of
+      class \code{\linkS4class{sysBiolAlg}}.\cr
+      Default: \code{FALSE}.
     }
     \item{\code{"PATH_TO_MODEL"}}{
       Path to a directory to read or write files.\cr

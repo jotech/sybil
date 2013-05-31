@@ -45,6 +45,9 @@ setMethod(f = "initialize",
                                 fixObjVal = TRUE,
                                 tol = SYBIL_SETTINGS("TOLERANCE"),
                                 lpdir = SYBIL_SETTINGS("OPT_DIRECTION"),
+                                useNames = SYBIL_SETTINGS("USE_NAMES"),
+                                cnames = NULL,
+                                rnames = NULL,
                                 scaling = NULL, ...) {
 
               if ( ! missing(model) ) {
@@ -58,6 +61,33 @@ setMethod(f = "initialize",
                   # problem dimensions
                   nCols <- react_num(model)
                   nRows <- met_num(model)
+
+                  # row and column names for the problem object
+                  if (isTRUE(useNames)) {
+                      if (is.null(cnames)) {
+                          colNames = sybil:::.makeLPcompatible(react_id(model),
+                                                               prefix = "x")
+                      }
+                      else {
+                          stopifnot(is(cnames, "character"),
+                                    length(cnames) == nCols)
+                          colNames = cnames
+                      }
+
+                      if (is.null(rnames)) {
+                          rowNames = sybil:::.makeLPcompatible(met_id(model),
+                                                               prefix = "r")
+                      }
+                      else {
+                          stopifnot(is(rnames, "character"),
+                                    length(rnames) == nRows)
+                          rowNames = rnames
+                      }
+                  }
+                  else {
+                      colNames = NULL
+                      rowNames = NULL
+                  }
 
                   .Object <- callNextMethod(.Object,
                                             sbalg      = "fv",
@@ -75,6 +105,8 @@ setMethod(f = "initialize",
                                             lpdir      = lpdir,
                                             rub        = NULL,
                                             ctype      = NULL,
+                                            cnames     = colNames,
+                                            rnames     = rowNames,
                                             algPar     = list("percentage" = percentage,
                                                               "Zopt"       = Zopt),
                                             ...)
@@ -111,10 +143,11 @@ setMethod(f = "initialize",
                       type <- ifelse(lpdir == "max", "L", "U")
                       oind <- which(obj_coef(model) != 0)
                       oval <- obj_coef(model)[oind]
-                      addRowsToProb(problem(.Object),
-                                    met_num(model)+1,
-                                    type, obj, obj,
-                                    list(oind), list(oval))
+                      addRowsToProb(lp = problem(.Object),
+                                    i = met_num(model)+1,
+                                    type = type, lb = obj, ub = obj,
+                                    cind = list(oind), nzval = list(oval),
+                                    rnames = "Z")
                       .Object@nr <- .Object@nr + 1L
                       .Object@alg_par[["Zopt"]] <- obj
 

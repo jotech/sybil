@@ -42,6 +42,7 @@
         MAXIMUM          = 1000,
         ALGORITHM        = "fba",
         OPT_DIRECTION    = "max",
+        USE_NAMES        = FALSE,
         PATH_TO_MODEL    = ".",
         SOLVER_CTRL_PARM = as.data.frame(NA)
     )

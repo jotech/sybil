@@ -145,7 +145,7 @@
       A single boolean, numeric or character value, controling the amount of
       terminal output of the solver software. See also \code{\link{initProb}}
       (argument \code{to}) for more details.\cr
-      Default: \code{FALSE}.
+      Default: \code{NULL}.
     }
     \item{sbalg}{
       Single character string containing the name of the algorithm to use.
@@ -215,6 +215,16 @@
       to \code{NULL}, no specific variable type is set, which usually means, all
       variables are treated as continuous variables.
       See \code{\link{loadLPprob}} for details.\cr
+      Default: \code{NULL}.
+    }
+    \item{cnames}{
+      A character vector of length \code{nCols} giving the variable names.
+      If set to \code{NULL}, no specific variable names are set.\cr
+      Default: \code{NULL}.
+    }
+    \item{rnames}{
+      A character vector of length \code{nRows} giving the constraint names.
+      If set to \code{NULL}, no specific constraint names are set.\cr
       Default: \code{NULL}.
     }
     \item{retAlgPar}{

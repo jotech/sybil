@@ -289,7 +289,7 @@ setMethod("addRowsToProb", signature(lp = "optObj_lpSolveAPI"),
     # "E" = fixed variable                 lb  = x  = ub
     # "R" = ranged constraint
 
-    function(lp, i, type, lb, ub, cind, nzval) {
+    function(lp, i, type, lb, ub, cind, nzval, rnames = NULL) {
 
         for (k in seq(along = i)) {
             ltype <- switch(type[k],
@@ -300,6 +300,13 @@ setMethod("addRowsToProb", signature(lp = "optObj_lpSolveAPI"),
             )
             out <- lpSolveAPI::add.constraint(lp@oobj, nzval[[k]],
                                               ltype, lb[k], cind[[k]])
+        }
+
+        # row names
+        if (!is.null(rnames)) {
+            rrnames <- sub("(", "_", rnames, fixed = TRUE)
+            rrnames <- sub(")", "_", rrnames, fixed = TRUE)
+            rownames(lp@oobj)[i] <- rrnames
         }
 
         return(out)
@@ -469,7 +476,8 @@ setMethod("changeMatrixRow", signature(lp = "optObj_lpSolveAPI"),
 setMethod("loadLPprob", signature(lp = "optObj_lpSolveAPI"),
 
     function(lp, nCols, nRows, mat, ub, lb, obj, rlb, rtype,
-             lpdir = "max", rub = NULL, ctype = NULL) {
+             lpdir = "max", rub = NULL, ctype = NULL,
+             cnames = NULL, rnames = NULL) {
 
         stopifnot(is(mat, "Matrix"))
 
@@ -527,6 +535,14 @@ setMethod("loadLPprob", signature(lp = "optObj_lpSolveAPI"),
             }
         }
 
+        # row and column names
+        if ( (!is.null(rnames)) && (!is.null(cnames)) ) {
+            rrnames <- sub("(", "_", rnames, fixed = TRUE)
+            rrnames <- sub(")", "_", rrnames, fixed = TRUE)
+            ccnames <- sub("(", "_", cnames, fixed = TRUE)
+            ccnames <- sub(")", "_", ccnames, fixed = TRUE)
+            dimnames(lp@oobj) <- list(rrnames, ccnames)
+        }
     }
 )
 

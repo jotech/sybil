@@ -260,6 +260,8 @@
       \code{"Nnnz"}         \tab number of non-zero elements in
                                  the stoichiometric matrix        \cr
   }
+  If a file contains a certain column name, there must be no empty entries.
+  
   If a model description file is provided, it is supposed to contain at least
   the entries \code{"name"} and \code{"id"}.  Otherwise, the filename of the
   reactions list will be used (the filename extension and the string

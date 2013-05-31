@@ -53,8 +53,10 @@
 }
 
 \details{
-  Metabolite id's not beginning with a letter will be prefixed by the letter
-  \code{"n"} and square brackets will be replaced by round brackets.
+  Metabolite id's beginning with a digit or period will be prefixed by the
+  letter \code{"r"}, reaction id's beginning with a digit or period will be
+  prefixed by the letter \code{"x"} and square brackets in reaction or
+  metabolite id's will be replaced by round brackets.
 }
 
 \author{

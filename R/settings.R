@@ -92,6 +92,10 @@ SYBIL_SETTINGS <- function(parm, value, ...) {
             }
         },
     
+        "USE_NAMES" = {
+            .SYBILenv$settings[["USE_NAMES"]] <- as.logical(value)
+        },
+
         "PATH_TO_MODEL" = {
             if (file.exists(value)) {
                 .SYBILenv$settings[["PATH_TO_MODEL"]] <- as.character(value)

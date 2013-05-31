@@ -97,7 +97,16 @@ doubleGeneDel <- function(model, geneList1, geneList2, lb = NULL, ub = NULL,
 
         ca <- match.call()
         if ("solver" %in% names(ca)) {
-            slv <- as.character(ca["solver"])
+            # It is necessary to test, whether argument solver has a variable,
+            # or not. If it is a variable, it needs to be evaluated.
+            testslv <- tryCatch(eval(parse(text = ca["solver"])),
+                                error = function(e) e)
+            if (is(testslv, "simpleError")) {
+                slv <- as.character(ca["solver"])
+            }
+            else {
+                slv <- as.character(testslv)
+            }
         }
         else {
             slv <- SYBIL_SETTINGS("SOLVER")

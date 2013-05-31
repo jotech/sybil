@@ -115,6 +115,10 @@ setGeneric(name = "changeRowsBnds",
            def  = function(lp, ...) { standardGeneric("changeRowsBnds") }
 )
 
+setGeneric(name = "changeUptake",
+           def  = function(object, ...) { standardGeneric("changeUptake") }
+)
+
 setGeneric(name = "checkOptSol",
            def  = function(opt, ...) { standardGeneric("checkOptSol") }
 )

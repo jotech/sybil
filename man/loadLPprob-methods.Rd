@@ -21,19 +21,23 @@
 \usage{
 \S4method{loadLPprob}{optObj_clpAPI}(lp,
            nCols, nRows, mat, ub, lb, obj, rlb, rtype,
-           lpdir = "max", rub = NULL, ctype = NULL)
+           lpdir = "max", rub = NULL, ctype = NULL,
+           cnames = NULL, rnames = NULL)
 
 \S4method{loadLPprob}{optObj_cplexAPI}(lp,
            nCols, nRows, mat, ub, lb, obj, rlb, rtype,
-           lpdir = "max", rub = NULL, ctype = NULL)
+           lpdir = "max", rub = NULL, ctype = NULL,
+           cnames = NULL, rnames = NULL)
 
 \S4method{loadLPprob}{optObj_glpkAPI}(lp,
            nCols, nRows, mat, ub, lb, obj, rlb, rtype,
-           lpdir = "max", rub = NULL, ctype = NULL)
+           lpdir = "max", rub = NULL, ctype = NULL,
+           cnames = NULL, rnames = NULL)
 
 \S4method{loadLPprob}{optObj_lpSolveAPI}(lp,
            nCols, nRows, mat, ub, lb, obj, rlb, rtype,
-           lpdir = "max", rub = NULL, ctype = NULL)
+           lpdir = "max", rub = NULL, ctype = NULL,
+           cnames = NULL, rnames = NULL)
 }
 
 \section{Methods}{
@@ -134,11 +138,30 @@
     If \code{ctype[j]} is not \code{"C"}, \code{"B"}, \code{"I"}, \code{"S"},
     or \code{"N"}, the value of \code{ctype[j]} will be set to \code{"C"}.
   }
+  \item{cnames}{
+    A character vector of length \code{nCols} containing symbolic names for
+    the variable of the problem object.
+  }
+  \item{rnames}{
+    A character vector of length \code{nRows} containing symbolic names for
+    the constraints of the problem object.
+  }
 }
 
 \details{
   Method \code{loadLPprob} can be used any time after a problem object is
   initialized by \code{\link{initProb}}.
+  
+  For the \code{\linkS4class{optObj_glpkAPI}} method: if \code{cnames} or
+  \code{rnames} is not \code{NULL}, an index will be created.
+
+  For the \code{\linkS4class{optObj_clpAPI}} method: if \code{cnames} is
+  not \code{NULL}, \code{rnames} must be also not \code{NULL} and vice versa.
+
+  For the \code{\linkS4class{optObj_lpSolveAPI}} method: if \code{cnames} is
+  not \code{NULL}, \code{rnames} must be also not \code{NULL} and vice versa.
+  Round brackets (\code{"("} and \code{)}) will be replaced by underscores
+  \code{"_"}.
 }
 
 \author{

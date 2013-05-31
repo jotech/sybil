@@ -73,10 +73,11 @@ setMethod(f = "initialize",
                                 solver = SYBIL_SETTINGS("SOLVER"),
                                 method = SYBIL_SETTINGS("METHOD"),
                                 solverParm = SYBIL_SETTINGS("SOLVER_CTRL_PARM"),
-                                termOut = FALSE,
+                                termOut = NULL,
                                 sbalg, pType = "lp", scaling = NULL, fi, nCols,
                                 nRows, mat, ub, lb, obj, rlb, rtype,
                                 lpdir = "max", rub = NULL, ctype = NULL,
+                                cnames = NULL, rnames = NULL,
                                 retAlgPar = TRUE, algPar = list(NULL)) {
 
               if ( (!missing(solver)) ||
@@ -132,7 +133,9 @@ setMethod(f = "initialize",
                              rtype = rtype,
                              lpdir = lpdir,
                              rub   = rub,
-                             ctype = ctype)
+                             ctype = ctype,
+                             cnames = cnames,
+                             rnames = rnames)
 
 
                   # ---------------------------------------------

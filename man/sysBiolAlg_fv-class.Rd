@@ -93,6 +93,24 @@
       Can be set to \code{"min"} or \code{"max"}.\cr
       Default: \code{SYBIL_SETTINGS("OPT_DIRECTION")}.
     }
+    \item{useNames}{
+      A single boolean value. If set to \code{TRUE}, variables and constraints
+      will be named according to \code{cnames} and \code{rnames}. If set to
+      \code{NULL}, no specific variable or constraint names are set.\cr
+      Default: \code{SYBIL_SETTINGS("USE_NAMES")}.
+    }
+    \item{cnames}{
+      A character vector giving the variable names. If set to \code{NULL},
+      the reaction id's of \code{model} are used.\cr
+      Default: \code{NULL}.
+    }
+    \item{rnames}{
+      A character vector giving the constraint names. If set to \code{NULL},
+      the metabolite id's of \code{model} are used. If an objective value has
+      to be fixed (see argument \code{fixObjVal}), the corresponding constrained
+      is named \code{"Z"}.\cr
+      Default: \code{NULL}.
+    }
     \item{scaling}{
       Scaling options used to scale the constraint matrix. If set to
       \code{NULL}, no scaling will be performed

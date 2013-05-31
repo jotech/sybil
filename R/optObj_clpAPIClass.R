@@ -302,11 +302,17 @@ setMethod("addRowsToProb", signature(lp = "optObj_clpAPI"),
     # "E" = fixed variable                 lb  = x  = ub
     # "R" = ranged constraint
 
-    function(lp, i, type, lb, ub, cind, nzval) {
+    function(lp, i, type, lb, ub, cind, nzval, rnames = NULL) {
 
         cst <- c(0, cumsum(unlist(lapply(cind, length))))
         out <- clpAPI::addRowsCLP(lp@oobj, length(i), lb, ub,
                                   cst, unlist(cind)-1, unlist(nzval))
+
+        #if (!is.null(rnames)) {
+        #    for (rind in seq(along = i)) {
+        #        clpAPI::rowNameCLP(lp@oobj, i = i[rind], rname = rnames[rind])
+        #    }
+        #}
 
         return(out)
     }
@@ -459,7 +465,8 @@ setMethod("getObjCoefs", signature(lp = "optObj_clpAPI", j = "numeric"),
 setMethod("loadLPprob", signature(lp = "optObj_clpAPI"),
 
     function(lp, nCols, nRows, mat, ub, lb, obj, rlb, rtype,
-             lpdir = "max", rub = NULL, ctype = NULL) {
+             lpdir = "max", rub = NULL, ctype = NULL,
+             cnames = NULL, rnames = NULL) {
 
         stopifnot(is(mat, "Matrix"))
         
@@ -491,6 +498,10 @@ setMethod("loadLPprob", signature(lp = "optObj_clpAPI"),
                                rlb      = rlb,
                                rub      = crub)
 
+        # row and column names
+        if ( (!is.null(rnames)) && (!is.null(cnames)) ) {
+            clpAPI::copyNamesCLP(lp@oobj, cnames = cnames, rnames = rnames)
+        }
     }
 )
 

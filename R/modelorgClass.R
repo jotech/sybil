@@ -786,18 +786,21 @@ setMethod("printMetabolite", signature(object = "modelorg"),
             }
         }
         
-        midbr <- sub("[", "(", mid, fixed = TRUE)
-        midbr <- sub("]", ")", midbr, fixed = TRUE)
-        midbr <- sub("^([^a-z])", "n\\1", midbr,
-                     perl = TRUE, ignore.case = TRUE)
+        # format metabolite id's to be compatible with CPLEX LP format
+        midbr <- sybil:::.makeLPcompatible(name = mid, prefix = "r", sep = "")
+
+        # format reaction id's to be compatible with CPLEX LP format
+        reaction_id <- sybil:::.makeLPcompatible(name = react_id(object),
+                                                 prefix = "x", sep = "")
 
         mat <- S(object)[rind, , drop = FALSE]
         nnz <- apply(mat, 1, "!=", 0)
         metabolite <- character(length(rind))
 
+
         for (i in seq(along = rind)) {
         
-            react <- react_id(object)[nnz[, i]]
+            react <- reaction_id[nnz[, i]]
             nzv   <- mat[i, ][nnz[, i]]
             
             nm <- nzv != 0
@@ -822,7 +825,7 @@ setMethod("printMetabolite", signature(object = "modelorg"),
             bnds <- c("",
                       "Bounds",
                       paste(paste("", lowbnd(object)),
-                            react_id(object), uppbnd(object), sep = " <= "),
+                            reaction_id, uppbnd(object), sep = " <= "),
                       "",
                       "End")
             
@@ -908,6 +911,70 @@ setMethod("shrinkMatrix", signature(X = "modelorg"),
               
     }
 )
+
+
+#------------------------------------------------------------------------------#
+
+setMethod("changeUptake", signature(object = "modelorg"),
+    function(object, off = NULL, on = NULL,
+             rate = SYBIL_SETTINGS("MAXIMUM") * -1) {
+  	
+        ex <- findExchReact(object)
+
+        if (is.null(off)) {
+            reactOFF <- react_pos(ex)[uptake(ex)]
+        }
+        else {
+            # metabolite id
+            if (is(off, "character")) {
+                met      <- which(met_id(ex) %in% off)
+                reactOFF <- react_pos(ex)[met]
+            }
+            # metabolite index in S
+            else if (is(off, "numeric")) {
+                met      <- which(met_pos(ex) %in% off)
+                reactOFF <- react_pos(ex)[met]
+            }
+            # exchange reactions
+            else if (is(off, "reactId_Exch")) {
+                reactOFF <- react_pos(off)
+            }
+            else {
+                stop("check argument off")
+            }
+        }
+
+        lowbnd(object)[reactOFF] <- 0
+
+        if (!is.null(on)) {
+            # metabolite id
+            if (is(on, "character")) {
+                met     <- which(met_id(ex) %in% on)
+                reactON <- react_pos(ex)[met]
+            }
+            # metabolite index in S
+            else if (is(on, "numeric")) {
+                met     <- which(met_pos(ex) %in% on)
+                reactON <- react_pos(ex)[met]
+            }
+            # exchange reactions
+            else if (is(on, "reactId_Exch")) {
+                reactON <- react_pos(on)
+            }
+            else {
+                stop("check argument on")
+            }
+
+            lowbnd(object)[reactON] <- rate
+        }
+        
+        return(object)
+              
+    }
+)
+
+
+
 
 
 

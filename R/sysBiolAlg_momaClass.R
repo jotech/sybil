@@ -42,6 +42,9 @@ setMethod(f = "initialize",
                                 model,
                                 wtflux = NULL,
                                 Qmat = NULL,
+                                useNames = SYBIL_SETTINGS("USE_NAMES"),
+                                cnames = NULL,
+                                rnames = NULL,
                                 scaling = NULL, ...) {
 
               if ( ! missing(model) ) {
@@ -82,6 +85,33 @@ setMethod(f = "initialize",
                       Q <- Qmat
                   }
 
+                  # row and column names for the problem object
+                  if (isTRUE(useNames)) {
+                      if (is.null(cnames)) {
+                          colNames = sybil:::.makeLPcompatible(react_id(model),
+                                                               prefix = "x")
+                      }
+                      else {
+                          stopifnot(is(cnames, "character"),
+                                    length(cnames) == nCols)
+                          colNames = cnames
+                      }
+
+                      if (is.null(rnames)) {
+                          rowNames = sybil:::.makeLPcompatible(met_id(model),
+                                                               prefix = "r")
+                      }
+                      else {
+                          stopifnot(is(rnames, "character"),
+                                    length(rnames) == nRows)
+                          rowNames = rnames
+                      }
+                  }
+                  else {
+                      colNames = NULL
+                      rowNames = NULL
+                  }
+
 
                   # ---------------------------------------------
                   # build problem object
@@ -104,6 +134,8 @@ setMethod(f = "initialize",
                                             lpdir      = "min",
                                             rub        = NULL,
                                             ctype      = NULL,
+                                            cnames     = colNames,
+                                            rnames     = rowNames,
                                             algPar     = list("wtflux" = wtsol,
                                                               "Qmat" = Q),
                                             ...)

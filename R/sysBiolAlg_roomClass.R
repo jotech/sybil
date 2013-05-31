@@ -56,6 +56,9 @@ setMethod(f = "initialize",
                                 delta = 0.03,
                                 epsilon = 0.001,
                                 LPvariant = FALSE,
+                                useNames = SYBIL_SETTINGS("USE_NAMES"),
+                                cnames = NULL,
+                                rnames = NULL,
                                 scaling = NULL, ...) {
 
               if ( ! missing(model) ) {
@@ -182,6 +185,42 @@ setMethod(f = "initialize",
 
 
                   # ---------------------------------------------
+                  # row and column names for the problem object
+                  # ---------------------------------------------
+
+                  if (isTRUE(useNames)) {
+                      if (is.null(cnames)) {
+                          cn <- c(react_id(model),
+                                  paste("oo", react_id(model), sep = "_")
+                          )
+                          colNames = sybil:::.makeLPcompatible(cn, prefix = "x")
+                      }
+                      else {
+                          stopifnot(is(cnames, "character"),
+                                    length(cnames) == nCols)
+                          colNames = cnames
+                      }
+
+                      if (is.null(rnames)) {
+                          rn <- c(met_id(model),
+                                  paste("wl", react_id(model), sep = "_"),
+                                  paste("wu", react_id(model), sep = "_")
+                          )
+                          rowNames = sybil:::.makeLPcompatible(rn, prefix = "r")
+                      }
+                      else {
+                          stopifnot(is(rnames, "character"),
+                                    length(rnames) == nRows)
+                          rowNames = rnames
+                      }
+                  }
+                  else {
+                      colNames = NULL
+                      rowNames = NULL
+                  }
+
+
+                  # ---------------------------------------------
                   # build problem object
                   # ---------------------------------------------
 
@@ -201,6 +240,8 @@ setMethod(f = "initialize",
                                             rtype      = rtype,
                                             ctype      = ctype,
                                             lpdir      = "min",
+                                            cnames     = colNames,
+                                            rnames     = rowNames,
                                             algPar     = list("wtflux"  = wtflux,
                                                               "delta"   = delta,
                                                               "epsilon" = epsilon),
