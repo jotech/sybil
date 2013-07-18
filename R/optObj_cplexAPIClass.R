@@ -329,6 +329,50 @@ setMethod("addColsToProb", signature(lp = "optObj_cplexAPI"),
 
 #------------------------------------------------------------------------------#
 
+#setMethod("addRowsToProb", signature(lp = "optObj_cplexAPI"),
+#
+#    # i: vector containing the new row indices (must be ascending)
+#    # cind: list, containing the column indices of the new nz elements
+#    # nzval: list, containing the new nz elements
+#    #
+#    # i, type, lb, cind and nzval must have the same length
+#    #
+#    # type can be one of the following:
+#    # "F" = free variable                -INF <  x <  INF
+#    # "L" = variable with lower bound      lb <= x <  INF
+#    # "U" = variable with upper bound    -INF <  x <= ub
+#    # "D" = double-bounded variable        lb <= x <= ub
+#    # "E" = fixed variable                 lb  = x  = ub
+#    # "R" = ranged constraint
+#
+#    function(lp, i, type, lb, ub, cind, nzval, rnames = NULL) {
+#
+#        cptype = character(length(type))
+#        for (l in seq(along = type)) {
+#            cptype[l] <- switch(type[l],
+#                "L" = { "G" },
+#                "U" = { "L" },
+#                "E" = { "E" },
+#                "R" = { "R" },
+#                      { "E" }
+#            )
+#        }
+#
+#        beg <- c(0, cumsum(unlist(lapply(cind, length))))
+#        out <- cplexAPI::addRowsCPLEX(env = lp@oobj@env, lp = lp@oobj@lp,
+#                                      ncols = 0, nrows = length(i),
+#                                      nnz = length(unlist(nzval)),
+#                                      matbeg = beg, matind = unlist(cind)-1,
+#                                      matval = unlist(nzval), rhs = lb,
+#                                      sense = cptype, rnames = rnames)
+#
+#        return(out)
+#    }
+#)
+
+
+#------------------------------------------------------------------------------#
+
 setMethod("addRowsToProb", signature(lp = "optObj_cplexAPI"),
 
     # i: vector containing the new row indices (must be ascending)
@@ -343,7 +387,6 @@ setMethod("addRowsToProb", signature(lp = "optObj_cplexAPI"),
     # "U" = variable with upper bound    -INF <  x <= ub
     # "D" = double-bounded variable        lb <= x <= ub
     # "E" = fixed variable                 lb  = x  = ub
-    # "R" = ranged constraint
 
     function(lp, i, type, lb, ub, cind, nzval, rnames = NULL) {
 
@@ -352,19 +395,37 @@ setMethod("addRowsToProb", signature(lp = "optObj_cplexAPI"),
             cptype[l] <- switch(type[l],
                 "L" = { "G" },
                 "U" = { "L" },
+                "D" = { "R" },
                 "E" = { "E" },
-                "R" = { "R" },
                       { "E" }
             )
         }
 
+        stopifnot(length(lb) == length(ub))
+        rng      <- cptype == "R"
+        cub      <- abs(ub[rng] - lb[rng])     # range
+        
+        ubc      <- cptype == "L"
+        clb      <- lb
+        clb[ubc] <- ub[ubc]
+        
         beg <- c(0, cumsum(unlist(lapply(cind, length))))
         out <- cplexAPI::addRowsCPLEX(env = lp@oobj@env, lp = lp@oobj@lp,
                                       ncols = 0, nrows = length(i),
                                       nnz = length(unlist(nzval)),
                                       matbeg = beg, matind = unlist(cind)-1,
-                                      matval = unlist(nzval), rhs = lb,
+                                      matval = unlist(nzval), rhs = clb,
                                       sense = cptype, rnames = rnames)
+
+        # set ranged (double bounded constraints)
+        if (sum(rng) > 0) {
+            print("arsch")
+            print(i[rng])
+            cplexAPI::chgRngValCPLEX(env = lp@oobj@env, lp = lp@oobj@lp,
+                                     nrows = sum(rng),
+                                     ind = i[rng]-1,
+                                     val = cub)
+        }
 
         return(out)
     }
@@ -436,9 +497,32 @@ setMethod("changeRowsBnds", signature(lp = "optObj_cplexAPI"),
 
     function(lp, i, lb, ub) {
 
-        out <- cplexAPI::chgRhsCPLEX(lp@oobj@env, lp@oobj@lp,
-                                     length(i), i-1, lb)
+#        out <- cplexAPI::chgRhsCPLEX(lp@oobj@env, lp@oobj@lp,
+#                                     length(i), i-1, lb)
 
+        stopifnot(length(lb) == length(ub))
+        clb <- lb
+       
+        ct <- mapply(cplexAPI::getSenseCPLEX, i-1, i-1,
+                     MoreArgs = list(env = lp@oobj@env, lp  = lp@oobj@lp))
+        
+        # If a constraint is a ranged constraint, the range is build as ub - lb.
+        # For a constraint with an upper bound ('lower than'), the bound in rb
+        # is used. For equality constraints, lb is used.
+        
+        rng      <- ct == "R"
+        lbc      <- ct == "L"
+        clb[lbc] <- ub[lbc]
+        
+        out <- cplexAPI::chgRhsCPLEX(lp@oobj@env, lp@oobj@lp,
+                                     length(i), i-1, clb)
+
+        if (sum(rng) > 0) {
+            rngv <- abs(ub[rng] - lb[rng])
+            out  <- chgRngValCPLEX(lp@oobj@env, lp@oobj@lp,
+                                   sum(rng), i[rng]-1, rngv)
+        }
+        
         return(out)
     }
 )
@@ -542,11 +626,114 @@ setMethod("changeMatrixRow", signature(lp = "optObj_cplexAPI"),
 
 #------------------------------------------------------------------------------#
 
+#setMethod("loadLPprob", signature(lp = "optObj_cplexAPI"),
+#
+#    function(lp, nCols, nRows, mat, ub, lb, obj, rlb, rtype,
+#             lpdir = "max", rub = NULL, ctype = NULL,
+#             cnames = NULL, rnames = NULL) {
+#
+#        stopifnot(is(mat, "Matrix"))
+#
+#        crtype <- sapply(rtype,
+#                         function(x) switch(x,
+#                                            "L" = { "G" },
+#                                            "U" = { "L" },
+#                                            "E" = { "E" },
+#                                            "R" = { "R" },
+#                                                  { "E" }))
+#
+#        # ranged constraints
+#        if (is.null(rub)) {
+#            crub <- NULL
+#        }
+#        else {
+#            #rng        <- rtype == "R"
+#            rng        <- rtype %in% "R"
+#            crub       <- numeric(nRows)
+#            crub[rng]  <- rlb[rng] - rlb[rng]
+#            crub[!rng] <- 0
+#        }
+#
+##
+##        # problem type
+##         ptype <- switch(lp@probType,
+##             "lp"  = { CPXPROB_LP },
+##             "mip" = { CPXPROB_MILP },
+##                     { CPXPROB_LP }
+##         )
+##         cplexAPI::chgProbTypeCPLEX(lp@oobj@env, lp@oobj@lp, ptype)
+#
+#
+##
+##        # load problem
+##        TMPmat <- as(mat, "CsparseMatrix")
+##        cplexAPI::copyLpCPLEX(lp@oobj@env, lp@oobj@lp,
+##                              nCols  = nCols,
+##                              nRows  = nRows,
+##                              lpdir  = ifelse(lpdir == "max",
+##                                              cplexAPI::CPX_MAX,
+##                                              cplexAPI::CPX_MIN),
+##                              objf   = obj,
+##                              rhs    = rlb,
+##                              sense  = crtype,
+##                              matbeg = TMPmat@p,
+##                              matcnt = colSums(mat != 0),
+##                              matind = TMPmat@i,
+##                              matval = TMPmat@x,
+##                              lb     = lb,
+##                              ub     = ub,
+##                              rngval = crub)
+##
+##        if (!is.null(ctype)) {
+##            cplexAPI::chgColTypeCPLEX(lp@oobj@env, lp@oobj@lp,
+##                                      ncols  = nCols,
+##                                      ind    = c(1:nCols),
+##                                      xctype = ctype)
+##        }
+##
+#
+#        # optimization direction
+#        setObjDir(lp, lpdir = lpdir)
+#
+#        # constraints and right hand side
+#        cplexAPI::newRowsCPLEX(lp@oobj@env, lp@oobj@lp,
+#                               nrows  = nRows,
+#                               rhs    = rlb,
+#                               sense  = crtype,
+#                               rngval = crub,
+#                               rnames = rnames)
+#
+#        # variables, bounds and objective function
+#        cplexAPI::newColsCPLEX(lp@oobj@env, lp@oobj@lp,
+#                               ncols  = nCols,
+#                               obj    = obj,
+#                               lb     = lb,
+#                               ub     = ub,
+#                               cnames = cnames)
+#
+#        # constraint matrix
+#        TMPmat <- as(mat, "TsparseMatrix")
+#        cplexAPI::chgCoefListCPLEX(lp@oobj@env, lp@oobj@lp,
+#                                   nnz = length(TMPmat@x),
+#                                   ia  = TMPmat@i,
+#                                   ja  = TMPmat@j,
+#                                   ra  = TMPmat@x)
+#
+#        if (!is.null(ctype)) {
+#            cplexAPI::copyColTypeCPLEX(lp@oobj@env, lp@oobj@lp,
+#                                       xctype = ctype)
+#        }
+#    }
+#)
+
+
+#------------------------------------------------------------------------------#
+
 setMethod("loadLPprob", signature(lp = "optObj_cplexAPI"),
 
     function(lp, nCols, nRows, mat, ub, lb, obj, rlb, rtype,
              lpdir = "max", rub = NULL, ctype = NULL,
-             cnames = NULL, rnames = NULL) {
+             cnames = NULL, rnames = NULL, pname = NULL) {
 
         stopifnot(is(mat, "Matrix"))
 
@@ -554,20 +741,32 @@ setMethod("loadLPprob", signature(lp = "optObj_cplexAPI"),
                          function(x) switch(x,
                                             "L" = { "G" },
                                             "U" = { "L" },
+                                            "D" = { "R" },
                                             "E" = { "E" },
-                                            "R" = { "R" },
                                                   { "E" }))
 
         # ranged constraints
         if (is.null(rub)) {
             crub <- NULL
+            crlb <- rlb
         }
         else {
-            #rng        <- rtype == "R"
-            rng        <- rtype %in% "R"
+            # CPLEX only has a right-hand-side (rhs) and a so called range value
+            # for reanged constraints. The value in rub is used to calculate the
+            # range value (if required).
+            # Range for constraint i is abs(rub[i] - rlb[i]) The interval for
+            # constraint i then is [ rlb[i] , rlb[i] + range ] .
+            # For constraints with an upper bound, the value in rub is copied
+            # to rlb.
+            
+            stopifnot(length(rlb) == length(rub))
+            rng        <- crtype == "R"
             crub       <- numeric(nRows)
-            crub[rng]  <- rlb[rng] - rlb[rng]
-            crub[!rng] <- 0
+            crub[rng]  <- abs(rub[rng] - rlb[rng])     # range
+            
+            ubc        <- crtype == "L"
+            crlb       <- rlb
+            crlb[ubc]  <- rub[ubc]
         }
 
 #
@@ -614,7 +813,7 @@ setMethod("loadLPprob", signature(lp = "optObj_cplexAPI"),
         # constraints and right hand side
         cplexAPI::newRowsCPLEX(lp@oobj@env, lp@oobj@lp,
                                nrows  = nRows,
-                               rhs    = rlb,
+                               rhs    = crlb,
                                sense  = crtype,
                                rngval = crub,
                                rnames = rnames)
@@ -639,6 +838,13 @@ setMethod("loadLPprob", signature(lp = "optObj_cplexAPI"),
             cplexAPI::copyColTypeCPLEX(lp@oobj@env, lp@oobj@lp,
                                        xctype = ctype)
         }
+
+        # problem name
+        if (!is.null(pname)) {
+            cplexAPI::chgProbNameCPLEX(lp@oobj@env, lp@oobj@lp,
+                                       probname = pname)
+        }
+
     }
 )
 

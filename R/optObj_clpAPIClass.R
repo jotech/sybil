@@ -300,12 +300,17 @@ setMethod("addRowsToProb", signature(lp = "optObj_clpAPI"),
     # "U" = variable with upper bound    -INF <  x <= ub
     # "D" = double-bounded variable        lb <= x <= ub
     # "E" = fixed variable                 lb  = x  = ub
-    # "R" = ranged constraint
 
     function(lp, i, type, lb, ub, cind, nzval, rnames = NULL) {
 
+        stopifnot(length(lb) == length(ub))
+        cub <- ub
+        ebc <- type == "E"
+        cub[ebc] <- lb[ebc]
+
         cst <- c(0, cumsum(unlist(lapply(cind, length))))
-        out <- clpAPI::addRowsCLP(lp@oobj, length(i), lb, ub,
+
+        out <- clpAPI::addRowsCLP(lp@oobj, length(i), lb, cub,
                                   cst, unlist(cind)-1, unlist(nzval))
 
         #if (!is.null(rnames)) {
@@ -466,7 +471,9 @@ setMethod("loadLPprob", signature(lp = "optObj_clpAPI"),
 
     function(lp, nCols, nRows, mat, ub, lb, obj, rlb, rtype,
              lpdir = "max", rub = NULL, ctype = NULL,
-             cnames = NULL, rnames = NULL) {
+             cnames = NULL, rnames = NULL, pname = NULL,
+             defLowerBnd = SYBIL_SETTINGS("MAXIMUM") * -1,
+             defUpperBnd = SYBIL_SETTINGS("MAXIMUM")) {
 
         stopifnot(is(mat, "Matrix"))
         
@@ -475,10 +482,31 @@ setMethod("loadLPprob", signature(lp = "optObj_clpAPI"),
         }
 
         if (is.null(rub)) {
-            crub <- numeric(nRows)
+            stopifnot(is(defLowerBnd, "numeric"), is(defUpperBnd, "numeric"))
+            ##crub <- numeric(nRows)
+            # Default value for upper bound is SYBIL_SETTINGS("MAXIMUM").
+            
+            # If a constraint has an upper bound (type "U"), the corresponding
+            # value is copied from rlb to crub and crlb get's the default
+            # lower bound SYBIL_SETTINGS("MAXIMUM") * -1.
+            
+            # If a constraint is equality (type "E"), the corresponding
+            # value is copied from rlb to crub.
+
+            crub <- rep(defUpperBnd, nRows)
+            crlb <- rlb
+            ubc  <- rtype == "U"
+            crub[ubc] <- rlb[ubc]
+            crlb[ubc] <- defLowerBnd
+            ebc  <- rtype == "E"
+            crub[ebc] <- rlb[ebc]
         }
         else {
+            stopifnot(length(rub) == length(rlb))
             crub <- rub
+            crlb <- rlb
+            ebc  <- rtype == "E"
+            crub[ebc] <- crlb[ebc]
         }
 
         # optimization direction
@@ -495,12 +523,17 @@ setMethod("loadLPprob", signature(lp = "optObj_clpAPI"),
                                lb       = lb,
                                ub       = ub,
                                obj_coef = obj,
-                               rlb      = rlb,
+                               rlb      = crlb,
                                rub      = crub)
 
         # row and column names
         if ( (!is.null(rnames)) && (!is.null(cnames)) ) {
             clpAPI::copyNamesCLP(lp@oobj, cnames = cnames, rnames = rnames)
+        }
+
+        # problem name
+        if (!is.null(rnames)) {
+            clpAPI::probNameCLP(lp@oobj, pname = pname)
         }
     }
 )

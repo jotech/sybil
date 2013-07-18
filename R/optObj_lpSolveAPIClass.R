@@ -291,15 +291,26 @@ setMethod("addRowsToProb", signature(lp = "optObj_lpSolveAPI"),
 
     function(lp, i, type, lb, ub, cind, nzval, rnames = NULL) {
 
+        stopifnot(length(lb) == length(ub))
         for (k in seq(along = i)) {
             ltype <- switch(type[k],
                             "L" = { 2 },
                             "U" = { 1 },
+                            "D" = { 1 },
                             "E" = { 3 },
                                   { 3 }
             )
-            out <- lpSolveAPI::add.constraint(lp@oobj, nzval[[k]],
-                                              ltype, lb[k], cind[[k]])
+
+
+            if (type[k] == "D") {
+                out <- lpSolveAPI::add.constraint(lp@oobj, nzval[[k]],
+                                                 ltype, ub[k], cind[[k]], lb[k])
+            }
+            else {
+                clb <- ifelse(type[k] == "U", ub[k], lb[k])
+                out <- lpSolveAPI::add.constraint(lp@oobj, nzval[[k]],
+                                                  ltype, clb, cind[[k]])
+            }
         }
 
         # row names
@@ -374,7 +385,7 @@ setMethod("changeRowsBnds", signature(lp = "optObj_lpSolveAPI"),
 
     function(lp, i, lb, ub) {
 
-        out <- lpSolveAPI::set.constr.value(lp@oobj, rhs = ub, lhs = lb,
+        out <- lpSolveAPI::set.constr.value(lp@oobj, rhs = lb, lhs = ub,
                                                                 constraints = i)
         return(out)
     }
@@ -477,7 +488,7 @@ setMethod("loadLPprob", signature(lp = "optObj_lpSolveAPI"),
 
     function(lp, nCols, nRows, mat, ub, lb, obj, rlb, rtype,
              lpdir = "max", rub = NULL, ctype = NULL,
-             cnames = NULL, rnames = NULL) {
+             cnames = NULL, rnames = NULL, pname = NULL) {
 
         stopifnot(is(mat, "Matrix"))
 
@@ -487,8 +498,48 @@ setMethod("loadLPprob", signature(lp = "optObj_lpSolveAPI"),
                          function(x) switch(x,
                                             "L" = { 2 },
                                             "U" = { 1 },
+                                            "D" = { 1 },
                                             "E" = { 3 },
                                                   { 3 }))
+
+        # constraints with double bound
+        if (is.null(rub)) {
+            crub <- NULL
+            crlb <- rlb
+        }
+        else {
+            # Package lpSolveAPI uses rhs and lhs for constraints, but -- as far
+            # as I can see -- lhs does not work.
+            # If there is a maximization problem, the values from rub for double
+            # bounded constraints and constraints with upper bounds are
+            # exchanged for the corresponding values in rlb.
+            # If there is a minimization problem, the values from rub
+            # constraints with only upper bounds are exchanged for the
+            # corresponding values in rlb. For constraints with double bounds,
+            # the constraint type is changed to a constraint with lower bound
+            # (the upper bound should not be reached, because of the
+            #  minimization).
+            # Now, rlb is used as rhs and rub as rls for lpSolveAPI.
+            
+            stopifnot(length(rlb) == length(rub))
+            crub       <- rub
+            crlb       <- rlb
+
+            # for a max problem: the constraining bound is the upper bound
+            # for a min problem: the constraining bound is the lower bound
+
+            if (lpdir == "max") {
+                dbc    <- crtype == 1      # double bound and upper bound
+            }
+            else {
+                dbc    <- rtype == "U"     # only upper bounds
+                dbl    <- rtype == "D"
+                crtype[dbl] <- 2
+            }
+            tmp        <- crlb[dbc]
+            crlb[dbc]  <- crub[dbc]
+            crub[dbc]  <- tmp
+        }
 
         # optimization direction
         lpSolveAPI::lp.control(lp@oobj, sense = lpdir)
@@ -507,8 +558,8 @@ setMethod("loadLPprob", signature(lp = "optObj_lpSolveAPI"),
 
         # constraints (right hand side)
         lpSolveAPI::set.constr.value(lp@oobj,
-                                     rhs = rlb,
-                                     lhs = rub,
+                                     rhs = crlb,
+                                     lhs = crub,
                                      constraints = c(1:nRows))
 
         # type of constraint
@@ -542,6 +593,13 @@ setMethod("loadLPprob", signature(lp = "optObj_lpSolveAPI"),
             ccnames <- sub("(", "_", cnames, fixed = TRUE)
             ccnames <- sub(")", "_", ccnames, fixed = TRUE)
             dimnames(lp@oobj) <- list(rrnames, ccnames)
+        }
+
+        # problem name
+        if (!is.null(pname)) {
+            ppname <- sub("(", "_", pname, fixed = TRUE)
+            ppname <- sub(")", "_", ppname, fixed = TRUE)
+            lpSolveAPI::name.lp(lp@oobj, ppname)
         }
     }
 )

@@ -6,6 +6,7 @@
 \encoding{utf8}
 
 \alias{reactId_Exch-class}
+\alias{reactId_Exch}
 \alias{met_id,reactId_Exch-method}
 \alias{met_id<-,reactId_Exch-method}
 \alias{met_pos}

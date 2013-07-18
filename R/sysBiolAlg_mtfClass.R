@@ -50,8 +50,9 @@ setMethod(f = "initialize",
                                 useNames = SYBIL_SETTINGS("USE_NAMES"),
                                 cnames = NULL,
                                 rnames = NULL,
+                                pname = NULL,
                                 scaling = NULL,
-                                ...) {
+                                writeProbToFileName = NULL, ...) {
 
               if ( ! missing(model) ) {
 
@@ -60,6 +61,13 @@ setMethod(f = "initialize",
                       wtobj  <- tmp[["obj"]]
                   }
                   
+                  stopifnot(is(model, "modelorg"), is(wtobj, "numeric"))
+
+                  # If wtobj is longer than 1, mtf algorithm has to run several
+                  # times. In that case, wtobj is not written in the problem
+                  # object, it is written separately (maxobj) and used for
+                  # each iteration.
+
                   if (length(wtobj) > 1) {
                       maxobj <- wtobj
                       currmo <- 0
@@ -69,7 +77,6 @@ setMethod(f = "initialize",
                       currmo <- wtobj[1]
                   }
 
-                  stopifnot(is(model, "modelorg"), is(wtobj, "numeric"))
                   
                   #  the problem: minimize:
                   #
@@ -186,12 +193,12 @@ setMethod(f = "initialize",
                                   paste("bw", react_id(model), sep = "_"),
                                   paste("fw", react_id(model), sep = "_")
                           )
-                          colNames = sybil:::.makeLPcompatible(cn, prefix = "x")
+                          colNames <- sybil:::.makeLPcompatible(cn, prefix = "x")
                       }
                       else {
                           stopifnot(is(cnames, "character"),
                                     length(cnames) == nCols)
-                          colNames = cnames
+                          colNames <- cnames
                       }
 
                       if (is.null(rnames)) {
@@ -200,17 +207,29 @@ setMethod(f = "initialize",
                                   paste("fw", 1:nc, sep = "_"),
                                   "obj_wt"
                           )
-                          rowNames = sybil:::.makeLPcompatible(rn, prefix = "r")
+                          rowNames <- sybil:::.makeLPcompatible(rn, prefix = "r")
                       }
                       else {
                           stopifnot(is(rnames, "character"),
                                     length(rnames) == nRows)
-                          rowNames = rnames
+                          rowNames <- rnames
+                      }
+
+                      if (is.null(pname)) {
+                          probName <- sybil:::.makeLPcompatible(
+                              paste("MTF", mod_id(model), sep = "_"),
+                              prefix = "")
+                      }
+                      else {
+                          stopifnot(is(pname, "character"),
+                                    length(pname) == 1)
+                          probName <- pname
                       }
                   }
                   else {
-                      colNames = NULL
-                      rowNames = NULL
+                      colNames <- NULL
+                      rowNames <- NULL
+                      probName <- NULL
                   }
 
 
@@ -236,13 +255,18 @@ setMethod(f = "initialize",
                                             ctype      = NULL,
                                             cnames     = colNames,
                                             rnames     = rowNames,
+                                            pname      = probName,
                                             algPar     = list("wtobj" = wtobj,
-                                                              "costcoefbw" = bw,
-                                                              "costcoeffw" = fw),
+                                                             "costcoefbw" = bw,
+                                                             "costcoeffw" = fw),
                                             ...)
 
-                   .Object@maxobj <- as.numeric(maxobj)
+                  .Object@maxobj <- as.numeric(maxobj)
 
+                  if (!is.null(writeProbToFileName)) {
+                      writeProb(problem(.Object),
+                                fname = as.character(writeProbToFileName))
+                  }
 #
 #                  # ---------------------------------------------
 #                  # build problem object

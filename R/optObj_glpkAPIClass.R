@@ -323,7 +323,6 @@ setMethod("addRowsToProb", signature(lp = "optObj_glpkAPI"),
     # "U" = variable with upper bound    -INF <  x <= ub
     # "D" = double-bounded variable        lb <= x <= ub
     # "E" = fixed variable                 lb  = x  = ub
-    # "R" = ranged constraint
 
     function(lp, i, type, lb, ub, cind, nzval, rnames = NULL) {
 
@@ -342,6 +341,7 @@ setMethod("addRowsToProb", signature(lp = "optObj_glpkAPI"),
                                    length(cind[[k]]),
                                    cind[[k]], nzval[[k]])
         }
+        stopifnot(length(lb) == length(ub))
         out <- glpkAPI::setRowsBndsGLPK(lp@oobj, i, lb, ub, gtype)
 
         # row names
@@ -408,7 +408,8 @@ setMethod("changeRowsBnds", signature(lp = "optObj_glpkAPI"),
 
     function(lp, i, lb, ub) {
 
-        glpkAPI::setRowsBndsGLPK(lp@oobj, i, lb, ub)
+        ct <- glpkAPI::getRowsTypesGLPK(lp@oobj, i)
+        glpkAPI::setRowsBndsGLPK(lp@oobj, i, lb, ub, type = ct)
 
     }
 )
@@ -489,11 +490,88 @@ setMethod("changeMatrixRow", signature(lp = "optObj_glpkAPI"),
 
 #------------------------------------------------------------------------------#
 
+#setMethod("loadLPprob", signature(lp = "optObj_glpkAPI"),
+#
+#    function(lp, nCols, nRows, mat, ub, lb, obj, rlb, rtype,
+#             lpdir = "max", rub = NULL, ctype = NULL,
+#             cnames = NULL, rnames = NULL) {
+#
+#        stopifnot(is(mat, "Matrix"))
+#
+#        crtype <- sapply(rtype,
+#                         function(x) switch(x,
+#                                            "F" = { glpkAPI::GLP_FR },
+#                                            "L" = { glpkAPI::GLP_LO },
+#                                            "U" = { glpkAPI::GLP_UP },
+#                                            "D" = { glpkAPI::GLP_DB },
+#                                            "E" = { glpkAPI::GLP_FX },
+#                                                  { glpkAPI::GLP_FX }))
+#
+#        # optimization direction
+#        setObjDir(lp, lpdir = lpdir)
+#        
+#        # problem dimensions
+#        glpkAPI::addColsGLPK(lp@oobj, ncols = nCols)
+#        glpkAPI::addRowsGLPK(lp@oobj, nrows = nRows)
+#
+#        # constraint matrix
+#        TMPmat <- as(mat, "TsparseMatrix")
+#        glpkAPI::loadMatrixGLPK(lp@oobj,
+#                                ne = length(TMPmat@x),
+#                                ia = TMPmat@i + 1,
+#                                ja = TMPmat@j + 1,
+#                                ra = TMPmat@x)
+#
+#        # column (variable) bounds and objective function
+#        glpkAPI::setColsBndsObjCoefsGLPK(lp@oobj,
+#                                         j = c(1:nCols),
+#                                         lb = lb,
+#                                         ub = ub,
+#                                         obj_coef = obj)
+#
+#        # variable type
+#        if (!is.null(ctype)) {
+#            cctype <- sapply(ctype,
+#                             function(x) switch(x,
+#                                                "C" = { glpkAPI::GLP_CV },
+#                                                "I" = { glpkAPI::GLP_IV },
+#                                                "B" = { glpkAPI::GLP_BV },
+#                                                      { glpkAPI::GLP_CV }))
+#
+#            glpkAPI::setColsKindGLPK(lp@oobj, j = c(1:nCols), kind = cctype)
+#        }
+#
+#        # right hand side
+#        glpkAPI::setRowsBndsGLPK(lp@oobj,
+#                                 i = c(1:nRows),
+#                                 lb = rlb,
+#                                 ub = rub,
+#                                 type = crtype)
+#
+#        # row names
+#        if (!is.null(rnames)) {
+#            glpkAPI::setRowsNamesGLPK(lp@oobj, i = c(1:nRows), rnames = rnames)
+#        }
+#
+#        # column names
+#        if (!is.null(cnames)) {
+#            glpkAPI::setColsNamesGLPK(lp@oobj, j = c(1:nCols), cnames = cnames)
+#        }
+#
+#        if (!is.null(rnames) || !is.null(cnames)) {
+#            glpkAPI::createIndexGLPK(lp@oobj)
+#        }
+#    }
+#)
+
+
+#------------------------------------------------------------------------------#
+
 setMethod("loadLPprob", signature(lp = "optObj_glpkAPI"),
 
     function(lp, nCols, nRows, mat, ub, lb, obj, rlb, rtype,
              lpdir = "max", rub = NULL, ctype = NULL,
-             cnames = NULL, rnames = NULL) {
+             cnames = NULL, rnames = NULL, pname = NULL) {
 
         stopifnot(is(mat, "Matrix"))
 
@@ -506,6 +584,7 @@ setMethod("loadLPprob", signature(lp = "optObj_glpkAPI"),
                                             "E" = { glpkAPI::GLP_FX },
                                                   { glpkAPI::GLP_FX }))
 
+        
         # optimization direction
         setObjDir(lp, lpdir = lpdir)
         
@@ -541,10 +620,25 @@ setMethod("loadLPprob", signature(lp = "optObj_glpkAPI"),
         }
 
         # right hand side
+        if (is.null(rub)) {
+            # The values in rlb will be copied to rub. GLPK ignores rlb and rub,
+            # depending on the constraint type (e.g. an upper bound, if the
+            # constraint type says, it has a lower bound):
+            # Constraint type "L": ignore rub
+            # Constraint type "U": ignore rlb
+            # Constraint type "E": ignore rub
+            # Constraint type "F": ignore rlb and rub
+
+            crub <- rlb
+        }
+        else {
+            crub <- rub
+        }
+        stopifnot(length(rlb) == length(crub))
         glpkAPI::setRowsBndsGLPK(lp@oobj,
                                  i = c(1:nRows),
                                  lb = rlb,
-                                 ub = rub,
+                                 ub = crub,
                                  type = crtype)
 
         # row names
@@ -557,7 +651,12 @@ setMethod("loadLPprob", signature(lp = "optObj_glpkAPI"),
             glpkAPI::setColsNamesGLPK(lp@oobj, j = c(1:nCols), cnames = cnames)
         }
 
-        if (!is.null(rnames) || !is.null(cnames)) {
+        # problem name
+        if (!is.null(pname)) {
+            glpkAPI::setProbNameGLPK(lp@oobj, pname = pname)
+        }
+
+        if (!is.null(rnames) || !is.null(cnames) || !is.null(pname)) {
             glpkAPI::createIndexGLPK(lp@oobj)
         }
     }

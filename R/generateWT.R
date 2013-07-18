@@ -59,11 +59,11 @@
     if (is(react, "list")) {
         message("calculating fba solutions ... ", appendLF = FALSE)
         suppressMessages(
-        tmp <- optimizer(model, algorithm = "fba",
-                         lpdir = rep("max", length(react)),
-                         react = react, lb = lb, ub = ub, verboseMode = 0, 
-                         solver = me[["sol"]], method = me[["met"]],
-                         solverParm = as.data.frame(NA))
+            tmp <- optimizer(model, algorithm = "fba",
+                             lpdir = rep("max", length(react)),
+                             react = react, lb = lb, ub = ub, verboseMode = 0, 
+                             solver = me[["sol"]], method = me[["met"]],
+                             solverParm = as.data.frame(NA))
         )
         message("OK")
     }

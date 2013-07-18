@@ -97,10 +97,11 @@
   The function \code{addReact} can be used to add reactions and/or metabolites
   to a given metabolic model, or to change parameters of a reaction already
   present in a given metabolic model.
-  If the reaction id in argument \code{id}, this reaction will be changed, no
-  new column will be added to the stoichiometric matrix. If any of the
-  metabolite id's of argument \code{met} are not present in the model, they
-  will be added (new rows in the stoichiometric matrix will be added).
+  If the reaction id in argument \code{id}is already present in the given model,
+  this reaction will be changed, no new column will be added to the
+  stoichiometric matrix. If any of the metabolite id's of argument \code{met}
+  are not present in the model, they will be added (new rows in the
+  stoichiometric matrix will be added).
 
   Arguments \code{subSystem}, \code{gprAssoc} and \code{reactName} are only
   used, if a new reaction is added to the model (if \code{id} is not in

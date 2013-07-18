@@ -7,6 +7,39 @@
 \newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 
 % ---------------------------------------------------------------------------- %
+\section{Changes in version 1.2.2 2013-07-18}{
+  \itemize{
+    \item updated function \code{promptSysBiolAlg}, including now a very basic
+          example how to set column, row and problem names in problem objects of
+          class \code{sysBiolAlg} and \code{optObj}
+    \item fixed a bug in function \code{addReact} which accours if the model
+          does not contain a GPR association
+    \item some adjustments in classes extending class \code{optObj}:
+          methods \code{loadLPprob}, \code{addRowsToProb} and
+          \code{changeRowsBnds} works in the same way for each solver (see the
+          corresponding manual pages for details)
+    \item added parameters \code{writeProbToFileName} and \code{pname} to
+          constructor methods of classes extending class \code{sysBiolAlg}
+    \item fixed a bug in method \code{changeRowBnds} of class
+          \code{optObj_lpSolveAPI}
+    \item suggests on \CRANpkg{glpkAPI} (version \eqn{\geq}{>=} 1.2.8)
+    \item suggests on \CRANpkg{clpAPI} (version \eqn{\geq}{>=} 1.2.4)
+  }
+}
+
+
+% ---------------------------------------------------------------------------- %
+\section{Changes in version 1.2.1 2013-07-02}{
+  \itemize{
+    \item added parameter \code{scaleDist} to the constructor method of class
+          \code{sysBiolAlg_moma}, which provides a fine tuning method of the
+          impact of particular reactions on the objective function of the
+          MOMA algorithm
+  }
+}
+
+
+% ---------------------------------------------------------------------------- %
 \section{Changes in version 1.2.0 2013-05-31}{
   \itemize{
     \item suggests on \CRANpkg{glpkAPI} (version \eqn{\geq}{>=} 1.2.7)

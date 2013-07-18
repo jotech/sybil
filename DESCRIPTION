@@ -1,23 +1,18 @@
 Package: sybil
 Type: Package
 Title: sybil - Efficient Constrained Based Modelling in R
-Version: 1.2.0
-Date: 2013-05-31
-Authors@R: c(person("Gabriel", "Gelius-Dietrich", role = c("aut",
-        "cre"), email = "geliudie@uni-duesseldorf.de"), person(c("C.",
-        "Jonathan"), "Fritzemeier", role = "ctb"), person("Rajen",
-        "Piernikarczyk", role = "ctb"), person(c("Marc", "Andre"),
-        "Daxer", role = "ctb"), person("Benjamin", "Braasch", role =
-        "ctb"), person("Abdelmoneim", "Desouki", role = "ctb"))
+Version: 1.2.2
+Date: 2013-07-18
+Authors@R: c(person("Gabriel", "Gelius-Dietrich", role = c("aut", "cre"), email = "geliudie@uni-duesseldorf.de"),
+             person(c("C.", "Jonathan"), "Fritzemeier", role = "ctb"),
+             person("Rajen", "Piernikarczyk", role = "ctb"),
+             person(c("Marc", "Andre"), "Daxer", role = "ctb"),
+             person("Benjamin", "Braasch", role = "ctb"),
+             person("Abdelmoneim", "Desouki", role = "ctb"))
 Depends: R (>= 2.14.2), Matrix, methods, lattice
-Suggests: glpkAPI (>= 1.2.7), cplexAPI (>= 1.2.4), clpAPI (>= 1.2.3),
+Suggests: glpkAPI (>= 1.2.8), cplexAPI (>= 1.2.4), clpAPI (>= 1.2.4),
         lpSolveAPI (>= 5.5.2.0), parallel, grid
-Description: The package sybil is a Systems Biology Library for R,
-        implementing algorithms for constraint based analyses of
-        metabolic networks (e.g. flux-balance analysis (FBA),
-        minimization of metabolic adjustment (MOMA), regulatory on/off
-        minimization (ROOM), robustness analysis and flux variability
-        analysis).
+Description: The package sybil is a Systems Biology Library for R, implementing algorithms for constraint based analyses of metabolic networks (e.g. flux-balance analysis (FBA), minimization of metabolic adjustment (MOMA), regulatory on/off minimization (ROOM), robustness analysis and flux variability analysis).
 LazyLoad: yes
 License: GPL-3
 Collate: generics.R validmodelorg.R validoptsol.R validreactId.R
@@ -50,11 +45,14 @@ Collate: generics.R validmodelorg.R validoptsol.R validreactId.R
         sysBiolAlgClass.R sysBiolAlg_fbaClass.R sysBiolAlg_fvClass.R
         sysBiolAlg_lmomaClass.R sysBiolAlg_momaClass.R
         sysBiolAlg_mtfClass.R sysBiolAlg_roomClass.R sybilLogClass.R
-Packaged: 2013-05-31 08:49:41 UTC; gabriel
-Author: Gabriel Gelius-Dietrich [aut, cre], C. Jonathan Fritzemeier
-        [ctb], Rajen Piernikarczyk [ctb], Marc Andre Daxer [ctb],
-        Benjamin Braasch [ctb], Abdelmoneim Desouki [ctb]
+Packaged: 2013-07-18 12:44:33 UTC; gabriel
+Author: Gabriel Gelius-Dietrich [aut, cre],
+  C. Jonathan Fritzemeier [ctb],
+  Rajen Piernikarczyk [ctb],
+  Marc Andre Daxer [ctb],
+  Benjamin Braasch [ctb],
+  Abdelmoneim Desouki [ctb]
 Maintainer: Gabriel Gelius-Dietrich <geliudie@uni-duesseldorf.de>
 NeedsCompilation: no
 Repository: CRAN
-Date/Publication: 2013-05-31 11:48:59
+Date/Publication: 2013-07-18 15:05:05

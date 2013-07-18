@@ -77,23 +77,49 @@ promptSysBiolAlg <- function(algorithm,
         "          signature = \"", cname, "\",\n",
         "          definition = function(.Object,\n",
         "                                model,\n",
-        "## PLACE FURTHER ARGUMENTS TO CONSTRUCTOR HERE ##\n",
-        "## ARGUMENT '...' SHOULD BE LEFT FOR ARGUMENTS ##\n",
-        "## 'solver', 'method', and 'solverParm'        ##\n",
-        "                                scaling = NULL, ...) {\n\n",
+        "## PLACE FURTHER ARGUMENTS TO CONSTRUCTOR HERE                 ##\n",
+        "## ARGUMENT '...' SHOULD BE LEFT FOR ARGUMENTS                 ##\n",
+        "## 'solver', 'method', 'solverParm', 'termOut' AND 'retAlgPar' ##\n",
+        "                                useNames = SYBIL_SETTINGS(\"USE_NAMES\"),\n",
+        "                                cnames = NULL,\n",
+        "                                rnames = NULL,\n",
+        "                                pname = NULL,\n",
+        "                                scaling = NULL,\n",
+        "                                writeProbToFileName = NULL, ...) {\n\n",
         sep = "", file = sbfh, append = TRUE)
+
+
+
         
     cat("              if ( ! missing(model) ) {\n",
         "\n",
         "                  stopifnot(is(model, \"modelorg\"),\n",
-        "## PLACE FURTHER ARGUMENT TESTS HERE           ##\n",
+        "## PLACE FURTHER ARGUMENT TESTS HERE                           ##\n",
         "                            )\n\n",
         sep = "", file = sbfh, append = TRUE)
 
 
-    cat("## GENERATE DATA STRUCTURES TO USE FOR         ##\n",
-        "## BUILDING THE PROBLEM OBJECT VIA THE DEFAULT ##\n",
-        "## CONSTRUCTOR FOR CLASS sysBiolAlg            ##\n",
+    cat("## GENERATE ROW AND COLUMN NAMES FOR                           ##\n",
+        "## THE PROBLEM OBJECT (OPTIONALLY)                             ##\n",
+        sep = "", file = sbfh, append = TRUE)
+
+    cat("                 if (isTRUE(useNames)) {\n",
+        "                     # you maybe want to do something more fancy here:\n",
+        "                     # e.g. use .makeLPcompatible() for a default value\n",
+        "                     colNames <- cnames\n",
+        "                     rowNames <- rnames\n",
+        "                     probName <- pname\n",
+        "                 }\n",
+        "                 else {\n",
+        "                     colNames <- NULL\n",
+        "                     rowNames <- NULL\n",
+        "                     probName <- NULL\n",
+        "                 }\n\n",
+        sep = "", file = sbfh, append = TRUE)
+
+    cat("## GENERATE DATA STRUCTURES TO USE FOR                         ##\n",
+        "## BUILDING THE PROBLEM OBJECT VIA THE DEFAULT                 ##\n",
+        "## CONSTRUCTOR FOR CLASS sysBiolAlg                            ##\n",
         sep = "", file = sbfh, append = TRUE)
 
 
@@ -116,10 +142,18 @@ promptSysBiolAlg <- function(algorithm,
         "                                            lpdir      = \n",
         "                                            rub        = \n",
         "                                            ctype      = \n",
-        "                                            cnames     = \n",
-        "                                            rnames     = \n",
-        "                                            algPar     = list()\n",
+        "                                            cnames     = colNames,\n",
+        "                                            rnames     = rowNames,\n",
+        "                                            pnames     = probName,\n",
+        "                                            algPar     = list(),\n",
         "                                            ...)\n\n",
+        sep = "", file = sbfh, append = TRUE)
+
+    cat("                  # write problem to lp file\n",
+        "                  if (!is.null(writeToFileName)) {\n",
+        "                      writeProb(problem(.Object),\n",
+        "                                fname = as.character(writeProbToFileName))\n",
+        "                  }\n\n",
         sep = "", file = sbfh, append = TRUE)
 
     cat("                  validObject(.Object)\n",
@@ -138,6 +172,8 @@ promptSysBiolAlg <- function(algorithm,
         close(sbfh)
     }
 
+    message("created file ", sQuote(sbfile))
+    
     return(invisible(NULL))
 
 }

@@ -227,6 +227,10 @@
       If set to \code{NULL}, no specific constraint names are set.\cr
       Default: \code{NULL}.
     }
+    \item{pname}{
+      A single character string containing a name for the problem object.\cr
+      Default: \code{NULL}.
+    }
     \item{retAlgPar}{
       A single boolean flag, if algorithm specific parameters should be saved
       in the object extending class \code{sysBiolAlg}.\cr

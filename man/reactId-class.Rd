@@ -4,6 +4,7 @@
 \encoding{utf8}
 
 \alias{reactId-class}
+\alias{reactId}
 \alias{react_pos<-,reactId-method}
 \alias{react_pos,reactId-method}
 \alias{react_pos<-}

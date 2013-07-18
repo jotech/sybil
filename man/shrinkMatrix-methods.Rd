@@ -41,13 +41,13 @@
   \item{i}{
     A numeric or character vector containing row indices of the matrix
     given in argument \code{X}. For the \code{\linkS4class{modelorg}} method,
-    this can be an object of class \code{\linkS4class{reactId}}.\cr
+    this can be an object of class \code{\linkS4class{reactId_Exch}}.\cr
     Default: \code{NULL}.
   }
   \item{j}{
     A numeric or character vector containing column indices of the
     matrix given in argument \code{X}. For the \code{\linkS4class{modelorg}}
-    method, this can be an object of class \code{\linkS4class{reactId_Exch}}.\cr
+    method, this can be an object of class \code{\linkS4class{reactId}}.\cr
     Default: \code{NULL}.
   }
   \item{tol}{

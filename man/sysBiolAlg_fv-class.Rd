@@ -111,10 +111,19 @@
       is named \code{"Z"}.\cr
       Default: \code{NULL}.
     }
+    \item{pname}{
+      A single character string containing a name for the problem object.\cr
+      Default: \code{NULL}.
+    }
     \item{scaling}{
       Scaling options used to scale the constraint matrix. If set to
       \code{NULL}, no scaling will be performed
       (see \code{\link{scaleProb}}).\cr
+      Default: \code{NULL}.
+    }
+    \item{writeProbToFileName}{
+      A single character string containing a file name to which the problem
+      object will be written in LP file format.\cr
       Default: \code{NULL}.
     }
     \item{...}{

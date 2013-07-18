@@ -48,7 +48,9 @@ setMethod(f = "initialize",
                                 useNames = SYBIL_SETTINGS("USE_NAMES"),
                                 cnames = NULL,
                                 rnames = NULL,
-                                scaling = NULL, ...) {
+                                pname = NULL,
+                                scaling = NULL,
+                                writeProbToFileName = NULL, ...) {
 
               if ( ! missing(model) ) {
 
@@ -65,28 +67,40 @@ setMethod(f = "initialize",
                   # row and column names for the problem object
                   if (isTRUE(useNames)) {
                       if (is.null(cnames)) {
-                          colNames = sybil:::.makeLPcompatible(react_id(model),
-                                                               prefix = "x")
+                          colNames <- sybil:::.makeLPcompatible(react_id(model),
+                                                                prefix = "x")
                       }
                       else {
                           stopifnot(is(cnames, "character"),
                                     length(cnames) == nCols)
-                          colNames = cnames
+                          colNames <- cnames
                       }
 
                       if (is.null(rnames)) {
-                          rowNames = sybil:::.makeLPcompatible(met_id(model),
-                                                               prefix = "r")
+                          rowNames <- sybil:::.makeLPcompatible(met_id(model),
+                                                                prefix = "r")
                       }
                       else {
                           stopifnot(is(rnames, "character"),
                                     length(rnames) == nRows)
-                          rowNames = rnames
+                          rowNames <- rnames
+                      }
+
+                      if (is.null(pname)) {
+                          probName <- sybil:::.makeLPcompatible(
+                              paste("FV", mod_id(model), sep = "_"),
+                              prefix = "")
+                      }
+                      else {
+                          stopifnot(is(pname, "character"),
+                                    length(pname) == 1)
+                          probName <- pname
                       }
                   }
                   else {
-                      colNames = NULL
-                      rowNames = NULL
+                      colNames <- NULL
+                      rowNames <- NULL
+                      probName <- NULL
                   }
 
                   .Object <- callNextMethod(.Object,
@@ -107,6 +121,7 @@ setMethod(f = "initialize",
                                             ctype      = NULL,
                                             cnames     = colNames,
                                             rnames     = rowNames,
+                                            pname      = probName,
                                             algPar     = list("percentage" = percentage,
                                                               "Zopt"       = Zopt),
                                             ...)
@@ -140,18 +155,34 @@ setMethod(f = "initialize",
                       }
 
                       # add a row to the problem
-                      type <- ifelse(lpdir == "max", "L", "U")
+                      #type <- ifelse(lpdir == "max", "L", "U")
+                      if (lpdir == "max") {
+                          type <- "L"
+                          lowb <- obj
+                          uppb <- SYBIL_SETTINGS("MAXIMUM")
+                      }
+                      else {
+                          type <- "U"
+                          lowb <- SYBIL_SETTINGS("MAXIMUM") * -1
+                          uppb <- obj
+                      }
                       oind <- which(obj_coef(model) != 0)
                       oval <- obj_coef(model)[oind]
                       addRowsToProb(lp = problem(.Object),
                                     i = met_num(model)+1,
-                                    type = type, lb = obj, ub = obj,
+                                    type = type, lb = lowb, ub = uppb,
                                     cind = list(oind), nzval = list(oval),
                                     rnames = "Z")
                       .Object@nr <- .Object@nr + 1L
                       .Object@alg_par[["Zopt"]] <- obj
 
                   }
+
+                  if (!is.null(writeProbToFileName)) {
+                      writeProb(problem(.Object),
+                                fname = as.character(writeProbToFileName))
+                  }
+
               }
               return(.Object)
           }

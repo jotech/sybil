@@ -48,7 +48,9 @@ setMethod(f = "initialize",
                                 useNames = SYBIL_SETTINGS("USE_NAMES"),
                                 cnames = NULL,
                                 rnames = NULL,
-                                scaling = NULL, ...) {
+                                pname = NULL,
+                                scaling = NULL,
+                                writeProbToFileName = NULL, ...) {
 
               if ( ! missing(model) ) {
 
@@ -228,12 +230,13 @@ setMethod(f = "initialize",
                                   paste("dM",  react_id(model), sep = "_"),
                                   paste("dP",  react_id(model), sep = "_")
                           )
-                          colNames = sybil:::.makeLPcompatible(cn, prefix = "x")
+                          colNames <- sybil:::.makeLPcompatible(cn,
+                                                                prefix = "x")
                       }
                       else {
                           stopifnot(is(cnames, "character"),
                                     length(cnames) == nCols)
-                          colNames = cnames
+                          colNames <- cnames
                       }
 
                       if (is.null(rnames)) {
@@ -251,17 +254,30 @@ setMethod(f = "initialize",
                                       paste("deltaP", 1:nc, sep = "_")
                               )
                           }
-                          rowNames = sybil:::.makeLPcompatible(rn, prefix = "r")
+                          rowNames <- sybil:::.makeLPcompatible(rn,
+                                                                prefix = "r")
                       }
                       else {
                           stopifnot(is(rnames, "character"),
                                     length(rnames) == nRows)
-                          rowNames = rnames
+                          rowNames <- rnames
+                      }
+
+                      if (is.null(pname)) {
+                          probName <- sybil:::.makeLPcompatible(
+                              paste(toupper(subalg), mod_id(model), sep = "_"),
+                              prefix = "")
+                      }
+                      else {
+                          stopifnot(is(pname, "character"),
+                                    length(pname) == 1)
+                          probName <- pname
                       }
                   }
                   else {
-                      colNames = NULL
-                      rowNames = NULL
+                      colNames <- NULL
+                      rowNames <- NULL
+                      probName <- NULL
                   }
 
 
@@ -287,10 +303,17 @@ setMethod(f = "initialize",
                                             ctype      = NULL,
                                             cnames     = colNames,
                                             rnames     = rowNames,
+                                            pname      = probName,
                                             algPar     = list("wtflux" = wtflux,
                                                               "wtobj"  = wtobj),
                                             ...)
-#
+
+                  if (!is.null(writeProbToFileName)) {
+                      writeProb(problem(.Object),
+                                fname = as.character(writeProbToFileName))
+                  }
+
+
 #                  # ---------------------------------------------
 #                  # build problem object
 #                  # ---------------------------------------------

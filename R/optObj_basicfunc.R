@@ -115,7 +115,8 @@ getMeanStatus <- function(code,
             out <- clpAPI::status_codeCLP(code)
         },
         "lpSolveAPI" = {
-            out <- "see return code"
+            #out <- "see return code"
+            out <- getMeanReturn(code, solver)
         },
         "cplexAPI" = {
             if (is.null(env)) {

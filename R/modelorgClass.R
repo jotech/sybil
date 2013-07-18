@@ -852,7 +852,7 @@ setMethod("shrinkMatrix", signature(X = "modelorg"),
   	
         stopifnot(xor(is.null(i), is.null(j)))
 
-        # look for reactions
+        # look for reactions --> j
         if (is.null(i)) {
             # translate reaction id's to indices
             cj <- checkReactId(X, react = j)
@@ -866,7 +866,7 @@ setMethod("shrinkMatrix", signature(X = "modelorg"),
         }
 
 
-        # look for metabolites
+        # look for metabolites --> i
         if (is.null(j)) {
             # translate reaction id's to indices
             if (is(i, "character")) {

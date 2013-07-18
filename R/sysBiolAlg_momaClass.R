@@ -42,10 +42,13 @@ setMethod(f = "initialize",
                                 model,
                                 wtflux = NULL,
                                 Qmat = NULL,
+                                scaleDist = NULL,
                                 useNames = SYBIL_SETTINGS("USE_NAMES"),
                                 cnames = NULL,
                                 rnames = NULL,
-                                scaling = NULL, ...) {
+                                pname = NULL,
+                                scaling = NULL,
+                                writeProbToFileName = NULL, ...) {
 
               if ( ! missing(model) ) {
 
@@ -60,7 +63,9 @@ setMethod(f = "initialize",
 
                   stopifnot(is(model, "modelorg"),
                             is(wtsol, "numeric"),
-                            length(wtsol) == react_num(model))
+                            length(wtsol) == react_num(model),
+                            is.null(scaleDist) ||
+                            length(scaleDist) == react_num(model))
                   
                   #  the problem: minimize
                   #
@@ -78,6 +83,14 @@ setMethod(f = "initialize",
                   nCols <- react_num(model)
                   nRows <- met_num(model)
 
+                  if (is.null(scaleDist)) {
+                      sdf <- rep(1, nCols)
+                  }
+                  else {
+                      stopifnot(is(scaleDist, "numeric"))
+                      sdf <- scaleDist
+                  }
+
                   if (is.null(Qmat)) {
                       Q <- rep(2, nCols)
                   }
@@ -85,31 +98,46 @@ setMethod(f = "initialize",
                       Q <- Qmat
                   }
 
+                  # scaling of particular reactions in the objective function
+                  Q <- Q * sdf
+
                   # row and column names for the problem object
                   if (isTRUE(useNames)) {
                       if (is.null(cnames)) {
-                          colNames = sybil:::.makeLPcompatible(react_id(model),
-                                                               prefix = "x")
+                          colNames <- sybil:::.makeLPcompatible(react_id(model),
+                                                                prefix = "x")
                       }
                       else {
                           stopifnot(is(cnames, "character"),
                                     length(cnames) == nCols)
-                          colNames = cnames
+                          colNames <- cnames
                       }
 
                       if (is.null(rnames)) {
-                          rowNames = sybil:::.makeLPcompatible(met_id(model),
-                                                               prefix = "r")
+                          rowNames <- sybil:::.makeLPcompatible(met_id(model),
+                                                                prefix = "r")
                       }
                       else {
                           stopifnot(is(rnames, "character"),
                                     length(rnames) == nRows)
-                          rowNames = rnames
+                          rowNames <- rnames
+                      }
+
+                      if (is.null(pname)) {
+                          probName <- sybil:::.makeLPcompatible(
+                              paste("MOMA", mod_id(model), sep = "_"),
+                              prefix = "")
+                      }
+                      else {
+                          stopifnot(is(pname, "character"),
+                                    length(pname) == 1)
+                          probName <- pname
                       }
                   }
                   else {
-                      colNames = NULL
-                      rowNames = NULL
+                      colNames <- NULL
+                      rowNames <- NULL
+                      probName <- NULL
                   }
 
 
@@ -128,7 +156,7 @@ setMethod(f = "initialize",
                                             ub         = uppbnd(model),
                                             lb         = lowbnd(model),
                                             #obj        = -2 * wtsol,
-                                            obj        = -2 * wtsol,
+                                            obj        = (-2 * wtsol) * sdf,
                                             rlb        = rep(0, nRows),
                                             rtype      = rep("E", nRows),
                                             lpdir      = "min",
@@ -136,14 +164,22 @@ setMethod(f = "initialize",
                                             ctype      = NULL,
                                             cnames     = colNames,
                                             rnames     = rowNames,
+                                            pname      = probName,
                                             algPar     = list("wtflux" = wtsol,
-                                                              "Qmat" = Q),
+                                                              "Qmat" = Q,
+                                                              "scaleDist" = sdf),
                                             ...)
 
                   # add quadratic part of objective function
                   loadQobj(.Object@problem, Q)
                   #loadQobj(.Object@problem, rep(2, nCols))
                   #loadQobj(.Object@problem, 2 * Diagonal(nCols))
+
+                  if (!is.null(writeProbToFileName)) {
+                      writeProb(problem(.Object),
+                                fname = as.character(writeProbToFileName))
+                  }
+
 
 #                  # make problem object
 #                  lp <- optObj(solver = solver, method = method, pType = "qp")

@@ -22,22 +22,25 @@
 \S4method{loadLPprob}{optObj_clpAPI}(lp,
            nCols, nRows, mat, ub, lb, obj, rlb, rtype,
            lpdir = "max", rub = NULL, ctype = NULL,
-           cnames = NULL, rnames = NULL)
+           cnames = NULL, rnames = NULL, pname = NULL,
+           defLowerBnd = SYBIL_SETTINGS("MAXIMUM") * -1,
+           defUpperBnd = SYBIL_SETTINGS("MAXIMUM")
+)
 
 \S4method{loadLPprob}{optObj_cplexAPI}(lp,
            nCols, nRows, mat, ub, lb, obj, rlb, rtype,
            lpdir = "max", rub = NULL, ctype = NULL,
-           cnames = NULL, rnames = NULL)
+           cnames = NULL, rnames = NULL, pname = NULL)
 
 \S4method{loadLPprob}{optObj_glpkAPI}(lp,
            nCols, nRows, mat, ub, lb, obj, rlb, rtype,
            lpdir = "max", rub = NULL, ctype = NULL,
-           cnames = NULL, rnames = NULL)
+           cnames = NULL, rnames = NULL, pname = NULL)
 
 \S4method{loadLPprob}{optObj_lpSolveAPI}(lp,
            nCols, nRows, mat, ub, lb, obj, rlb, rtype,
            lpdir = "max", rub = NULL, ctype = NULL,
-           cnames = NULL, rnames = NULL)
+           cnames = NULL, rnames = NULL, pname = NULL)
 }
 
 \section{Methods}{
@@ -92,22 +95,20 @@
     A numeric vector of length \code{nRows} giving the right hand side of the
     problem object. If argument \code{rub} is not \code{NULL}, \code{rlb}
     contains the lower bounds of the constraints of the problem object.
+    See Details.
   }
   \item{rtype}{
     A character vector of length \code{nRows} giving the constraint type:
     \tabular{lll}{
-      \code{"F"}: \tab free variable, no upper or lower bound \tab \eqn{-\infty < x < \infty}{-INF < x < INF}               \cr
-      \code{"L"}: \tab variable with lower bound              \tab \eqn{\mathrm{lb} \leq x < \infty}{lb <= x < INF}         \cr
-      \code{"U"}: \tab variable with upper bound              \tab \eqn{-\infty < x \leq \mathrm{ub}}{-INF < x <= ub}       \cr
-      \code{"D"}: \tab double-bounded variable                \tab \eqn{\mathrm{lb} \leq x \leq \mathrm{ub}}{lb <= x <= ub} \cr
-      \code{"E"}: \tab fixed variable                         \tab \eqn{\mathrm{lb} = x = \mathrm{ub}}{lb = x = ub}         \cr
-      \code{"R"}: \tab ranged constraint                                                                                    \cr
+      \code{"F"}: \tab free constraint (GLPK only)          \tab \eqn{-\infty < x < \infty}{-INF < x < INF}               \cr
+      \code{"L"}: \tab constraint with lower bound          \tab \eqn{\mathrm{lb} \leq x < \infty}{lb <= x < INF}         \cr
+      \code{"U"}: \tab constraint with upper bound          \tab \eqn{-\infty < x \leq \mathrm{ub}}{-INF < x <= ub}       \cr
+      \code{"D"}: \tab double-bounded (ranged) constraint   \tab \eqn{\mathrm{lb} \leq x \leq \mathrm{ub}}{lb <= x <= ub} \cr
+      \code{"E"}: \tab fixed (equality) constraint          \tab \eqn{\mathrm{lb} = x = \mathrm{ub}}{lb = x = ub}         \cr
     }
-    Value \code{"R"} is not available for every solver software. Check
-    documentation of the solver software if ranged constraints are supported.
-    If \code{rtype[i]} is not \code{"F"}, \code{"L"}, \code{"U"}, \code{"D"},
-    \code{"E"} or \code{"R"}, the value of \code{rtype[i]} will be set to
-    \code{"E"}.
+    If \code{rtype[i]} is not one of \code{"F"}, \code{"L"}, \code{"U"},
+    \code{"D"} or \code{"E"}, the value of \code{rtype[i]} will be set to
+    \code{"E"}. See Details.
   }
   \item{lpdir}{
     Single character string containing the direction of optimization.
@@ -117,7 +118,7 @@
   \item{rub}{
     A numeric vector of length \code{nRows} giving the right hand side of the
     problem object. If not \code{NULL}, it contains the upper bounds of the
-    constraints of the problem object.\cr
+    constraints of the problem object. See Details.\cr
     Default: \code{NULL}.
   }
   \item{ctype}{
@@ -140,17 +141,58 @@
   }
   \item{cnames}{
     A character vector of length \code{nCols} containing symbolic names for
-    the variable of the problem object.
+    the variable of the problem object.\cr
+    Default: \code{NULL}.
   }
   \item{rnames}{
     A character vector of length \code{nRows} containing symbolic names for
-    the constraints of the problem object.
+    the constraints of the problem object.\cr
+    Default: \code{NULL}.
+  }
+  \item{pname}{
+    A single character string containing a name for the problem object.\cr
+    Default: \code{NULL}.
+  }
+  \item{defLowerBnd}{
+    For the \code{\linkS4class{optObj_clpAPI}} method only: a single numeric
+    value containing a default value for an lower bound to a constraint in an
+    optimization problem.\cr
+    Default: \code{SYBIL_SETTINGS("MAXIMUM") * -1}.
+  }
+  \item{defUpperBnd}{
+    For the \code{\linkS4class{optObj_clpAPI}} method only: a single numeric
+    value containing a default value for an upper bound to a constraint in an
+    optimization problem.\cr
+    Default: \code{SYBIL_SETTINGS("MAXIMUM")}.
   }
 }
 
 \details{
   Method \code{loadLPprob} can be used any time after a problem object is
   initialized by \code{\link{initProb}}.
+  
+  In order so set constraints, usually only parameter \code{rlb} is required
+  and parameter \code{rub} can be left at \code{NULL} (which is the default).
+  If \code{rub} is not \code{NULL}, \code{rlb} and \code{rub} must have the same
+  length. Parameter \code{rub} is required, if a particular constraint is a
+  ranged or double bounded constraint. The general idea is, for any constraint
+  \code{i}, the value in \code{rlb[i]} gives the lower bound and the value in
+  \code{rub[i]} gives the upper bound. If the constraints of the optimization
+  problem do only have one bound (type \code{"L"}, \code{"U"} and \code{"E"}),
+  all bounds can be set via \code{rlb} and \code{rub} is not required. If any
+  constraint is of type \code{"D"} (a double-bounded or ranged constraint)
+  additionally \code{rub} is required. It is of course also possible to use
+  \code{rlb} strictly for all lower bounds and \code{rub} for all upper bounds.
+  Again, if both \code{rlb} and \code{rub} are given (not \code{NULL}), they
+  must have the same length. For equality constraints (type \code{"E"}), allways
+  the value in \code{rlb} is used.
+  
+  For the \code{\linkS4class{optObj_cplexAPI}} method: CPLEX uses so called
+  ranged constraints for double bounded constraints. The values in \code{rlb}
+  and \code{rub} will be transformed into range values for ranged constraints.
+  The range for a ranged constraint \eqn{i} is given as
+  \code{abs(rub[i] - rlb[i])}, so that the valid interval is denoted as
+  \code{[rlb[i], rlb[i] + range]}.
   
   For the \code{\linkS4class{optObj_glpkAPI}} method: if \code{cnames} or
   \code{rnames} is not \code{NULL}, an index will be created.
@@ -160,7 +202,7 @@
 
   For the \code{\linkS4class{optObj_lpSolveAPI}} method: if \code{cnames} is
   not \code{NULL}, \code{rnames} must be also not \code{NULL} and vice versa.
-  Round brackets (\code{"("} and \code{)}) will be replaced by underscores
+  Round brackets (\code{"("} and \code{")"}) will be replaced by underscores
   \code{"_"}.
 }
 

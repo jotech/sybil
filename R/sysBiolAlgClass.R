@@ -77,7 +77,7 @@ setMethod(f = "initialize",
                                 sbalg, pType = "lp", scaling = NULL, fi, nCols,
                                 nRows, mat, ub, lb, obj, rlb, rtype,
                                 lpdir = "max", rub = NULL, ctype = NULL,
-                                cnames = NULL, rnames = NULL,
+                                cnames = NULL, rnames = NULL, pname = NULL,
                                 retAlgPar = TRUE, algPar = list(NULL)) {
 
               if ( (!missing(solver)) ||
@@ -123,19 +123,20 @@ setMethod(f = "initialize",
                   # ---------------------------------------------
 
                   loadLPprob(lp,
-                             nCols = nCols,
-                             nRows = nRows,
-                             mat   = mat,
-                             ub    = ub,
-                             lb    = lb,
-                             obj   = obj,
-                             rlb   = rlb,
-                             rtype = rtype,
-                             lpdir = lpdir,
-                             rub   = rub,
-                             ctype = ctype,
+                             nCols  = nCols,
+                             nRows  = nRows,
+                             mat    = mat,
+                             ub     = ub,
+                             lb     = lb,
+                             obj    = obj,
+                             rlb    = rlb,
+                             rtype  = rtype,
+                             lpdir  = lpdir,
+                             rub    = rub,
+                             ctype  = ctype,
                              cnames = cnames,
-                             rnames = rnames)
+                             rnames = rnames,
+                             pname  = pname)
 
 
                   # ---------------------------------------------

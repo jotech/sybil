@@ -57,8 +57,12 @@
   }
   \item{ub}{
     A numeric vector of the same length as \code{i} containing the upper bounds
-    of the constraints to change (unused with \pkg{cplexAPI}).
+    of the constraints to change.
   }
+}
+
+\note{
+  Changing row bounds does not change the constraint type.
 }
 
 \author{

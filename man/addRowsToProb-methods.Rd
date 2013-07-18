@@ -54,17 +54,19 @@
   }
   \item{type}{
     A character vector giving the constraint type:
+    \code{"F"}: free constraint (\pkg{optObj_glpkAPI} only),
     \code{"L"}: \code{>=} (lower bound),
     \code{"U"}: \code{<=} (upper bound) or
+    \code{"D"}: \code{lb <= r <= ub} (double bound) or
     \code{"E"}: \code{=} (equality).
-    If \code{type[k]} is not \code{"L"}, \code{"U"} or \code{"E"}, the
-    value of \code{type[k]} will be set to \code{"E"}.
+    If \code{type[k]} is not \code{F}, \code{"L"}, \code{"U"}, \code{"D"} or
+    \code{"E"}, the value of \code{type[k]} will be set to \code{"E"}.
   }
   \item{lb}{
-    A numeric vector containing the right-hand side of the new rows.
+    A numeric vector containing the lower bound of the new constraints.
   }
   \item{ub}{
-    Currently unused.
+    A numeric vector containing the upper bound of the new constraints.
   }
   \item{cind}{
     A list containing the column indices of the new non-zero elements.

@@ -225,14 +225,25 @@ addReact <- function(model,
 
 
             # gpr association
-
-            newrxnGeneMat   <- rBind(rxnGeneMat(model),
-                                     rep(FALSE, ncol(rxnGeneMat(model))))
+            if (ncol(rxnGeneMat(model)) > 0) {
+                newrxnGeneMat   <- rBind(rxnGeneMat(model),
+                                         rep(FALSE, ncol(rxnGeneMat(model))))
+            }
+            else if (nrow(rxnGeneMat(model)) > 0) {
+                newrxnGeneMat <- rxnGeneMat(model)
+                dim(newrxnGeneMat) <- c(nrow(newrxnGeneMat)+1,
+                                        ncol(newrxnGeneMat))
+            }
+            else {
+                newrxnGeneMat <- rxnGeneMat(model)
+            }
 
             if ( (is.na(gprAssoc)) || (gprAssoc == "") ) {
-                newgprRules     <- append(gprRules(model), "")
-                newgenes        <- append(genes(model), "")
-                newgpr          <- append(gpr(model), "")
+                if ((length(gprRules(model)) > 0)) {
+                    newgprRules     <- append(gprRules(model), "")
+                    newgenes        <- append(genes(model), "")
+                    newgpr          <- append(gpr(model), "")
+                }
             }
             else {
                 gene_rule <- sybil:::.parseBoolean(gprAssoc)

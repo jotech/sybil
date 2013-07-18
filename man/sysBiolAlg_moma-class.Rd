@@ -79,6 +79,14 @@
       of reactions given in the model is used.
       Default: \code{NULL}.
     }
+    \item{scaleDist}{
+      A numeric vector containing scaling factors for each reaction in the
+      objective function. If \code{scaleDist[j]} is set to \code{0}, reaction
+      \code{j} will be ignored. The quadratic and the linear part of the
+      objective function are multiplied by this factor. If set to \code{NULL},
+      the reactions are not scaled.
+      Default: \code{NULL}.
+    }
     \item{useNames}{
       A single boolean value. If set to \code{TRUE}, variables and constraints
       will be named according to \code{cnames} and \code{rnames}. If set to
@@ -95,10 +103,19 @@
       the metabolite id's of \code{model} are used.\cr
       Default: \code{NULL}.
     }
+    \item{pname}{
+      A single character string containing a name for the problem object.\cr
+      Default: \code{NULL}.
+    }
     \item{scaling}{
       Scaling options used to scale the constraint matrix. If set to
       \code{NULL}, no scaling will be performed
       (see \code{\link{scaleProb}}).\cr
+      Default: \code{NULL}.
+    }
+    \item{writeProbToFileName}{
+      A single character string containing a file name to which the problem
+      object will be written in LP file format.\cr
       Default: \code{NULL}.
     }
     \item{...}{
@@ -115,25 +132,26 @@
     \begin{array}{rll}%
       \min            & \begin{minipage}[b]{5em}
                         \[ 
-                          \sum_{i,j=1}^n
-                          \bigl(v_{j,\mathrm{del}} - v_{i,\mathrm{wt}}\bigr)^2
+                          \sum_{j=1}^n
+                          %\bigl(v_{j,\mathrm{del}} - v_{j,\mathrm{wt}}\bigr)^2
+                          \left(\left(v_{j,\mathrm{del}} - v_{j,\mathrm{wt}}\right) \cdot sd_j \right)^2
                         \]
                         \end{minipage}                                 \\[2em]
           \mathrm{s.\,t.} & \mbox{\boldmath$Sv$\unboldmath} = 0         \\[1ex]
-                          & \alpha_i \leq v_i \leq \beta_i
-                            & \quad \forall i \in \{1, \ldots, n\}      \\[1ex]
+                          & \alpha_j \leq v_j \leq \beta_j
+                            & \quad \forall j \in \{1, \ldots, n\}      \\[1ex]
     \end{array}%
   }{
-     min  sum (v_j,del - v_i,wt)^2  for i,j = 1, ..., n
+     min  sum ( (v_j,del - v_j,wt) * sd[j] )^2  for j = 1, ..., n
       s.t. Sv = 0
-           a_i <= v_i <= b_i  for i = 1, ..., n
+           a_j <= v_j <= b_j  for j = 1, ..., n
   }
-  with \eqn{\bold{S}}{S} being the stoichiometric matrix, \eqn{\alpha_i}{a_i}
-  and \eqn{\beta_i}{b_i} being the lower and upper bounds for flux (variable)
-  \eqn{i} (\eqn{j} for the deletion strain).
-  The total number of variables of the optimization problem is denoted
-  by \eqn{n}.
-  Here,
+  with \eqn{\bold{S}}{S} being the stoichiometric matrix, \eqn{\alpha_j}{a_j}
+  and \eqn{\beta_j}{b_j} being the lower and upper bounds for flux (variable)
+  \eqn{j} and \eqn{sd_j}{sd[j]} being the scaling factor for reaction \eqn{j}
+  (default: \eqn{sd_j = 1,\ \forall j}{sd[j] = 1, for j = 1, ..., n}).
+  The total number of variables of the optimization problem is denoted by
+  \eqn{n}. Here,
   \eqn{
     \mbox{\boldmath$v$\unboldmath}_{\mathrm{wt}}
   }{v_wt}
