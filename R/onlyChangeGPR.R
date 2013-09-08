@@ -71,12 +71,12 @@ onlyChangeGPR <- function(model,gprRules,reactNr,verboseMode = 0) {
 
       genes(model)[[reactNr[anz]]] <- ""
       rxnGeneMat(model)[reactNr[anz],] <- 0
-      gprRules(model)[reactNr[anz]] <- sybil:::.parseBoolean(gprRules[anz])[[2]]
+      gprRules(model)[reactNr[anz]] <- .parseBoolean(gprRules[anz])[[2]]
       gprRules_tmp <- as.numeric(unlist(strsplit(gprRules(model)[reactNr[anz]], "\\D+", perl = TRUE))[-1])
       #print(gprRules_tmp)
       #print(gprRules(model)[reactNr[anz]])
       #print(gprRules(model)[reactNr])
-      #print(sybil:::.parseBoolean(gprRules)[[2]])
+      #print(.parseBoolean(gprRules)[[2]])
 
       j <- 1
 

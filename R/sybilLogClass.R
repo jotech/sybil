@@ -300,7 +300,7 @@ setReplaceMethod(f = "logClose",
     if (is(object@fh, "file")) {
 
         if (!isTRUE(didFoot(object))) {
-            lc <- sybil:::.printLogComment("end unexpected:")
+            lc <- .printLogComment("end unexpected:")
             cat("\n", lc, sep = "", file = object@fh, append = TRUE)
         }
 
@@ -329,7 +329,7 @@ setMethod(f = "logHead",
         return(FALSE)
     }
 
-    lc <- sybil:::.printLogComment("start:")
+    lc <- .printLogComment("start:")
     cat(lc, file = object@fh, append = TRUE)
 
     return(TRUE)
@@ -350,7 +350,7 @@ setReplaceMethod(f = "logFoot",
         return(object)
     }
 
-    lc <- sybil:::.printLogComment("end:")
+    lc <- .printLogComment("end:")
     cat("\n", lc, sep = "", file = object@fh, append = TRUE)
 
     object@didFoot <- value
@@ -622,7 +622,7 @@ setMethod(f = "logCall",
               fc <- sys.call(sys.parent(n = nog))
               cat("# call to function", dQuote(fc[[1]]),
                   "with arguments:\n", file = object@fh, append = TRUE)
-              sybil:::.printNamedList(nList = as.list(fc)[-1],
+              .printNamedList(nList = as.list(fc)[-1],
                                       file = object@fh, append = TRUE)
           }
           else {}
@@ -641,13 +641,13 @@ setMethod(f = "logCall",
 #                       fc <- as.character(func)
 #                       cat("# formal arguments to ", fc, "()\n",
 #                           sep = "", file = object@fh, append = TRUE)
-#                       sybil:::.printNamedList(fargl, file = object@fh, append = TRUE)
+#                       .printNamedList(fargl, file = object@fh, append = TRUE)
 #
 #                       if ( (length(thdargs) > 0) && (!is.na(thdargs)) ) {
 #                           cat("# further arguments to", fc, "(...)\n",
 #                               file = object@fh, append = TRUE)
 #                           if (length(thdargs) > 0) {
-#                               sybil:::.printNamedList(thdargs,
+#                               .printNamedList(thdargs,
 #                                                       file = object@fh, append = TRUE)
 #                           }
 #                           else {

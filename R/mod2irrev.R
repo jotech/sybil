@@ -108,11 +108,11 @@ mod2irrev <- function(model, exex = FALSE) {
   counti <- 0
 
   message("building the new model ...")
-  progr <- sybil:::.progressBar() # initialize the progressbar
+  progr <- .progressBar() # initialize the progressbar
 
   for (i in 1 : react_num(model)) {
 
-      progr <- sybil:::.progressBar(i, react_num(model), progr)
+      progr <- .progressBar(i, react_num(model), progr)
 
       counti <- counti + 1
 

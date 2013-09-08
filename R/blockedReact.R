@@ -95,7 +95,7 @@ blockedReact <- function(model,
     obj_max <- 0
     obj_min <- 0
     
-    if (verboseMode > 1) { progr <- sybil:::.progressBar() }
+    if (verboseMode > 1) { progr <- .progressBar() }
   
     for (i in seq(along = intReact)) {
 
@@ -174,7 +174,7 @@ blockedReact <- function(model,
         }
 
         if (verboseMode > 1) {
-            progr <- sybil:::.progressBar(i, length(intReact), progr)
+            progr <- .progressBar(i, length(intReact), progr)
         }
 
     }

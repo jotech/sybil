@@ -55,7 +55,7 @@ setMethod(f = "initialize",
               if ( ! missing(model) ) {
 
                   if (missing(wtflux)) {
-                      tmp    <- sybil:::.generateWT(model, ...)
+                      tmp    <- .generateWT(model, ...)
                       wtflux <- tmp$fluxes[tmp$fldind]
                       wtobj  <- tmp$obj
                   }
@@ -230,7 +230,7 @@ setMethod(f = "initialize",
                                   paste("dM",  react_id(model), sep = "_"),
                                   paste("dP",  react_id(model), sep = "_")
                           )
-                          colNames <- sybil:::.makeLPcompatible(cn,
+                          colNames <- .makeLPcompatible(cn,
                                                                 prefix = "x")
                       }
                       else {
@@ -254,7 +254,7 @@ setMethod(f = "initialize",
                                       paste("deltaP", 1:nc, sep = "_")
                               )
                           }
-                          rowNames <- sybil:::.makeLPcompatible(rn,
+                          rowNames <- .makeLPcompatible(rn,
                                                                 prefix = "r")
                       }
                       else {
@@ -264,7 +264,7 @@ setMethod(f = "initialize",
                       }
 
                       if (is.null(pname)) {
-                          probName <- sybil:::.makeLPcompatible(
+                          probName <- .makeLPcompatible(
                               paste(toupper(subalg), mod_id(model), sep = "_"),
                               prefix = "")
                       }

@@ -192,72 +192,96 @@ opt <- oneGeneDel(Ec_core)
 
 
 ###################################################
-### code chunk number 31: sybil.Rnw:739-740
+### code chunk number 31: sybil.Rnw:740-741
 ###################################################
 checkOptSol(opt)
 
 
 ###################################################
-### code chunk number 32: sybil.Rnw:744-745
+### code chunk number 32: sybil.Rnw:745-746
 ###################################################
-histogram(opt, col = "lightgray", nint = 20)
+plot(opt, nint = 20)
 
 
 ###################################################
-### code chunk number 33: sybil.Rnw:751-754
+### code chunk number 33: sybil.Rnw:752-755
 ###################################################
 opt <- oneGeneDel(Ec_core, algorithm = "lmoma", wtflux = getFluxDist(mtf))
 checkOptSol(opt)
-histogram(opt, col = "lightgray", nint = 20)
+plot(opt, nint = 20)
 
 
 ###################################################
-### code chunk number 34: sybil.Rnw:760-761
+### code chunk number 34: sybil.Rnw:761-762
 ###################################################
 opt <- geneDeletion(Ec_core)
 
 
 ###################################################
-### code chunk number 35: sybil.Rnw:764-766 (eval = FALSE)
+### code chunk number 35: sybil.Rnw:765-767 (eval = FALSE)
 ###################################################
 ## opt2 <- geneDeletion(Ec_core, combinations = 2)
 ## opt3 <- geneDeletion(Ec_core, combinations = 3)
 
 
 ###################################################
-### code chunk number 36: sybil.Rnw:782-784
+### code chunk number 36: sybil.Rnw:783-785
 ###################################################
 opt <- fluxVar(Ec_core, percentage = 80, verboseMode = 0)
 plot(opt)
 
 
 ###################################################
-### code chunk number 37: sybil.Rnw:812-814
+### code chunk number 37: sybil.Rnw:813-815
 ###################################################
-opt <- robAna(Ec_core, "EX_o2(e)", verboseMode = 0)
+opt <- robAna(Ec_core, ctrlreact = "EX_o2(e)", verboseMode = 0)
 plot(opt)
 
 
 ###################################################
-### code chunk number 38: sybil.Rnw:828-829
+### code chunk number 38: sybil.Rnw:832-839
+###################################################
+Ec_core_wo_glc <- changeUptake(Ec_core, off = "glc_D[e]")
+opt <- phpp(Ec_core_wo_glc,
+            ctrlreact = c("EX_succ(e)", "EX_o2(e)"),
+            redCosts = TRUE,
+            numP = 25,
+            verboseMode = 0)
+plot(opt)
+
+
+###################################################
+### code chunk number 39: phpp_rf
+###################################################
+plot(opt, "EX_succ(e)")
+
+
+###################################################
+### code chunk number 40: phpp_rs
+###################################################
+plot(opt, "EX_o2(e)")
+
+
+###################################################
+### code chunk number 41: sybil.Rnw:873-874
 ###################################################
 opt <- oneGeneDel(Ec_core, algorithm = "fba", fld = "all")
 
 
 ###################################################
-### code chunk number 39: sybil.Rnw:832-833
+### code chunk number 42: sybil.Rnw:877-878
 ###################################################
 sum <- summaryOptsol(opt, Ec_core)
 
 
 ###################################################
-### code chunk number 40: sybil.Rnw:847-848
+### code chunk number 43: sybil.Rnw:892-893
 ###################################################
 printExchange(sum, j = c(1:50), dense = TRUE)
 
 
 ###################################################
-### code chunk number 41: sybil.Rnw:863-867
+### code chunk number 44: sybil.Rnw:908-912
 ###################################################
 ref    <- optimizeProb(Ec_core)
 opt    <- oneGeneDel(Ec_core)
@@ -266,44 +290,44 @@ nletid <- c(1:length(allGenes(Ec_core)))[! let]
 
 
 ###################################################
-### code chunk number 42: sybil.Rnw:876-877 (eval = FALSE)
+### code chunk number 45: sybil.Rnw:921-922 (eval = FALSE)
 ###################################################
 ## gmat <- combn(nletid, 3)
 
 
 ###################################################
-### code chunk number 43: sybil.Rnw:882-883 (eval = FALSE)
+### code chunk number 46: sybil.Rnw:927-928 (eval = FALSE)
 ###################################################
 ## opt <- multiDel(Ec_core, nProc = 4, todo = "geneDeletion", del1 = gmat)
 
 
 ###################################################
-### code chunk number 44: sybil.Rnw:894-895 (eval = FALSE)
+### code chunk number 47: sybil.Rnw:939-940 (eval = FALSE)
 ###################################################
 ## mapply(checkOptSol, opt)
 
 
 ###################################################
-### code chunk number 45: sybil.Rnw:906-908
+### code chunk number 48: sybil.Rnw:951-953
 ###################################################
 opt <- optimizeProb(Ec_core, poCmd = list("getRedCosts"))
 postProc(opt)
 
 
 ###################################################
-### code chunk number 46: sybil.Rnw:944-945 (eval = FALSE)
+### code chunk number 49: sybil.Rnw:989-990 (eval = FALSE)
 ###################################################
 ## optimizeProb(Ec_core, method = "exact")
 
 
 ###################################################
-### code chunk number 47: sybil.Rnw:948-949 (eval = FALSE)
+### code chunk number 50: sybil.Rnw:993-994 (eval = FALSE)
 ###################################################
 ## optimizeProb(Ec_core, solver = "cplexAPI", method = "dualopt")
 
 
 ###################################################
-### code chunk number 48: sybil.Rnw:972-975 (eval = FALSE)
+### code chunk number 51: sybil.Rnw:1017-1020 (eval = FALSE)
 ###################################################
 ## opt <- oneGeneDel(Ec_core,
 ##                   solverParm = list(TM_LIM = 1000,
@@ -311,7 +335,7 @@ postProc(opt)
 
 
 ###################################################
-### code chunk number 49: sybil.Rnw:988-992 (eval = FALSE)
+### code chunk number 52: sybil.Rnw:1033-1037 (eval = FALSE)
 ###################################################
 ## opt <- optimizeProb(Ec_core,
 ##                     solverParm = list(CPX_PARAM_SCRIND = CPX_ON,
@@ -320,7 +344,7 @@ postProc(opt)
 
 
 ###################################################
-### code chunk number 50: sybil.Rnw:1011-1015 (eval = FALSE)
+### code chunk number 53: sybil.Rnw:1056-1060 (eval = FALSE)
 ###################################################
 ## opt <- optimizeProb(Ec_core,
 ##                     solverParm = list(verbose = "full",
@@ -329,136 +353,136 @@ postProc(opt)
 
 
 ###################################################
-### code chunk number 51: sybil.Rnw:1029-1030
+### code chunk number 54: sybil.Rnw:1074-1075
 ###################################################
 help(SYBIL_SETTINGS)
 
 
 ###################################################
-### code chunk number 52: sybil.Rnw:1052-1053 (eval = FALSE)
+### code chunk number 55: sybil.Rnw:1097-1098 (eval = FALSE)
 ###################################################
 ## SYBIL_SETTINGS("parameter name", value)
 
 
 ###################################################
-### code chunk number 53: sybil.Rnw:1058-1059 (eval = FALSE)
+### code chunk number 56: sybil.Rnw:1103-1104 (eval = FALSE)
 ###################################################
 ## SYBIL_SETTINGS("parameter name")
 
 
 ###################################################
-### code chunk number 54: sybil.Rnw:1064-1065 (eval = FALSE)
+### code chunk number 57: sybil.Rnw:1109-1110 (eval = FALSE)
 ###################################################
 ## SYBIL_SETTINGS()
 
 
 ###################################################
-### code chunk number 55: sybil.Rnw:1080-1081
+### code chunk number 58: sybil.Rnw:1125-1126
 ###################################################
 SYBIL_SETTINGS("SOLVER", "cplexAPI", loadPackage = FALSE)
 
 
 ###################################################
-### code chunk number 56: sybil.Rnw:1087-1088
+### code chunk number 59: sybil.Rnw:1132-1133
 ###################################################
 SYBIL_SETTINGS("METHOD")
 
 
 ###################################################
-### code chunk number 57: sybil.Rnw:1091-1092
+### code chunk number 60: sybil.Rnw:1136-1137
 ###################################################
 SYBIL_SETTINGS("SOLVER", "glpkAPI")
 
 
 ###################################################
-### code chunk number 58: sybil.Rnw:1095-1096
+### code chunk number 61: sybil.Rnw:1140-1141
 ###################################################
 SYBIL_SETTINGS("METHOD")
 
 
 ###################################################
-### code chunk number 59: sybil.Rnw:1131-1133
+### code chunk number 62: sybil.Rnw:1176-1178
 ###################################################
 data(Ec_core)
 Ec_core
 
 
 ###################################################
-### code chunk number 60: sybil.Rnw:1137-1138
+### code chunk number 63: sybil.Rnw:1182-1183
 ###################################################
 help("modelorg")
 
 
 ###################################################
-### code chunk number 61: sybil.Rnw:1145-1146
+### code chunk number 64: sybil.Rnw:1190-1191
 ###################################################
 react_num(Ec_core)
 
 
 ###################################################
-### code chunk number 62: sybil.Rnw:1149-1150
+### code chunk number 65: sybil.Rnw:1194-1195
 ###################################################
 id <- react_id(Ec_core)
 
 
 ###################################################
-### code chunk number 63: sybil.Rnw:1153-1154
+### code chunk number 66: sybil.Rnw:1198-1199
 ###################################################
 react_id(Ec_core)[13] <- "biomass"
 
 
 ###################################################
-### code chunk number 64: sybil.Rnw:1158-1160
+### code chunk number 67: sybil.Rnw:1203-1205
 ###################################################
 cg <- gray(0:8/8)
 image(S(Ec_core), col.regions = c(cg, rev(cg)))
 
 
 ###################################################
-### code chunk number 65: sybil.Rnw:1173-1174 (eval = FALSE)
+### code chunk number 68: sybil.Rnw:1218-1219 (eval = FALSE)
 ###################################################
 ## mod <- readTSVmod(reactList = "reactionList.txt")
 
 
 ###################################################
-### code chunk number 66: sybil.Rnw:1198-1199
+### code chunk number 69: sybil.Rnw:1243-1244
 ###################################################
 help("optsol")
 
 
 ###################################################
-### code chunk number 67: sybil.Rnw:1203-1205
+### code chunk number 70: sybil.Rnw:1248-1250
 ###################################################
 os <- optimizeProb(Ec_core)
 is(os)
 
 
 ###################################################
-### code chunk number 68: sybil.Rnw:1208-1209
+### code chunk number 71: sybil.Rnw:1253-1254
 ###################################################
 lp_obj(os)
 
 
 ###################################################
-### code chunk number 69: sybil.Rnw:1212-1213
+### code chunk number 72: sybil.Rnw:1257-1258
 ###################################################
 getFluxDist(os)
 
 
 ###################################################
-### code chunk number 70: sybil.Rnw:1258-1259
+### code chunk number 73: sybil.Rnw:1303-1304
 ###################################################
 lp <- optObj(solver = "glpkAPI", method = "exact")
 
 
 ###################################################
-### code chunk number 71: sybil.Rnw:1283-1284
+### code chunk number 74: sybil.Rnw:1328-1329
 ###################################################
 lp <- initProb(lp)
 
 
 ###################################################
-### code chunk number 72: sybil.Rnw:1288-1293
+### code chunk number 75: sybil.Rnw:1333-1338
 ###################################################
 cm <- Matrix(c(0.5, 2, 1, 1), nrow = 2)
 loadLPprob(lp, nCols = 2, nRows = 2, mat = cm,
@@ -468,65 +492,65 @@ loadLPprob(lp, nCols = 2, nRows = 2, mat = cm,
 
 
 ###################################################
-### code chunk number 73: sybil.Rnw:1298-1299
+### code chunk number 76: sybil.Rnw:1343-1344
 ###################################################
 lp
 
 
 ###################################################
-### code chunk number 74: sybil.Rnw:1302-1303
+### code chunk number 77: sybil.Rnw:1347-1348
 ###################################################
 status <- solveLp(lp)
 
 
 ###################################################
-### code chunk number 75: sybil.Rnw:1306-1307
+### code chunk number 78: sybil.Rnw:1351-1352
 ###################################################
 getMeanReturn(code = status, solver = solver(lp))
 
 
 ###################################################
-### code chunk number 76: sybil.Rnw:1310-1312
+### code chunk number 79: sybil.Rnw:1355-1357
 ###################################################
 status <- getSolStat(lp)
 getMeanStatus(code = status, solver = solver(lp))
 
 
 ###################################################
-### code chunk number 77: sybil.Rnw:1316-1318
+### code chunk number 80: sybil.Rnw:1361-1363
 ###################################################
 getObjVal(lp)
 getFluxDist(lp)
 
 
 ###################################################
-### code chunk number 78: sybil.Rnw:1321-1322
+### code chunk number 81: sybil.Rnw:1366-1367
 ###################################################
 getRedCosts(lp)
 
 
 ###################################################
-### code chunk number 79: sybil.Rnw:1325-1327
+### code chunk number 82: sybil.Rnw:1370-1372
 ###################################################
 delProb(lp)
 lp
 
 
 ###################################################
-### code chunk number 80: sybil.Rnw:1358-1360
+### code chunk number 83: sybil.Rnw:1403-1405
 ###################################################
 ec <- sysBiolAlg(Ec_core, algorithm = "fba")
 is(ec)
 
 
 ###################################################
-### code chunk number 81: sybil.Rnw:1365-1366
+### code chunk number 84: sybil.Rnw:1410-1411
 ###################################################
 opt <- optimizeProb(ec)
 
 
 ###################################################
-### code chunk number 82: sybil.Rnw:1373-1376
+### code chunk number 85: sybil.Rnw:1418-1421
 ###################################################
 ecr <- sysBiolAlg(Ec_core, algorithm = "room", wtflux = opt$fluxes)
 is(ecr)
@@ -534,7 +558,7 @@ ecr
 
 
 ###################################################
-### code chunk number 83: sybil.Rnw:1425-1426 (eval = FALSE)
+### code chunk number 86: sybil.Rnw:1470-1471 (eval = FALSE)
 ###################################################
 ## promptSysBiolAlg(algorithm = "foo")
 

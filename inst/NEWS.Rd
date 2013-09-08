@@ -7,6 +7,34 @@
 \newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 
 % ---------------------------------------------------------------------------- %
+\section{Changes in version 1.2.4 2013-09-08}{
+  \itemize{
+    \item added methods \code{singletonMetabolites} and
+          \code{deadEndMetabolites} to class \code{modelorg} to find dead end
+          or singleton metabolites in metabolic networks
+    \item fixed a bug in function \code{findExchReact} which accours when a
+          model is in irreversible format
+    \item added methods \code{setRowsNames}, \code{getRowsNames},
+          \code{setColsNames} and \code{getColsNames} to classes extending
+          class \code{optObj}
+  }
+}
+
+
+% ---------------------------------------------------------------------------- %
+\section{Changes in version 1.2.3 2013-08-22}{
+  \itemize{
+    \item added function \code{phpp} for phenotypic phase plane analysis
+    \item added class \code{optsol_phpp}
+    \item added argument \code{rng} to function \code{robAna}
+    \item fixed a bug in function \code{optimizer} which accours when setting
+          arguments \code{setToZero} to \code{TRUE} and \code{verboseMode} to
+          a value larger than two
+  }
+}
+
+
+% ---------------------------------------------------------------------------- %
 \section{Changes in version 1.2.2 2013-07-18}{
   \itemize{
     \item updated function \code{promptSysBiolAlg}, including now a very basic

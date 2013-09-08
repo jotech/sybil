@@ -279,7 +279,7 @@ setMethod("addRowsToProb", signature(lp = "optObj_lpSolveAPI"),
     # cind: list, containing the column indices of the new nz elements
     # nzval: list, containing the new nz elements
     #
-    # i, type, lb, cind and nzval must have the same length
+    # i, type, lb, ub, cind and nzval must have the same length
     #
     # type can be one of the following:
     # "F" = free variable                -INF <  x <  INF
@@ -287,7 +287,6 @@ setMethod("addRowsToProb", signature(lp = "optObj_lpSolveAPI"),
     # "U" = variable with upper bound    -INF <  x <= ub
     # "D" = double-bounded variable        lb <= x <= ub
     # "E" = fixed variable                 lb  = x  = ub
-    # "R" = ranged constraint
 
     function(lp, i, type, lb, ub, cind, nzval, rnames = NULL) {
 
@@ -719,6 +718,58 @@ setMethod("readProb", signature(lp = "optObj_lpSolveAPI", fname = "character"),
         lp@oobj <- lpSolveAPI::read.lp(filename = fname, type = ff, ...)
 
         return(lp)
+    }
+)
+
+
+#------------------------------------------------------------------------------#
+
+setMethod("setRowsNames", signature(lp = "optObj_lpSolveAPI",
+                                    i = "numeric", names = "character"),
+
+    function(lp, i, names) {
+
+        invisible(dimnames(lp@oobj)[[1]][i] <- names)
+
+    }
+)
+
+
+#------------------------------------------------------------------------------#
+
+setMethod("setColsNames", signature(lp = "optObj_lpSolveAPI",
+                                    j = "numeric", names = "character"),
+
+    function(lp, j, names) {
+
+        invisible(dimnames(lp@oobj)[[2]][j] <- names)
+
+    }
+)
+
+
+#------------------------------------------------------------------------------#
+
+setMethod("getRowsNames", signature(lp = "optObj_lpSolveAPI", i = "numeric"),
+
+    function(lp, i) {
+
+        rn <- dimnames(lp@oobj)[[1]][i]
+        return(rn)
+
+    }
+)
+
+
+#------------------------------------------------------------------------------#
+
+setMethod("getColsNames", signature(lp = "optObj_lpSolveAPI", j = "numeric"),
+
+    function(lp, j) {
+
+        cn <- dimnames(lp@oobj)[[2]][j]
+        return(cn)
+
     }
 )
 

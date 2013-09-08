@@ -217,13 +217,14 @@ setMethod("show", signature(object = "summaryOptsol"),
 
 
 # draw a histogramm (package lattice)
-setMethod("histogram", signature(x = "summaryOptsol"),
-          function(x,
+setMethod("plot", signature(x = "summaryOptsol", y = "missing"),
+          function(x, y,
+                   col = "grey",
                    main = "",
                    xlab = "optimal values of model objective function",
                    ...) {
 
-              histogram(mod_obj(x), main = main, xlab = xlab, ...)
+              histogram(mod_obj(x), col = col, main = main, xlab = xlab, ...)
               
           }
 )
@@ -266,7 +267,7 @@ setMethod("printExchange", signature(object = "summaryOptsol"),
                   j <- 1:ncol(object@ex_val)
               }
 
-              mat <- sybil:::.recodeMatrix(object@ex_val[i, j, drop = FALSE])
+              mat <- .recodeMatrix(object@ex_val[i, j, drop = FALSE])
               rownames(mat) <- sprintf("%10s", object@ex_met[i])
               cw <- paste("%-", floor(log10(ncol(mat)))+1, "i", sep = "")
               colnames(mat) <- sprintf(cw, j)
@@ -295,7 +296,7 @@ setMethod("image", signature(x = "summaryOptsol"),
                    sub = NULL,
                    printOut = TRUE, ...) {
 
-              mat <- sybil:::.recodeMatrix(x@ex_val, signs = c(-1, 0, 1))
+              mat <- .recodeMatrix(x@ex_val, signs = c(-1, 0, 1))
 
               imgmat <- image(Matrix(mat),
                               cuts = 2,

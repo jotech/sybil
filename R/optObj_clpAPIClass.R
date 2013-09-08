@@ -292,7 +292,7 @@ setMethod("addRowsToProb", signature(lp = "optObj_clpAPI"),
     # cind: list, containing the column indices of the new nz elements
     # nzval: list, containing the new nz elements
     #
-    # i, type, lb, cind and nzval must have the same length
+    # i, type, lb, ub, cind and nzval must have the same length
     #
     # type can be one of the following:
     # "F" = free variable                -INF <  x <  INF
@@ -708,5 +708,4 @@ setMethod("readProb", signature(lp = "optObj_clpAPI", fname = "character"),
 
 
 #------------------------------------------------------------------------------#
-
 

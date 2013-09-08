@@ -48,7 +48,7 @@ editEnvir <- function(model, newKey = FALSE, ...) {
     uppbnd(model)[exid] <- exfr[["upper_bound"]]
     
     if (isTRUE(newKey)) {
-        mod_key(model) <- sybil:::.generateModKey()
+        mod_key(model) <- .generateModKey()
     }
 
     validObject(model)

@@ -1,7 +1,8 @@
 importFrom("graphics", plot)
-importFrom("lattice", histogram)
 
+import(methods)
 import(Matrix)
+import(lattice)
 
 exportPattern("^[^\\.]")
 

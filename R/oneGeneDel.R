@@ -65,7 +65,7 @@ oneGeneDel <- function(model, geneList,
 
     # ------------------------------------------------------------------------ #
 
-    fd <- sybil:::.generateFluxdels(model, geneList)
+    fd <- .generateFluxdels(model, geneList)
 
     sol <- optimizer(model = model,
                      react = fd[["react"]], lb = lb, ub = ub, ...)

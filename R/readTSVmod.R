@@ -325,9 +325,10 @@ readTSVmod <- function(prefix, suffix,
             modNM <- newModelName
         }
         else {
-            nal <- sybil:::.checkEmptyField(modNM, "name")
+            nal <- .checkEmptyField(modNM, "name")
             if (!is.null(nal)) {
-                stop(nal[["msg"]], call. = FALSE)
+                #stop(nal[["msg"]], call. = FALSE)
+                modNM <- newModelName
             }
         }
 
@@ -336,9 +337,10 @@ readTSVmod <- function(prefix, suffix,
             modID <- newModelName
         }
         else {
-            nal <- sybil:::.checkEmptyField(modID, "id")
+            nal <- .checkEmptyField(modID, "id")
             if (!is.null(nal)) {
-                stop(nal[["msg"]], call. = FALSE)
+                #stop(nal[["msg"]], call. = FALSE)
+                modID <- newModelName
             }
         }
 
@@ -346,7 +348,7 @@ readTSVmod <- function(prefix, suffix,
             modDC <- ""
         }
         else {
-            nal <- sybil:::.checkEmptyField(modDC, "description")
+            nal <- .checkEmptyField(modDC, "description")
             if (!is.null(nal)) {
                 modDC <- ""
             }
@@ -356,7 +358,7 @@ readTSVmod <- function(prefix, suffix,
             modCO <- NULL
         }
         else {
-            nal <- sybil:::.checkEmptyField(modCO, "compartment")
+            nal <- .checkEmptyField(modCO, "compartment")
             if (!is.null(nal)) {
                 stop(nal[["msg"]], call. = FALSE)
             }
@@ -367,7 +369,7 @@ readTSVmod <- function(prefix, suffix,
             modCA <- NULL
         }
         else {
-            nal <- sybil:::.checkEmptyField(modCA, "abbreviation")
+            nal <- .checkEmptyField(modCA, "abbreviation")
             if (!is.null(nal)) {
                 stop(nal[["msg"]], call. = FALSE)
             }
@@ -378,7 +380,7 @@ readTSVmod <- function(prefix, suffix,
             modNmet <- NULL
         }
         else {
-            nal <- sybil:::.checkEmptyField(modNmet, "Nmetabolites")
+            nal <- .checkEmptyField(modNmet, "Nmetabolites")
             if (!is.null(nal)) {
                 stop(nal[["msg"]], call. = FALSE)
             }
@@ -389,7 +391,7 @@ readTSVmod <- function(prefix, suffix,
             modNreact <- NULL
         }
         else {
-            nal <- sybil:::.checkEmptyField(modNreact, "Nreactions")
+            nal <- .checkEmptyField(modNreact, "Nreactions")
             if (!is.null(nal)) {
                 stop(nal[["msg"]], call. = FALSE)
             }
@@ -400,7 +402,7 @@ readTSVmod <- function(prefix, suffix,
             modNgenes <- NULL
         }
         else {
-            nal <- sybil:::.checkEmptyField(modNgenes, "Ngenes")
+            nal <- .checkEmptyField(modNgenes, "Ngenes")
             if (!is.null(nal)) {
                 stop(nal[["msg"]], call. = FALSE)
             }
@@ -411,7 +413,7 @@ readTSVmod <- function(prefix, suffix,
             modNnnz <- NULL
         }
         else {
-            nal <- sybil:::.checkEmptyField(modNnnz, "Nnnz")
+            nal <- .checkEmptyField(modNnnz, "Nnnz")
             if (!is.null(nal)) {
                 stop(nal[["msg"]], call. = FALSE)
             }
@@ -459,7 +461,7 @@ readTSVmod <- function(prefix, suffix,
             metABBR <- NULL
         }
         else {
-            nal <- sybil:::.checkEmptyField(metABBR, "abbreviation")
+            nal <- .checkEmptyField(metABBR, "abbreviation")
             if (!is.null(nal)) {
                 stop(nal[["msg"]], call. = FALSE)
             }
@@ -479,7 +481,7 @@ readTSVmod <- function(prefix, suffix,
             metNAME <- NULL
         }
         else {
-            nal <- sybil:::.checkEmptyField(metNAME, "name")
+            nal <- .checkEmptyField(metNAME, "name")
             if (!is.null(nal)) {
                 metNAME[nal[["nalines"]]] <- ""
             }
@@ -489,7 +491,7 @@ readTSVmod <- function(prefix, suffix,
             metCOMP <- NULL
         }
         else {
-            nal <- sybil:::.checkEmptyField(metCOMP, "compartment")
+            nal <- .checkEmptyField(metCOMP, "compartment")
             if (!is.null(nal)) {
                 metCOMP[nal[["nalines"]]] <- ""
             }
@@ -520,7 +522,7 @@ readTSVmod <- function(prefix, suffix,
         stop("field 'equation' does not exist in the reactions list")
     }
     else {
-        nal <- sybil:::.checkEmptyField(reactEQU, "equation")
+        nal <- .checkEmptyField(reactEQU, "equation")
         if (!is.null(nal)) {
             stop(nal[["msg"]], call. = FALSE)
         }
@@ -557,7 +559,7 @@ readTSVmod <- function(prefix, suffix,
         reactABBR <- paste(rep("v", nreact), 1:nreact, sep = "")
     }
     else {
-        nal <- sybil:::.checkEmptyField(reactABBR, "abbreviation")
+        nal <- .checkEmptyField(reactABBR, "abbreviation")
         if (!is.null(nal)) {
             stop(nal[["msg"]], call. = FALSE)
         }
@@ -572,7 +574,7 @@ readTSVmod <- function(prefix, suffix,
         reactNAME <- NULL
     }
     else {
-        nal <- sybil:::.checkEmptyField(reactNAME, "name")
+        nal <- .checkEmptyField(reactNAME, "name")
         if (!is.null(nal)) {
             reactNAME[nal[["nalines"]]] <- ""
         }
@@ -582,7 +584,7 @@ readTSVmod <- function(prefix, suffix,
         reactREV <- NULL                  # in reactEQU
     }
     else {
-        nal <- sybil:::.checkEmptyField(reactREV, "reversible")
+        nal <- .checkEmptyField(reactREV, "reversible")
         if (!is.null(nal)) {
             stop(nal[["msg"]], call. = FALSE)
         }
@@ -592,9 +594,10 @@ readTSVmod <- function(prefix, suffix,
         reactCOMP <- NULL
     }
     else {
-        nal <- sybil:::.checkEmptyField(reactCOMP, "compartment")
+        nal <- .checkEmptyField(reactCOMP, "compartment")
         if (!is.null(nal)) {
-            stop(nal[["msg"]], call. = FALSE)
+            #stop(nal[["msg"]], call. = FALSE)
+            reactCOMP[nal[["nalines"]]] <- ""
         }
     }
 
@@ -602,9 +605,10 @@ readTSVmod <- function(prefix, suffix,
         reactLOW <- NULL                  # we use for irreversible reactions:
     }                                     # [0, SYBIL_SETTINGS("MAXIMUM")]
     else {
-        nal <- sybil:::.checkEmptyField(reactLOW, "lowbnd")
+        nal <- .checkEmptyField(reactLOW, "lowbnd")
         if (!is.null(nal)) {
-            stop(nal[["msg"]], call. = FALSE)
+            #stop(nal[["msg"]], call. = FALSE)
+            reactLOW[nal[["nalines"]]] <- -1 * def_bnd
         }
     }
 
@@ -612,9 +616,10 @@ readTSVmod <- function(prefix, suffix,
         reactUPP <- NULL                  # [-SYBIL_SETTINGS("MAXIMUM"),
     }                                     #   SYBIL_SETTINGS("MAXIMUM")]
     else {
-        nal <- sybil:::.checkEmptyField(reactUPP, "uppbnd")
+        nal <- .checkEmptyField(reactUPP, "uppbnd")
         if (!is.null(nal)) {
-            stop(nal[["msg"]], call. = FALSE)
+            #stop(nal[["msg"]], call. = FALSE)
+            reactUPP[nal[["nalines"]]] <- def_bnd
         }
     }
 
@@ -622,9 +627,10 @@ readTSVmod <- function(prefix, suffix,
         reactQBJ <- rep(0, nreact)
     }
     else {
-        nal <- sybil:::.checkEmptyField(reactQBJ, "obj_coef")
+        nal <- .checkEmptyField(reactQBJ, "obj_coef")
         if (!is.null(nal)) {
-            stop(nal[["msg"]], call. = FALSE)
+            #stop(nal[["msg"]], call. = FALSE)
+            reactQBJ[nal[["nalines"]]] <- 0
         }
     }
 
@@ -632,7 +638,7 @@ readTSVmod <- function(prefix, suffix,
         reactRULE <- rep("", nreact)
     }
     else {
-        nal <- sybil:::.checkEmptyField(reactRULE, "rule")
+        nal <- .checkEmptyField(reactRULE, "rule")
         if (!is.null(nal)) {
             reactRULE[nal[["nalines"]]] <- ""
         }
@@ -642,7 +648,7 @@ readTSVmod <- function(prefix, suffix,
         reactSUBS <- NULL
     }
     else {
-        nal <- sybil:::.checkEmptyField(reactSUBS, "subsystem")
+        nal <- .checkEmptyField(reactSUBS, "subsystem")
         if (!is.null(nal)) {
             reactSUBS[nal[["nalines"]]] <- "none"
         }
@@ -903,7 +909,7 @@ readTSVmod <- function(prefix, suffix,
 
 
         # gpr association
-        gene_rule <- sybil:::.parseBoolean(reactRULE[i])
+        gene_rule <- .parseBoolean(reactRULE[i])
         Rgenes[[i]] <- gene_rule$gene                # list of involved genes
         Rrules[i]   <- gene_rule$rule                # the rule string
         if (gene_rule$rule != "") {
@@ -964,7 +970,7 @@ readTSVmod <- function(prefix, suffix,
     message("sub systems ... ", appendLF = FALSE)
 
     subSysdelim <- ifelse(isTRUE(oneSubSystem), NA, entrydelim)
-    ssys <- sybil:::.prepareSubSysMatrix(reactSUBS,
+    ssys <- .prepareSubSysMatrix(reactSUBS,
                                          nreact,
                                          entrydelim = subSysdelim)
 
@@ -1099,7 +1105,7 @@ readTSVmod <- function(prefix, suffix,
         message("identifying reactions containing single metabolites ... ",
                 appendLF = FALSE)
 
-        singleton <- sybil:::.singletonMetabolite(mat = RmatMb)
+        singleton <- .singletonMetabolite(mat = RmatMb)
 
         sing_met[!singleton$smet]     <- FALSE
         sing_react[!singleton$sreact] <- FALSE
@@ -1177,7 +1183,7 @@ readTSVmod <- function(prefix, suffix,
         message("identifying reactions containing dead end metabolites ... ",
                 appendLF = FALSE)
 
-        demr <- sybil:::.deadEndMetabolite(mat   = RmatM,
+        demr <- .deadEndMetabolite(mat   = RmatM,
                                            lb    = Rlow,
                                            exclM = sing_met,
                                            exclR = sing_react,

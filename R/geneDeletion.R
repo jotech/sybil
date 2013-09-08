@@ -82,7 +82,7 @@ geneDeletion <- function(model, genes, combinations = 1,
 
     kogenes <- lapply(seq_len(ncol(delGenes)), function(x) delGenes[ , x])
 
-    fd <- sybil:::.generateFluxdels(model, kogenes)
+    fd <- .generateFluxdels(model, kogenes)
 
     if (is.null(lb)) {
         lb <- rep(0, length(kogenes))

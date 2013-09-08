@@ -78,13 +78,18 @@ optimizer <- function(model, react,
 
     # parameters modifying the model
     if (!is.null(lb)) {
-        stopifnot(length(lb) == nObj, is(lb, "numeric"))
+        stopifnot((length(lb) == nObj || nrow(lb) == nObj),
+                  (is(lb, "numeric")  || is(lb, "list") || is(lb, "matrix")))
     }
     if (!is.null(ub)) {
-        stopifnot(length(ub) == nObj, is(ub, "numeric"))
+        stopifnot((length(ub) == nObj || nrow(ub) == nObj),
+                  (is(ub, "numeric")  || is(ub, "list") || is(ub, "matrix")))
     }
     if (!is.null(obj_coef)) {
-        stopifnot(length(obj_coef) == nObj, is(obj_coef, "numeric"))
+        stopifnot((length(obj_coef) == nObj || nrow(obj_coef) == nObj),
+                  (is(obj_coef, "numeric") ||
+                   is(obj_coef, "list")    ||
+                   is(obj_coef, "matrix")))
     }
     if (!is.null(lpdir)) {
         stopifnot(length(lpdir) == nObj, is(lpdir, "character"))
@@ -100,6 +105,52 @@ optimizer <- function(model, react,
     else {
         fdist <- fld
     }
+
+
+    #--------------------------------------------------------------------------#
+    # convenient function
+
+    gEl <- function(el, num, pos) {
+
+        if (is.null(el)) {
+            return(el)
+        }
+        
+        stopifnot(length(pos) == 1)
+
+        if (is.list(el)) {
+            ret <- el[[pos]]
+        }
+        else if (is.matrix(el)) {
+            ret <- el[pos, , drop = TRUE]
+        }
+        else {
+            ret <- rep(el[pos], num)
+        }
+    
+        stopifnot(length(ret) == num)
+        return(ret)
+    
+    } 
+#    gEl <- function(el, num) {
+#    
+#        if (is.null(el)) {
+#            return(el)
+#        }
+#        
+#        stopifnot(length(el) == 1)
+#
+#        if (is.list(el)) {
+#            ret <- unlist(el)
+#            stopifnot(length(el) == num)
+#        }
+#        else {
+#            ret <- rep(el, num)
+#        }
+#    
+#        return(ret)
+#    
+#    } 
 
 
     #--------------------------------------------------------------------------#
@@ -159,7 +210,7 @@ optimizer <- function(model, react,
     if (all(!is.na(prCmd))) {
         do_pr  <- TRUE
         prPcmd <- NULL
-        runPrP <- sybil:::.doInRound(prDIR, nObj)
+        runPrP <- .doInRound(prDIR, nObj)
         prPpa  <- vector(mode = "list", length = length(runPrP))
         runPrPl[runPrP] <- TRUE
     }
@@ -169,7 +220,7 @@ optimizer <- function(model, react,
     if (all(!is.na(poCmd))) {
         do_po  <- TRUE
         poPcmd <- NULL
-        runPoP <- sybil:::.doInRound(poDIR, nObj)
+        runPoP <- .doInRound(poDIR, nObj)
         poPpa  <- vector(mode = "list", length = length(runPoP))
         runPoPl[runPoP] <- TRUE
     }
@@ -185,7 +236,7 @@ optimizer <- function(model, react,
     message("calculating ", nObj, " optimizations ... ", appendLF = FALSE)
     if (verboseMode > 1) { cat("\n") }
     if (verboseMode == 2) {
-        progr <- sybil:::.progressBar()
+        progr <- .progressBar()
         #progr <- txtProgressBar(min = 2, max = nObj, initial = 2, style = 3)
     }
 
@@ -197,7 +248,7 @@ optimizer <- function(model, react,
     for (i in 1:nObj) {
 
         if (verboseMode == 2) {
-            progr <- sybil:::.progressBar(i, nObj, progr)
+            progr <- .progressBar(i, nObj, progr)
             #setTxtProgressBar(progr, i)
         }
 
@@ -224,12 +275,18 @@ optimizer <- function(model, react,
         if (isTRUE(rebuildModel)) {
             sol <- optimizeProb(model,
                                 react = react[[i]],
-                                lb = rep(lb[i], length(react[[i]])),
-                                ub = rep(ub[i], length(react[[i]])),
-                                retOptSol = FALSE,
-                                obj_coef = obj_coef[i],
+#                                lb = rep(lb[i], length(react[[i]])),
+#                                ub = rep(ub[i], length(react[[i]])),
+#                                obj_coef = obj_coef[i],
+#                                lb = gEl(lb[i], length(react[[i]])),
+#                                ub = gEl(ub[i], length(react[[i]])),
+#                                obj_coef = gEl(obj_coef[i], length(react[[i]])),
+                                lb = gEl(lb, length(react[[i]]), i),
+                                ub = gEl(ub, length(react[[i]]), i),
+                                obj_coef = gEl(obj_coef, length(react[[i]]), i),
                                 lpdir = lpdir[i],
                                 #lpdir = getObjDir(problem(lpmod)),
+                                retOptSol = FALSE,
                                 prCmd = prCmd_tmp, poCmd = poCmd_tmp,
                                 prCil = runPrPcn, poCil = runPoPcn,
                                 algorithm = algorithm, ...)
@@ -241,9 +298,15 @@ optimizer <- function(model, react,
 
             sol <- optimizeProb(lpmod,
                                 react = react[[i]],
-                                lb = rep(lb[i], length(react[[i]])),
-                                ub = rep(ub[i], length(react[[i]])),
-                                obj_coef = obj_coef[i],
+#                                lb = rep(lb[i], length(react[[i]])),
+#                                ub = rep(ub[i], length(react[[i]])),
+#                                obj_coef = obj_coef[i],
+#                                lb = gEl(lb[i], length(react[[i]])),
+#                                ub = gEl(ub[i], length(react[[i]])),
+#                                obj_coef = gEl(obj_coef[i], length(react[[i]])),
+                                lb = gEl(lb, length(react[[i]]), i),
+                                ub = gEl(ub, length(react[[i]]), i),
+                                obj_coef = gEl(obj_coef, length(react[[i]]), i),
                                 lpdir = lpdir[i],
                                 prCmd = prCmd_tmp, poCmd = poCmd_tmp,
                                 prCil = runPrPcn, poCil = runPoPcn)
@@ -356,13 +419,15 @@ optimizer <- function(model, react,
     if (isTRUE(setToZero)) {
         do_again <- checkSolStat(stat, solver(problem(lpmod)))
         num_new  <- length(do_again)
-        optsol$lp_obj[do_again] <- as.numeric(0)
+        optsol[["obj"]][do_again] <- as.numeric(0)
 
         message("setting ", num_new, " objective values to zero")
 
         for (i in seq(along = do_again)) {
-            logOptimization(logObj, optsol$lp_ok[do_again[i]],
-                            optsol$lp_stat[do_again[i]], 0,
+            logOptimization(logObj,
+                            optsol[["ok"]][do_again[i]],
+                            optsol[["stat"]][do_again[i]], 0,
+                            lpdir[[do_again[i]]], obj_coef[[do_again[i]]],
                             react[[do_again[i]]], do_again[i])
         }
     }

@@ -169,7 +169,7 @@ rmReact <- function(model, react, rm_met = TRUE) {
   # check what to do with the reversible match stuff (model in irrev format)  
   if (is(model, "modelorg_irrev")) {
 
-      matchrev(mod_out)     <- sybil:::.reassignFwBwMatch(matchrev(model),
+      matchrev(mod_out)     <- .reassignFwBwMatch(matchrev(model),
                                                           keepReact)
 
       # propably we do not need this:

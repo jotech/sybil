@@ -60,7 +60,7 @@ setMethod(f = "initialize",
                   # row and column names for the problem object
                   if (isTRUE(useNames)) {
                       if (is.null(cnames)) {
-                          colNames <- sybil:::.makeLPcompatible(react_id(model),
+                          colNames <- .makeLPcompatible(react_id(model),
                                                                 prefix = "x")
                       }
                       else {
@@ -70,7 +70,7 @@ setMethod(f = "initialize",
                       }
 
                       if (is.null(rnames)) {
-                          rowNames <- sybil:::.makeLPcompatible(met_id(model),
+                          rowNames <- .makeLPcompatible(met_id(model),
                                                                 prefix = "r")
                       }
                       else {
@@ -80,7 +80,7 @@ setMethod(f = "initialize",
                       }
 
                       if (is.null(pname)) {
-                          probName <- sybil:::.makeLPcompatible(
+                          probName <- .makeLPcompatible(
                               paste("FBA", mod_id(model), sep = "_"),
                               prefix = "")
                       }

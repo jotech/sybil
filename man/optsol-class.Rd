@@ -82,7 +82,7 @@
 \alias{solver<-,optsol-method}
 \alias{solver<-}
 \alias{length,optsol-method}
-\alias{histogram,optsol-method}
+\alias{plot,optsol,missing-method}
 
 \encoding{utf8}
 
@@ -201,9 +201,11 @@
     \item{\code{fluxes}:}{\code{signature(object = "optsol")}:
       gets the \code{fluxes} slot of slot \code{fluxdist}.
     }
-    \item{\code{histogram}:}{
-      \code{signature(x = "optsol")}: plots a histogram of the
+    \item{\code{plot}:}{
+      \code{signature(x = "optsol")}: plots a \code{\link{histogram}} of the
       values of the objective function given in the model in optimal state.
+      Additional arguments can be passed to \code{\link{histogram}} via the
+      \code{\dots} argument.
     }
     \item{\code{length}:}{\code{signature(x = "optsol")}:
       returns the number of optimizations.

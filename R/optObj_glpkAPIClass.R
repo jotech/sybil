@@ -315,7 +315,7 @@ setMethod("addRowsToProb", signature(lp = "optObj_glpkAPI"),
     # cind: list, containing the column indices of the new nz elements
     # nzval: list, containing the new nz elements
     #
-    # i, type, lb, cind and nzval must have the same length
+    # i, type, lb, ub, cind and nzval must have the same length
     #
     # type can be one of the following:
     # "F" = free variable                -INF <  x <  INF
@@ -909,26 +909,57 @@ setMethod("sensitivityAnalysis", signature(lp = "optObj_glpkAPI"),
 #------------------------------------------------------------------------------#
 
 
+setMethod("setRowsNames", signature(lp = "optObj_glpkAPI",
+                                    i = "numeric", names = "character"),
+
+    function(lp, i, names) {
+
+        invisible(glpkAPI::setRowsNamesGLPK(lp@oobj, i, names))
+
+    }
+)
 
 
+#------------------------------------------------------------------------------#
+
+setMethod("setColsNames", signature(lp = "optObj_glpkAPI",
+                                    j = "numeric", names = "character"),
+
+    function(lp, j, names) {
+
+        invisible(glpkAPI::setColsNamesGLPK(lp@oobj, j, names))
+
+    }
+)
 
 
+#------------------------------------------------------------------------------#
+
+setMethod("getRowsNames", signature(lp = "optObj_glpkAPI", i = "numeric"),
+
+    function(lp, i) {
+
+        rn <- mapply(glpkAPI::getRowNameGLPK, i, MoreArgs = list(lp = lp@oobj),
+                     SIMPLIFY = TRUE, USE.NAMES = FALSE)
+        return(unlist(rn))
+
+    }
+)
 
 
+#------------------------------------------------------------------------------#
+
+setMethod("getColsNames", signature(lp = "optObj_glpkAPI", j = "numeric"),
+
+    function(lp, j) {
+
+        cn <- mapply(glpkAPI::getColNameGLPK, j, MoreArgs = list(lp = lp@oobj),
+                     SIMPLIFY = TRUE, USE.NAMES = FALSE)
+        return(unlist(cn))
+
+    }
+)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#------------------------------------------------------------------------------#
 

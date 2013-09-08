@@ -67,7 +67,12 @@ findExchReact <- function(model) {
   if (is(model, "modelorg")) {
 
       # get the row id's of S containing the non-zeros of the exchange reactions
-      exMet <- which(Matrix::rowSums(abs(S(model)[, ex])) == 1)
+      #exMet <- which(Matrix::rowSums(abs(S(model)[, ex])) == 1)
+      
+      # must be '> 0', because irreversible models (including exchange
+      # reactions) have 2 entries per row, if the exchange reaction is
+      # reversible
+      exMet <- which(Matrix::rowSums(abs(S(model)[, ex])) > 0)
       
       # get the rows in the correct order
       # (if exchange reactions are not in main diagonal)

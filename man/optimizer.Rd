@@ -39,21 +39,40 @@ optimizer(model, react, lb, ub, obj_coef, lpdir,
     optimization.
   }
   \item{lb}{
-    A numeric vector of the same length as \code{react} containing the lower
+    A numeric vector or list of the same length as \code{react} or a matrix with
+    the number of rows equal to the length of \code{react} containing the lower
     bounds for the reaction rates of reactions (variables) given in argument
-    \code{react}. If set to \code{NULL}, no lower bounds will be changed.\cr
+    \code{react}. If set to \code{NULL}, no lower bounds will be changed.
+    If \code{lb} is a vector, \code{lb[k]} is used as lower bound for all
+    reactions given in \code{react[k]}. If \code{lb} is a list, \code{lb[k]}
+    must have the same length as \code{react[k]}. If \code{lb} is a matrix, each
+    row serves as lower bound for the reactions given in each element of
+    \code{react} (all elements in \code{react} must have the same length).\cr
     Default: \code{NULL}.
   }
   \item{ub}{
-    A numeric vector of the same length as \code{react} containing the upper
+    A numeric vector or list of the same length as \code{react} or a matrix with
+    the number of rows equal to the length of \code{react} containing the upper
     bounds for the reaction rates of reactions (variables) given in argument
-    \code{react}. If set to \code{NULL}, no upper bounds will be changed.\cr
+    \code{react}. If set to \code{NULL}, no upper bounds will be changed.
+    If \code{ub} is a vector, \code{ub[k]} is used as upper bound for all
+    reactions given in \code{react[k]}. If \code{ub} is a list, \code{ub[k]}
+    must have the same length as \code{react[k]}. If \code{ub} is a matrix, each
+    row serves as upper bound for the reactions given in each element of
+    \code{react} (all elements in \code{react} must have the same length).\cr
     Default: \code{NULL}.
   }
   \item{obj_coef}{
-    A numeric vector of the same length as \code{react} containing the objective
-    coefficients for the reactions (variables) given in argument \code{react}.
-    If set to \code{NULL}, no objective coefficients will be changed.\cr
+    A numeric vector or list of the same length as \code{react} or a matrix with
+    the number of rows equal to the length of \code{react} containing the
+    objective coefficients for the reactions (variables) given in argument
+    \code{react}. If set to \code{NULL}, no objective coefficients will be
+    changed. If \code{obj_coef} is a vector, \code{obj_coef[k]} is used as
+    objective coefficients for all reactions given in \code{react[k]}.
+    If \code{obj_coef} is a list, \code{obj_coef[k]} must have the same length
+    as \code{react[k]}. If \code{obj_coef} is a matrix, each row serves as
+    objective coefficient for the reactions given in each element of
+    \code{react} (all elements in \code{react} must have the same length).\cr
     Default: \code{NULL}.
   }
   \item{lpdir}{
@@ -74,7 +93,7 @@ optimizer(model, react, lb, ub, obj_coef, lpdir,
     \code{"\link[=sysBiolAlg_lmoma-class]{lmoma}"}: linear version of MOMA,
     \code{"\link[=sysBiolAlg_room-class]{room}"}: regulatory on/off
                                                   minimization (ROOM) or
-    \code{"\link[=sysBiolAlg_fv-class]{fv}"}: flux variablility analysis.\cr
+    \code{"\link[=sysBiolAlg_fv-class]{fv}"}: flux variability analysis.\cr
     Default: \code{SYBIL_SETTINGS("ALGORITHM")}.
   }
   \item{mtfobj}{
@@ -139,9 +158,11 @@ optimizer(model, react, lb, ub, obj_coef, lpdir,
   }
   \item{verboseMode}{
     Single integer value, giving the amount of output to the console. Use
-    \code{\link{sink}} to redirect output to a file. If \code{loglevel == 2},
-    a progress bar will be produced. If \code{loglevel > 2}, intermediate
-    results will be printed.\cr
+    \code{\link{sink}} to redirect output to a file. If \code{verboseMode == 1}
+    status messages will be printed, if \code{verboseMode == 2} additionally
+    a progress bar will be produced. If \code{verboseMode > 2}, intermediate
+    results will be printed. Use \code{\link{suppressMessages}} to disable any
+    output to the console.\cr
     Default: \code{2}.
   }
   \item{\dots}{

@@ -34,7 +34,11 @@
     A numeric or character vector or an object of class
     \code{\linkS4class{reactId_Exch}} containing the metabolite id's of
     metabolites to not use for uptake. If they have an exchange reaction with
-    a lower bound less than zero, this lower bound is set to \code{0}.\cr
+    a lower bound less than zero, this lower bound is set to \code{0}.
+    If \code{off} is set to \code{NULL}, all uptake reactions will be
+    deactivated. If \code{off} is set to \code{FALSE}, no uptake reaction will
+    be deactivated. If you just want to add an uptake reaction, set \code{off}
+    to \code{FALSE}.\cr
     Default: \code{NULL}.
   }
   \item{on}{

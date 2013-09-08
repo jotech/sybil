@@ -235,7 +235,7 @@ doubleGeneDel <- function(model, geneList1, geneList2, lb = NULL, ub = NULL,
                        geneList2[deletions[,"col"]])
     kogenes   <- lapply(seq_len(nrow(kogenesID)), function(x) kogenesID[x, ])
 
-    fd <- sybil:::.generateFluxdels(model, kogenes)
+    fd <- .generateFluxdels(model, kogenes)
 
     if (is.null(lb)) {
         lb <- rep(0, length(kogenes))

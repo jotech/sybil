@@ -66,7 +66,7 @@
         }
         if (length(mod_compart(object)) != length(unique(mod_compart(object)))) {
             dup <- duplicated(met_id(object))
-            return(paste("mod_compart must be unique! Check ", mod_compart(object)[dup], ".", sep = ""))
+            return(paste("mod_compart must be unique! Check ", paste(mod_compart(object)[dup], collapse = ", "), ".", sep = ""))
         }
     
         # metabolite stuff
@@ -79,7 +79,7 @@
         }
         if (met != length(unique(met_id(object)))) {
             dup <- duplicated(met_id(object))
-            return(paste("met_id must be unique! Check ", met_id(object)[dup], ".", sep = ""))
+            return(paste("met_id must be unique! Check ", paste(met_id(object)[dup], collapse = ", "), ".", sep = ""))
         }
         if (met != length(met_name(object))) {
             return("Wrong number of metabolite names!")
@@ -104,7 +104,7 @@
         }
         if (react != length(unique(react_id(object)))) {
             dup <- duplicated(react_id(object))
-            return(paste("reaction_id must be unique! Check ", react_id(object)[dup], ".", sep = ""))
+            return(paste("reaction_id must be unique! Check ", paste(react_id(object)[dup], collapse = ", "), ".", sep = ""))
         }
         if (react != length(react_name(object))) {
             return("Wrong number of reaction names!")

@@ -246,7 +246,7 @@ addReact <- function(model,
                 }
             }
             else {
-                gene_rule <- sybil:::.parseBoolean(gprAssoc)
+                gene_rule <- .parseBoolean(gprAssoc)
             
                 geneInd <- match(gene_rule$gene, allGenes(model))
             

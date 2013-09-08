@@ -31,8 +31,8 @@
 
 setClass("optsol_robAna",
          representation(
-              ctrlr    = "reactId",   # id of the control reaction,
-              ctrlfl   = "numeric"    # fixed flux values for the control reaction
+              ctrlr   = "reactId",   # id of the control reaction,
+              ctrlfl  = "numeric"     # fixed flux values of control reaction
          ),
          contains = "optsol_optimizeProb"
 )
@@ -95,7 +95,7 @@ setMethod("plot", signature(x = "optsol_robAna", y = "missing"),
               }
 
               plot(cr, x@lp_obj, type = "n", xlab = xlab, ylab = ylab)
-              if (fillBg == TRUE) {
+              if (isTRUE(fillBg)) {
                   polygon(c(cr[1], cr, cr[length(cr)]),
                           c(min(x@lp_obj), x@lp_obj, min(x@lp_obj)),
                           col = fillColorBg, border = NA)
@@ -103,3 +103,4 @@ setMethod("plot", signature(x = "optsol_robAna", y = "missing"),
               points(cr, x@lp_obj, type = type, pch = pch, ...)
           }
 )
+

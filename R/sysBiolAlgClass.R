@@ -36,7 +36,7 @@ setClass(Class = "sysBiolAlg",
              alg_par   = "list"
          ),
          contains = "VIRTUAL",
-         validity = sybil:::.validsysBiolAlg
+         validity = .validsysBiolAlg
 )
 
 
@@ -342,7 +342,7 @@ setMethod("optimizeProb", signature(object = "sysBiolAlg"),
         lpmod <- problem(object)
 
         # do some kind of preprocessing
-        preP <- sybil:::.ppProcessing(lpprob  = lpmod,
+        preP <- .ppProcessing(lpprob  = lpmod,
                                       ppCmd   = prCmd,
                                       loopvar = prCil)
 
@@ -356,7 +356,7 @@ setMethod("optimizeProb", signature(object = "sysBiolAlg"),
         lp_fluxes <- getFluxDist(lpmod)
 
         # do some kind of postprocessing
-        postP <- sybil:::.ppProcessing(lpprob = lpmod,
+        postP <- .ppProcessing(lpprob = lpmod,
                                        ppCmd = poCmd,
                                        loopvar = poCil)
     

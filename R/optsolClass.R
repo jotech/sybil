@@ -50,7 +50,7 @@ setClass("optsol",
         alg_par      = "list"              # parameters to the algorithm
     ),
     contains = "VIRTUAL",
-    #validity = sybil:::.validoptsol
+    #validity = .validoptsol
 )
 
 
@@ -516,10 +516,12 @@ setMethod("length", signature = signature(x = "optsol"),
 
 
 # draw a histogramm (package lattice)
-setMethod("histogram", signature(x = "optsol"),
-          function(x, xlab = "value of objective function", ...) {
+setMethod("plot", signature(x = "optsol", y = "missing"),
+          function(x, y,
+                   col = "grey",
+                   xlab = "value of objective function", ...) {
 
-              histogram(x = mod_obj(x), xlab = xlab, ...)
+              histogram(x = mod_obj(x), col = col, xlab = xlab, ...)
               
           }
 )

@@ -45,7 +45,7 @@
       postprocessing commands.
     }
     \item{\code{pa}:}{Object of class \code{"list"}
-      return values of the pro- or postprocessing commands. They can be
+      return values of the pre- or postprocessing commands. They can be
       numeric, integer, character, list or of class
       \code{\linkS4class{sybilError}}.
     }

@@ -38,7 +38,7 @@ setClass("reactId_Exch",
               uppbnd  = "numeric"
          ),
          contains = "reactId",
-         validity = sybil:::.validreactId_Exch
+         validity = .validreactId_Exch
 )
 
 

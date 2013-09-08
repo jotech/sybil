@@ -734,15 +734,16 @@ The result stored in the variable \Comp{opt} is an object of class
 \Comp{optsol\_geneDel}, extending class \Comp{optsol\_optimizeProb}
 (see section~\ref{fba}).  Method \Comp{checkOptSol} gives an overview about the
 results and status of the optimizations. Additionally, class \Comp{optsol}
-contains a method \Comp{histogram}, plotting the values of the objective
-function given in the model (section~\ref{classopt}).
+contains a method \Comp{plot}, plotting a histogram of the values of the
+objective function given in the model after optimization 
+(section~\ref{classopt}).
 <<>>=
 checkOptSol(opt)
 @
 Plot the histogram:
 \begin{center}
 <<fig=TRUE>>=
-histogram(opt, col = "lightgray", nint = 20)
+plot(opt, nint = 20)
 @
 \end{center}
 Argument \Comp{algorithm} can be used here to use MOMA to compute the mutant
@@ -751,7 +752,7 @@ flux distributions. Additionally, a wild-type solution can be provided.
 <<fig=TRUE>>=
 opt <- oneGeneDel(Ec_core, algorithm = "lmoma", wtflux = getFluxDist(mtf))
 checkOptSol(opt)
-histogram(opt, col = "lightgray", nint = 20)
+plot(opt, nint = 20)
 @
 \end{center}
 In order to perform all possible double-knock-out mutants, or $n$-knock-out
@@ -807,13 +808,57 @@ The flux of a control reaction will be varied stepwise between the maximum and
 minimum value the flux of the control reaction can reach \citep{Palsson:2006fk}. 
 The example below shows a flux variability analysis based upon the metabolic
 model of the core energy metabolism of \emph{E.\,coli} using the exchange flux
-of Oxygen as control reaction.
+of oxygen as control reaction.
 \begin{center}
 <<fig=TRUE>>=
-opt <- robAna(Ec_core, "EX_o2(e)", verboseMode = 0)
+opt <- robAna(Ec_core, ctrlreact = "EX_o2(e)", verboseMode = 0)
 plot(opt)
 @
 \end{center}
+
+
+% ---------------------------------------------------------------------------- %
+
+\subsection{Phenotypic phase plane analysis}
+
+The function \Comp{phpp} performs a phenotypic phase plane
+analysis \citep{Edwards:2001fk,Edwards:2002uq} with a given model.  The flux of
+two control reactions will be varied stepwise between a given maximum and
+minimum value.  The example below shows a phenotypic phase plane analysis based
+upon the metabolic model of the core energy metabolism of \emph{E.\,coli} using
+the exchange fluxes of oxygen and succinate as control reactions.  First, the
+uptake of glucose is switched off.
+\begin{center}
+<<fig=TRUE>>=
+Ec_core_wo_glc <- changeUptake(Ec_core, off = "glc_D[e]")
+opt <- phpp(Ec_core_wo_glc,
+            ctrlreact = c("EX_succ(e)", "EX_o2(e)"),
+            redCosts = TRUE,
+            numP = 25,
+            verboseMode = 0)
+plot(opt)
+@
+\end{center}
+Plot reduced costs of succinate import flux and oxygen import flux.
+
+<<fig=TRUE, label=phpp_rf, include=FALSE>>=
+plot(opt, "EX_succ(e)")
+@
+<<fig=TRUE,label=phpp_rs, include=FALSE>>=
+plot(opt, "EX_o2(e)")
+@
+
+\begin{minipage}{0.45\textwidth}
+\begin{center}
+\includegraphics[width=\textwidth]{sybil-phpp_rf}
+\end{center}
+\end{minipage}
+\hfill
+\begin{minipage}{0.45\textwidth}
+\begin{center}
+\includegraphics[width=\textwidth]{sybil-phpp_rs}
+\end{center}
+\end{minipage}
 
 
 % ---------------------------------------------------------------------------- %

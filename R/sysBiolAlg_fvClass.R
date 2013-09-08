@@ -67,7 +67,7 @@ setMethod(f = "initialize",
                   # row and column names for the problem object
                   if (isTRUE(useNames)) {
                       if (is.null(cnames)) {
-                          colNames <- sybil:::.makeLPcompatible(react_id(model),
+                          colNames <- .makeLPcompatible(react_id(model),
                                                                 prefix = "x")
                       }
                       else {
@@ -77,7 +77,7 @@ setMethod(f = "initialize",
                       }
 
                       if (is.null(rnames)) {
-                          rowNames <- sybil:::.makeLPcompatible(met_id(model),
+                          rowNames <- .makeLPcompatible(met_id(model),
                                                                 prefix = "r")
                       }
                       else {
@@ -87,7 +87,7 @@ setMethod(f = "initialize",
                       }
 
                       if (is.null(pname)) {
-                          probName <- sybil:::.makeLPcompatible(
+                          probName <- .makeLPcompatible(
                               paste("FV", mod_id(model), sep = "_"),
                               prefix = "")
                       }
@@ -137,11 +137,11 @@ setMethod(f = "initialize",
 
                           if (optimal$ok == 0) {
                               if (lpdir == "max") {
-                                  obj <- sybil:::.floorValues(optimal$obj,
+                                  obj <- .floorValues(optimal$obj,
                                                        tol = tol)*percentage/100
                               }
                               else {
-                                  obj <- sybil:::.ceilValues(optimal$obj,
+                                  obj <- .ceilValues(optimal$obj,
                                                        tol = tol)*percentage/100
                               }
                           }

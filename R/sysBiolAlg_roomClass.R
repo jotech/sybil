@@ -66,7 +66,7 @@ setMethod(f = "initialize",
               if ( ! missing(model) ) {
 
                   if (missing(wtflux)) {
-                      tmp <- sybil:::.generateWT(model, ...)
+                      tmp <- .generateWT(model, ...)
                       wtflux <- tmp$fluxes[tmp$fldind]
                   }
 
@@ -195,7 +195,7 @@ setMethod(f = "initialize",
                           cn <- c(react_id(model),
                                   paste("oo", react_id(model), sep = "_")
                           )
-                          colNames <- sybil:::.makeLPcompatible(cn,
+                          colNames <- .makeLPcompatible(cn,
                                                                 prefix = "x")
                       }
                       else {
@@ -209,7 +209,7 @@ setMethod(f = "initialize",
                                   paste("wl", react_id(model), sep = "_"),
                                   paste("wu", react_id(model), sep = "_")
                           )
-                          rowNames <- sybil:::.makeLPcompatible(rn,
+                          rowNames <- .makeLPcompatible(rn,
                                                                 prefix = "r")
                       }
                       else {
@@ -219,7 +219,7 @@ setMethod(f = "initialize",
                       }
 
                       if (is.null(pname)) {
-                          probName <- sybil:::.makeLPcompatible(
+                          probName <- .makeLPcompatible(
                            paste("ROOM", toupper(pt), mod_id(model), sep = "_"),
                            prefix = "")
                       }

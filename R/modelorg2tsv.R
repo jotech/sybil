@@ -75,7 +75,7 @@ modelorg2tsv <- function(model, prefix, suffix, extMetFlag = "b",
     #--------------------------------------------------------------------------#
 
     # create reaction strings
-    rstr <- sybil:::.createReactionString(model,
+    rstr <- .createReactionString(model,
                                           makeClosedNetwork,
                                           entrydelim,
                                           extMetFlag)

@@ -168,7 +168,8 @@
 \author{Gabriel Gelius-Dietrich}
 
 \seealso{
-  \code{\link{checkOptSol}} and \code{\linkS4class{optsol}}
+  \code{\link{robAna}}, \code{\link{checkOptSol}} and
+  \code{\linkS4class{optsol}}
 }
       
 \examples{

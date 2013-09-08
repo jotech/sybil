@@ -8,14 +8,12 @@
 }
 
 \description{
-  Performs robustness analysis for a given model.
+  Performs robustness analysis for a given metabolic model.
 }
 
 \usage{
-  robAna(model,
-         ctrlreact,
-         numP = 20,
-         verboseMode = 2, fld = FALSE, ...)
+  robAna(model, ctrlreact, rng = NULL,
+         numP = 20, verboseMode = 1, ...)
 }
 
 \arguments{
@@ -26,22 +24,24 @@
     An object of class \code{\linkS4class{reactId}}, character or integer.
     Specifies the control reaction -- the parameter to vary.
   }
-  \item{numP}{
-    The number of points to analyse.
+  \item{rng}{
+    A numeric vector of length two, giving the lower and upper bound of the
+    control reaction. If set to \code{NULL} (the default), the range will be
+    computed by flux variability analysis for the reaction given in
+    \code{ctrlreact}.\cr
+    Default: \code{NULL}
   }
-  \item{fld}{
-    Boolean.  Save the resulting flux distribution.\cr
-    Default: \code{FALSE}
+  \item{numP}{
+    The number of points to analyse.\cr
+    Default: \code{20}
   }
   \item{verboseMode}{
-    An integer value indicating the amount of output to stdout:
-    0: nothing, 1: status messages, 2: like 1 plus a progress indicator,
-    3: a table containing the control reaction id and the corresponding
-    flux values.\cr
-    Default: \code{2}.
+    An integer value indicating the amount of output to stdout, see
+    \code{\link{optimizer}} for details.\cr
+    Default: \code{1}.
   }
   \item{\dots}{
-    Further arguments passed to \code{\linkS4class{sysBiolAlg}}.
+    Further arguments passed to \code{\link{optimizer}}.
   }
 }
 
@@ -106,7 +106,7 @@
 
 \examples{
   data(Ec_core)
-  rb <- robAna(Ec_core, ctrlreact = "EX_o2")
+  rb <- robAna(Ec_core, ctrlreact = "EX_o2(e)")
   plot(rb)
 }
 

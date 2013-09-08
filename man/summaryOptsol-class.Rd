@@ -9,7 +9,6 @@
 
 \alias{ex_met,summaryOptsol-method}
 \alias{ex_val,summaryOptsol-method}
-\alias{histogram,summaryOptsol-method}
 \alias{image,summaryOptsol-method}
 \alias{mod_id,summaryOptsol-method}
 \alias{mod_id<-,summaryOptsol-method}
@@ -19,6 +18,7 @@
 \alias{mod_obj<-,summaryOptsol-method}
 \alias{nnzero,summaryOptsol-method}
 \alias{nzeros,summaryOptsol-method}
+\alias{plot,summaryOptsol,missing-method}
 \alias{printExchange,summaryOptsol-method}
 \alias{ex_met}
 \alias{ex_val}
@@ -83,14 +83,14 @@
     \item{ex_val}{\code{signature(object = "summaryOptsol")}:
       gets the \code{ex_val} slot.
     }
-    \item{\code{histogram}:}{\code{signature(x = "summaryOptsol")}:
-      plots a histogram of the values of the objective function in optimal
-      state. Additional arguments can be passed to
-      \code{\link[lattice]{histogram}} via the \code{\dots} argument.
+    \item{\code{plot}:}{\code{signature(x = "summaryOptsol")}:
+      plots a \code{\link{histogram}} of the values of the objective function
+      in optimal state. Additional arguments can be passed to
+      \code{\link{histogram}} via the \code{\dots} argument.
     }
     \item{image}{\code{signature(x = "summaryOptsol")}:
-      plots a gray-scale representation of the exchange fluxes of the flux
-      distribution. Black: metabolite is produced, gray: metabolite is imported.
+      plots a grey-scale representation of the exchange fluxes of the flux
+      distribution. Black: metabolite is produced, grey: metabolite is imported.
       Further arguments are:
       \describe{
         \item{\code{printOut}}{

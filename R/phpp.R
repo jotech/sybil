@@ -1,4 +1,4 @@
-#  robAna.R
+#  phpp.R
 #  FBA and friends with R.
 #
 #  Copyright (C) 2010-2013 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
@@ -23,23 +23,23 @@
 
 
 ################################################
-# Function: robAna
+# Function: phpp
 #
 #
-# The function robAna() is inspired by the function
-# robustnessAnalysis() contained in the COBRA Toolbox.
+# The function phpp() is inspired by the function
+# phenotypePhasePlane() contained in the COBRA Toolbox.
 # The algorithm is the same.
 
 
-robAna <- function(model, ctrlreact, rng = NULL,
-                   numP = 20, verboseMode = 1, ...) {
+phpp <- function(model, ctrlreact, rng = c(0, 0, 20, 20),
+                 numP = 50, setToZero = TRUE, redCosts = FALSE, ...) {
 
     if (!is(model, "modelorg")) {
         stop("needs an object of class modelorg!")
     }
     
-    if (length(ctrlreact) != 1) {
-        stop("Please enter exactly one control reaction.")
+    if (length(ctrlreact) != 2) {
+        stop("Please enter two control reactions.")
     }
     
     tmp <- checkReactId(model, ctrlreact)
@@ -50,57 +50,72 @@ robAna <- function(model, ctrlreact, rng = NULL,
     
     ctrlr <- react_pos(tmp)
 
+    if (length(rng) != 4) {
+        stop("rng must have length 4")
+    }
 
-#------------------------------------------------------------------------------#
-#                       minimum and maximum solution                           #
-#------------------------------------------------------------------------------#
+    rngA <- seq(rng[1], rng[3], length.out = numP)
+    rngB <- seq(rng[2], rng[4], length.out = numP)
+    ctrlfl <- as.matrix(expand.grid(rngA, rngB))
+    colnames(ctrlfl) <- react_id(tmp)
 
-    if (is.null(rng)) {
-        suppressMessages(
-            fvmm <- fluxVar(model,
-                            react = ctrlr,
-                            fixObjVal = FALSE,
-                            verboseMode = 0, ...)
-        )
-        if (length(checkStat(fvmm)) > 0) {
-            stop("Optimization for min/max solution ended not successfull!")
-        }
-        else {
-            mm <- c(minSol(fvmm, "lp_obj"), maxSol(fvmm, "lp_obj"))
-        }
+    num_of_prob <- numP ** 2
+
+    # reduced costs
+    ca <- match.call()
+    if ("poCmd" %in% names(ca)) {
+        rccmd <- ca[["poCmd"]]
     }
     else {
-        stopifnot(length(rng) == 2, is(rng, "numeric"))
-        mm <- sort(rng)
+        if (isTRUE(redCosts)) {
+            rccmd <- list("getRedCosts")
+        }
+        else {
+            rccmd <- list(NA)
+        }
     }
 
-    # sequence of numP numbers between lpmin and lpmax,
-    # all with the same distance
-    ctrlfl <- seq(mm[1], mm[2], length.out = numP)
-
-
 #------------------------------------------------------------------------------#
-#                                optimization                                  #
+#                                optimizations                                 #
 #------------------------------------------------------------------------------#
 
     sol <- optimizer(model,
-                     react = as.list(rep(ctrlr, numP)),
-                     lb = ctrlfl,
-                     ub = ctrlfl,
+                     react = rep(list(ctrlr), num_of_prob),
+                     lb = -1*abs(ctrlfl),
+                     ub = -1*abs(ctrlfl),
                      algorithm = "fba",
-                     verboseMode = verboseMode, ...)
+                     setToZero = setToZero,
+                     poCmd = rccmd, ...)
 
 
 #------------------------------------------------------------------------------#
 #                             save the results                                 #
 #------------------------------------------------------------------------------#
 
-    optsol <- new("optsol_robAna")
+    optsol <- new("optsol_phpp")
     opt <- makeOptsolMO(model, sol)
     as(optsol, "optsol_optimizeProb") <- opt
 
     ctrlr(optsol)  <- tmp
-    ctrlfl(optsol) <- as.numeric(ctrlfl)
+    ctrlfl(optsol) <- as.matrix(ctrlfl)
+
+    if (isTRUE(redCosts)) {
+        rc  <- pa(postProc(optsol))
+        src <- matrix(unlist(rc),
+                      nrow = length(rc), byrow = TRUE)[, ctrlr, drop = FALSE]
+        if (isTRUE(setToZero)) {
+            tz <- checkStat(optsol)
+            src[tz, ] <- 0
+        }
+        colnames(src) <- react_id(tmp)
+        optsol@redCosts <- src
+        np <- ppProc(list(NA))
+        pa(np) <- list(NA)
+        postProc(optsol) <- np
+    }
+    else {
+        optsol@redCosts <- as.matrix(NA)
+    }
 
     return(optsol)
 

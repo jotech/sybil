@@ -63,7 +63,7 @@ setClass("modelorg",
          subSys       = "Matrix"
 
     ),
-    validity = sybil:::.validmodelorg
+    validity = .validmodelorg
 )
 
 
@@ -93,7 +93,7 @@ setMethod(f = "initialize",
               if ( (!missing(id)) || (!missing(name)) ) {
                   .Object@mod_id   <- as.character(id)
                   .Object@mod_name <- as.character(name)
-                  .Object@mod_key  <- as.character(sybil:::.generateModKey())
+                  .Object@mod_key  <- as.character(.generateModKey())
               }
 
               return(.Object)
@@ -787,10 +787,10 @@ setMethod("printMetabolite", signature(object = "modelorg"),
         }
         
         # format metabolite id's to be compatible with CPLEX LP format
-        midbr <- sybil:::.makeLPcompatible(name = mid, prefix = "r", sep = "")
+        midbr <- .makeLPcompatible(name = mid, prefix = "r", sep = "")
 
         # format reaction id's to be compatible with CPLEX LP format
-        reaction_id <- sybil:::.makeLPcompatible(name = react_id(object),
+        reaction_id <- .makeLPcompatible(name = react_id(object),
                                                  prefix = "x", sep = "")
 
         mat <- S(object)[rind, , drop = FALSE]
@@ -921,30 +921,40 @@ setMethod("changeUptake", signature(object = "modelorg"),
   	
         ex <- findExchReact(object)
 
-        if (is.null(off)) {
-            reactOFF <- react_pos(ex)[uptake(ex)]
-        }
-        else {
-            # metabolite id
-            if (is(off, "character")) {
-                met      <- which(met_id(ex) %in% off)
-                reactOFF <- react_pos(ex)[met]
-            }
-            # metabolite index in S
-            else if (is(off, "numeric")) {
-                met      <- which(met_pos(ex) %in% off)
-                reactOFF <- react_pos(ex)[met]
-            }
-            # exchange reactions
-            else if (is(off, "reactId_Exch")) {
-                reactOFF <- react_pos(off)
+        if (! is(off, "logical")) {
+            if (is.null(off)) {
+                reactOFF <- react_pos(ex)[uptake(ex)]
             }
             else {
-                stop("check argument off")
+                # metabolite id
+                if (is(off, "character")) {
+                    met      <- which(met_id(ex) %in% off)
+                    reactOFF <- react_pos(ex)[met]
+                }
+                # metabolite index in S
+                else if (is(off, "numeric")) {
+                    met      <- which(met_pos(ex) %in% off)
+                    reactOFF <- react_pos(ex)[met]
+                }
+                # exchange reactions
+                else if (is(off, "reactId_Exch")) {
+                    reactOFF <- react_pos(off)
+                }
+                else {
+                    stop("check argument off")
+                }
+            
+                if (length(reactOFF) < 1) {
+                    stop("can not find ",
+                         ngettext(is(off, "reactId_Exch"),
+                                  "exchange reaction id ",
+                                  "an exchange reaction for metabolite id "),
+                         paste(sQuote(off), collapse = ", "))
+                }
             }
-        }
 
-        lowbnd(object)[reactOFF] <- 0
+            lowbnd(object)[reactOFF] <- 0
+        }
 
         if (!is.null(on)) {
             # metabolite id
@@ -965,6 +975,14 @@ setMethod("changeUptake", signature(object = "modelorg"),
                 stop("check argument on")
             }
 
+            if (length(reactON) < 1) {
+                stop("can not find ",
+                     ngettext(is(on, "reactId_Exch"),
+                              "exchange reaction id ",
+                              "an exchange reaction for metabolite id "),
+                     paste(sQuote(on), collapse = ", "))
+            }
+
             lowbnd(object)[reactON] <- rate
         }
         
@@ -972,6 +990,56 @@ setMethod("changeUptake", signature(object = "modelorg"),
               
     }
 )
+
+
+#------------------------------------------------------------------------------#
+
+setMethod("deadEndMetabolites", signature(object = "modelorg"),
+    function(object, retIds = TRUE) {
+
+  	    demr <- .deadEndMetabolite(mat = S(object), lb = lowbnd(object))
+        
+        if (isTRUE(retIds)) {
+            dem <- list(dem = met_id(object)[demr[["dem"]]],
+                        der = react_id(object)[demr[["der"]]])
+        }
+        else {
+            dem <- demr
+        }
+        
+        return(dem)
+              
+    }
+)
+
+#------------------------------------------------------------------------------#
+
+setMethod("singletonMetabolites", signature(object = "modelorg"),
+    function(object, tol = SYBIL_SETTINGS("TOLERANCE"), retIds = TRUE) {
+  	
+        Sb <- abs(S(object)) > tol
+
+        singleton <- .singletonMetabolite(mat = Sb)
+
+        if (isTRUE(retIds)) {
+            sg <- list(smet = met_id(object)[singleton[["smet"]]],
+                       sreact = react_id(object)[singleton[["sreact"]]])
+        }
+        else {
+            sg <- singleton
+        }
+
+        return(sg)
+              
+    }
+)
+
+
+
+
+
+
+
 
 
 

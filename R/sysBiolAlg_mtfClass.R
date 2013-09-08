@@ -57,7 +57,7 @@ setMethod(f = "initialize",
               if ( ! missing(model) ) {
 
                   if (is.null(wtobj)) {
-                      tmp <- sybil:::.generateWT(model, react, lb, ub, ...)
+                      tmp <- .generateWT(model, react, lb, ub, ...)
                       wtobj  <- tmp[["obj"]]
                   }
                   
@@ -193,7 +193,7 @@ setMethod(f = "initialize",
                                   paste("bw", react_id(model), sep = "_"),
                                   paste("fw", react_id(model), sep = "_")
                           )
-                          colNames <- sybil:::.makeLPcompatible(cn, prefix = "x")
+                          colNames <- .makeLPcompatible(cn, prefix = "x")
                       }
                       else {
                           stopifnot(is(cnames, "character"),
@@ -207,7 +207,7 @@ setMethod(f = "initialize",
                                   paste("fw", 1:nc, sep = "_"),
                                   "obj_wt"
                           )
-                          rowNames <- sybil:::.makeLPcompatible(rn, prefix = "r")
+                          rowNames <- .makeLPcompatible(rn, prefix = "r")
                       }
                       else {
                           stopifnot(is(rnames, "character"),
@@ -216,7 +216,7 @@ setMethod(f = "initialize",
                       }
 
                       if (is.null(pname)) {
-                          probName <- sybil:::.makeLPcompatible(
+                          probName <- .makeLPcompatible(
                               paste("MTF", mod_id(model), sep = "_"),
                               prefix = "")
                       }

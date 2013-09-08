@@ -28,7 +28,6 @@
 
 # from graphics
 setGeneric("plot")
-setGeneric("histogram")
 
 # sybil
 setGeneric(name = "addCols",
@@ -164,6 +163,10 @@ setGeneric(name = "ctrlr<-",
 
 setGeneric(name = "deleted",
            def  = function(object, ...) { standardGeneric("deleted") }
+)
+
+setGeneric(name = "deadEndMetabolites",
+           def  = function(object, ...) { standardGeneric("deadEndMetabolites") }
 )
 # setGeneric(name = "deleted<-",
 #            def  = function(object, value) { standardGeneric("deleted<-") }
@@ -301,6 +304,10 @@ setGeneric(name = "getColsLowBnds",
            def  = function(lp, j) { standardGeneric("getColsLowBnds") }
 )
 
+setGeneric(name = "getColsNames",
+           def  = function(lp, j) { standardGeneric("getColsNames") }
+)
+
 setGeneric(name = "getColsUppBnds",
            def  = function(lp, j) { standardGeneric("getColsUppBnds") }
 )
@@ -339,6 +346,10 @@ setGeneric(name = "getRedCosts",
 
 setGeneric(name = "getRowsLowBnds",
            def  = function(lp, i) { standardGeneric("getRowsLowBnds") }
+)
+
+setGeneric(name = "getRowsNames",
+           def  = function(lp, i) { standardGeneric("getRowsNames") }
 )
 
 setGeneric(name = "getRowsUppBnds",
@@ -838,6 +849,10 @@ setGeneric(name = "sensitivityAnalysis",
            def  = function(lp, ...) { standardGeneric("sensitivityAnalysis") }
 )
 
+setGeneric(name = "setColsNames",
+           def  = function(lp, j, names) { standardGeneric("setColsNames") }
+)
+
 setGeneric(name = "setObjDir",
            def  = function(lp, lpdir) { standardGeneric("setObjDir") }
 )
@@ -846,8 +861,16 @@ setGeneric(name = "setRhsZero",
            def  = function(lp) { standardGeneric("setRhsZero") }
 )
 
+setGeneric(name = "setRowsNames",
+           def  = function(lp, i, names) { standardGeneric("setRowsNames") }
+)
+
 setGeneric(name = "setSolverParm",
            def  = function(lp, solverParm) { standardGeneric("setSolverParm") }
+)
+
+setGeneric(name = "singletonMetabolites",
+           def  = function(object, ...) { standardGeneric("singletonMetabolites") }
 )
 
 setGeneric(name = "Snnz",

@@ -379,7 +379,7 @@ setMethod("addRowsToProb", signature(lp = "optObj_cplexAPI"),
     # cind: list, containing the column indices of the new nz elements
     # nzval: list, containing the new nz elements
     #
-    # i, type, lb, cind and nzval must have the same length
+    # i, type, lb, ub, cind and nzval must have the same length
     #
     # type can be one of the following:
     # "F" = free variable                -INF <  x <  INF
@@ -1016,7 +1016,7 @@ setMethod("getColPrim", signature(lp = "optObj_cplexAPI", j = "numeric"),
 
     function(lp, j) {
 
-        out <- cplexAPI::getProbVarCPLEX(lp@oobj@env, lp@oobj@lp, j, j)
+        out <- cplexAPI::getProbVarCPLEX(lp@oobj@env, lp@oobj@lp, j-1, j-1)
 
         return(out)
     }
@@ -1095,27 +1095,61 @@ setMethod("sensitivityAnalysis", signature(lp = "optObj_cplexAPI"),
 #------------------------------------------------------------------------------#
 
 
+setMethod("setRowsNames", signature(lp = "optObj_cplexAPI",
+                                    i = "numeric", names = "character"),
+
+    function(lp, i, names) {
+
+        invisible(cplexAPI::chgRowNameCPLEX(lp@oobj@env, lp@oobj@lp,
+                                            length(i), i-1, names))
+
+    }
+)
 
 
+#------------------------------------------------------------------------------#
+
+setMethod("setColsNames", signature(lp = "optObj_cplexAPI",
+                                    j = "numeric", names = "character"),
+
+    function(lp, j, names) {
+
+        invisible(cplexAPI::chgColNameCPLEX(lp@oobj@env, lp@oobj@lp,
+                                            length(j), j-1, names))
+
+    }
+)
 
 
+#------------------------------------------------------------------------------#
+
+setMethod("getRowsNames", signature(lp = "optObj_cplexAPI", i = "numeric"),
+
+    function(lp, i) {
+
+        rn <- mapply(cplexAPI::getRowNameCPLEX, begin = i-1, end = i-1,
+                     MoreArgs = list(env = lp@oobj@env, lp = lp@oobj@lp),
+                     SIMPLIFY = TRUE, USE.NAMES = FALSE)
+        return(unlist(rn))
+
+    }
+)
 
 
+#------------------------------------------------------------------------------#
+
+setMethod("getColsNames", signature(lp = "optObj_cplexAPI", j = "numeric"),
+
+    function(lp, j) {
+
+        cn <- mapply(cplexAPI::getColNameCPLEX, begin = j-1, end = j-1,
+                     MoreArgs = list(env = lp@oobj@env, lp = lp@oobj@lp),
+                     SIMPLIFY = TRUE, USE.NAMES = FALSE)
+        return(unlist(cn))
+
+    }
+)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#------------------------------------------------------------------------------#
 

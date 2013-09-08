@@ -37,7 +37,7 @@ model <- readTSVmod(prefix = "Ec_core",
 
   Plot the values of the objective function after optimization in a
   histogram:\cr
-  \code{histogram(ec_g)}
+  \code{plot(ec_g)}
 
   Perform flux variability analysis:\cr
   \code{ec_v <- fluxVar(model)}
@@ -81,7 +81,7 @@ model <- readTSVmod(prefix = "Ec_core",
 \examples{
   data(Ec_core)
   Ec_ofd <- oneGeneDel(Ec_core)
-  histogram(Ec_ofd)
+  plot(Ec_ofd)
 }
 
 \keyword{package}
