@@ -563,6 +563,9 @@ setMethod("optimizeProb", signature(object = "modelorg"),
 
 
         if (!is.null(gene)) {
+            if (!is.null(react)) {
+                warning("ignoring argument 'react'")
+            }
             react <- geneDel(object, gene, checkId = TRUE)
             lb <- rep(lb[1], length(react))
             ub <- rep(ub[1], length(react))

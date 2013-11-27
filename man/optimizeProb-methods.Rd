@@ -83,7 +83,9 @@
     Specifies the fluxes (variables) for which to change the upper and lower
     bound (see also arguments \code{lb} and \code{ub}) or objective coefficients
     (see also argument \code{obj_coef}). For class
-    \code{\linkS4class{sysBiolAlg}}, it must be numeric.\cr
+    \code{\linkS4class{sysBiolAlg}}, it must be numeric. For class
+    \code{\linkS4class{modelorg}}, setting \code{react} as no effect, if
+    \code{gene} is also not \code{NULL}.\cr
     Default: \code{NULL}.
   }
   \item{lb}{

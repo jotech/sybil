@@ -419,8 +419,7 @@ setMethod("addRowsToProb", signature(lp = "optObj_cplexAPI"),
 
         # set ranged (double bounded constraints)
         if (sum(rng) > 0) {
-            print("arsch")
-            print(i[rng])
+            #print(i[rng])
             cplexAPI::chgRngValCPLEX(env = lp@oobj@env, lp = lp@oobj@lp,
                                      nrows = sum(rng),
                                      ind = i[rng]-1,

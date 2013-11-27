@@ -1,4 +1,4 @@
-b358490ea7241e6bcc607da8b88ebda5 *DESCRIPTION
+453cea1e18b63c93188c42526740858c *DESCRIPTION
 9e67ef7613843de18475355ef889c4e2 *NAMESPACE
 0967d872ea73700b11a53f66d247d26d *R/addAlgorithm.R
 6f2a3779b7a1eb44f6707429bffdd174 *R/addExchReact.R
@@ -39,7 +39,7 @@ fc37093dea11b0d39ee855d7ea47fa5b *R/getsybilenv.R
 d6a3bdf31d6ca8613e870e9787517c02 *R/modelorg2ExPA.R
 e456712b5fd9968dfdea4c1ec91cb7ba *R/modelorg2text.R
 3eea14a600d9f9b1fd35fb871ce5bae0 *R/modelorg2tsv.R
-42069a6b4c137316dc5f976950c2f598 *R/modelorgClass.R
+7d2ecb5ce8899d787880e8747cf15f5b *R/modelorgClass.R
 8666ea7d7a9020e8e8f8e3a3b95a581b *R/modelorg_irrevClass.R
 a1f0fcbf88dd0a03a62ee718f057411c *R/multiDel.R
 520c76986dbfdfb6cbd85f3163bba304 *R/netFluxClass.R
@@ -50,7 +50,7 @@ c2dd9576b97ce365792eec60d7935580 *R/oneGeneDel.R
 21cd3e1bebc6e9fb4b052ecf65fee105 *R/optObjClass.R
 24957a7a18ca250fbb4703a806fda24e *R/optObj_basicfunc.R
 b5973d8ae991edd24b1e17134721eec3 *R/optObj_clpAPIClass.R
-4640d2250756cf381bbe5e56db28a31f *R/optObj_cplexAPIClass.R
+32b88675b4e61cf38d56c1e256599370 *R/optObj_cplexAPIClass.R
 d3db6e449fadb8fe7d96408842ea5bb4 *R/optObj_glpkAPIClass.R
 bdc1c00c99436fe5f131f5e4e20c20c4 *R/optObj_lpSolveAPIClass.R
 47f7acd2d5f1a8e595586d71ffbf5a70 *R/optObj_lpSolveAPIcompat.R
@@ -101,11 +101,13 @@ daab3fbea6c5d401ba2eb997ca895a07 *R/validreactId.R
 8353fdb16fdfb02b89ba52184d7396c4 *R/validsysBiolAlg.R
 a5416627944b1048c2f82473a6299dbd *R/ypd.R
 a9c399ffd600c200f9af0d106c6bf1a7 *R/zzz.R
+93915d1e092a18ba251d9ca7f8e992b3 *build/vignette.rds
 42f22e08da875977b8b30a0ae23fd493 *data/Ec_core.RData
-0d1f133a49db5bfff16402bcfb51935d *inst/NEWS.Rd
+dcb1bdb0b852efeed6c4633f10aa2fd0 *inst/CITATION
+beedc7a9c3687ee7dae1accf7dd5d7d5 *inst/NEWS.Rd
 d870dc00e23f0705a112feb9816741f6 *inst/doc/sybil.R
 6231205e5cfde61277bd95119ee6c7b4 *inst/doc/sybil.Rnw
-ebe033c4fca272cce35f425dac4258e3 *inst/doc/sybil.pdf
+4fbbd7774135c634175f86d985b6f32a *inst/doc/sybil.pdf
 57349ddd1c5292698b4f40828fb0a4c8 *inst/extdata/Ec_core_desc.tsv
 a087d5c12df926906688674ba133e6a9 *inst/extdata/Ec_core_met.tsv
 5e592ee880a444834fca2de9f320367a *inst/extdata/Ec_core_react.tsv
@@ -115,7 +117,7 @@ c94a9ca15e74ec5de8c7be9976faeaed *man/Ec_core.Rd
 6c27f136fede2f2b61d41e70a24b1105 *man/addCols-methods.Rd
 edfc0fc9b04380722fb42b0a15630990 *man/addColsToProb-methods.Rd
 244b2f7679e6f675d22c76c5b7f60f41 *man/addExchReact.Rd
-91928bf3c179e380e88dcc7d807602f8 *man/addReact.Rd
+66830adc2bc907240fc0d37d110152fd *man/addReact.Rd
 2930a81a64927c46628367fe9ac6800d *man/addRows-methods.Rd
 95fa7422e5bc69db2fa18b963e9e64bb *man/addRowsCols-methods.Rd
 3655d339c5642c23f049a4fe9c1033ff *man/addRowsToProb-methods.Rd
@@ -188,7 +190,7 @@ e2f9a3043c09db193aa8c4e16e6a7c98 *man/optObj-class.Rd
 7630d226088079b00ff4bbc46957798f *man/optObj_cplexAPI-class.Rd
 6119f2935b01530b34b3df2f463f44e8 *man/optObj_glpkAPI-class.Rd
 c71584edec539cf8d805b2770ef178d8 *man/optObj_lpSolveAPI-class.Rd
-07bdacb5edb7f9a727186c0d0ca5e29f *man/optimizeProb-methods.Rd
+2cb231ff9626c373503afe2726ea9bcd *man/optimizeProb-methods.Rd
 e8ce00d44ab333dd24b19f32cc5afe6f *man/optimizer.Rd
 3d70aab0c080c4ea61bc62c2755076a0 *man/optsol-class.Rd
 da9a2166e7c46a6501b05951e15715d1 *man/optsol_blockedReact-class.Rd

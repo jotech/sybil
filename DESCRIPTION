@@ -1,8 +1,8 @@
 Package: sybil
 Type: Package
 Title: sybil - Efficient Constrained Based Modelling in R
-Version: 1.2.4
-Date: 2013-09-08
+Version: 1.2.5
+Date: 2013-11-27
 Authors@R: c(person("Gabriel", "Gelius-Dietrich", role = c("aut", "cre"), email = "geliudie@uni-duesseldorf.de"),
              person(c("C.", "Jonathan"), "Fritzemeier", role = "ctb"),
              person("Rajen", "Piernikarczyk", role = "ctb"),
@@ -13,6 +13,8 @@ Depends: R (>= 2.14.2), Matrix, lattice
 Imports: methods
 Suggests: glpkAPI (>= 1.2.8), cplexAPI (>= 1.2.4), clpAPI (>= 1.2.4),
         lpSolveAPI (>= 5.5.2.0), parallel, grid
+URL:
+        http://www.cs.hhu.de/en/research-groups/bioinformatics/software/sybil.html
 Description: The package sybil is a Systems Biology Library for R, implementing algorithms for constraint based analyses of metabolic networks (e.g. flux-balance analysis (FBA), minimization of metabolic adjustment (MOMA), regulatory on/off minimization (ROOM), robustness analysis and flux variability analysis).
 LazyLoad: yes
 License: GPL-3
@@ -46,7 +48,7 @@ Collate: generics.R validmodelorg.R validoptsol.R validreactId.R
         sysBiolAlgClass.R sysBiolAlg_fbaClass.R sysBiolAlg_fvClass.R
         sysBiolAlg_lmomaClass.R sysBiolAlg_momaClass.R
         sysBiolAlg_mtfClass.R sysBiolAlg_roomClass.R sybilLogClass.R
-Packaged: 2013-09-08 18:03:05 UTC; gabriel
+Packaged: 2013-11-27 21:31:50 UTC; gabriel
 Author: Gabriel Gelius-Dietrich [aut, cre],
   C. Jonathan Fritzemeier [ctb],
   Rajen Piernikarczyk [ctb],
@@ -56,4 +58,4 @@ Author: Gabriel Gelius-Dietrich [aut, cre],
 Maintainer: Gabriel Gelius-Dietrich <geliudie@uni-duesseldorf.de>
 NeedsCompilation: no
 Repository: CRAN
-Date/Publication: 2013-09-08 22:54:36
+Date/Publication: 2013-11-28 08:19:27

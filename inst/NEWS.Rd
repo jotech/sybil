@@ -7,6 +7,17 @@
 \newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 
 % ---------------------------------------------------------------------------- %
+\section{Changes in version 1.2.5 2013-11-27}{
+  \itemize{
+    \item for method \code{optimizeProb} of class \code{modelorg}: if both
+          arguments \code{gene} and \code{react} are not \code{NULL}, a warning
+          will be given that \code{react} is ignored
+    \item added file \file{CITATION}
+  }
+}
+
+
+% ---------------------------------------------------------------------------- %
 \section{Changes in version 1.2.4 2013-09-08}{
   \itemize{
     \item added methods \code{singletonMetabolites} and

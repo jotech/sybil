@@ -37,7 +37,7 @@
   }
   \item{met}{
     A vector of character strings containing the metabolite id's used in the
-    reaction given in \code{react}.
+    reaction given in \code{Scoef}.
   }
   \item{Scoef}{
     A numeric vector of the same length as \code{met} of stoichiometric
