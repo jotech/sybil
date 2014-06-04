@@ -1,7 +1,7 @@
 #  sysBiolAlgClass.R
 #  FBA and friends with R.
 #
-#  Copyright (C) 2010-2013 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
+#  Copyright (C) 2010-2014 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
 #  Institute for Informatics, Heinrich-Heine-University, Duesseldorf, Germany.
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
@@ -394,24 +394,28 @@ setMethod("applyChanges", signature(object = "sysBiolAlg"),
         tmp_val <- list("react" = react, "lb" = NULL, "ub" = NULL,
                         "obj_coef" = NULL, "lpdir" = NULL)
 
-        fi    <- fldind(object)
+        fi    <- fldind(object)[react]
         lpmod <- problem(object)
+
+        if (any(is.na(fi))) {
+            stop("argument ", sQuote("react"), " must contain reactions only")
+        }
 
         if (isTRUE(del)) {
             # store default lower and upper bounds
-            tmp_val[["lb"]] <- getColsLowBnds(lpmod, fi[react])
-            tmp_val[["ub"]] <- getColsUppBnds(lpmod, fi[react])
+            tmp_val[["lb"]] <- getColsLowBnds(lpmod, fi)
+            tmp_val[["ub"]] <- getColsUppBnds(lpmod, fi)
     
             # change bounds of fluxes in react
-            check <- changeColsBnds(lpmod, fi[react], lb, ub)
+            check <- changeColsBnds(lpmod, fi, lb, ub)
         }
     
         if (isTRUE(obj)) {
             # store default objective function
-            tmp_val[["obj_coef"]] <- getObjCoefs(lpmod, fi[react])
+            tmp_val[["obj_coef"]] <- getObjCoefs(lpmod, fi)
             
             # change objective function
-            check <- changeObjCoefs(lpmod, fi[react], obj_coef)
+            check <- changeObjCoefs(lpmod, fi, obj_coef)
         }
 
         if (isTRUE(ld)) {

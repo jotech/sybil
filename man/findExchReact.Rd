@@ -34,7 +34,8 @@
   Otherwise, if \code{model} is of class \code{\link{matrix}} or
   of class \code{\link[Matrix]{Matrix}}, a logical vector is returned.
   If element \code{i} equals \code{TRUE}, column \code{i} of \code{model} is an
-  exchange reaction.
+  exchange reaction. The function returns \code{\link{NULL}} and gives a
+  warning, if no exchange reaction can be found. 
 }
 
 \details{

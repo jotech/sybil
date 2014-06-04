@@ -7,6 +7,24 @@
 \newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 
 % ---------------------------------------------------------------------------- %
+\section{Changes in version 1.2.6 2014-06-04}{
+  \itemize{
+    \item function \code{findExchReact} gives a propper warning, if no exchange
+          reactions can be found and returns \code{NULL} in this case
+    \item fixed a bug in function \code{addReact} which accours when more than
+          one new gene per reaction is added to the model
+    \item function \code{checkSolStat} recognizes return code
+          \code{CPXMIP_OPTIMAL_TOL (102)}: \sQuote{integer optimal, tolerance}
+          as \sQuote{successfully solved}
+    \item added parameter \code{absMAX} to the constructor methods of classes
+          \code{sysBiolAlg_lmoma}, \code{sysBiolAlg_mtf} and
+          \code{sysBiolAlg_room}, which is used as a maximum value for upper variable
+          and contraint bounds
+  }
+}
+
+
+% ---------------------------------------------------------------------------- %
 \section{Changes in version 1.2.5 2013-11-27}{
   \itemize{
     \item for method \code{optimizeProb} of class \code{modelorg}: if both

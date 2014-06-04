@@ -1,7 +1,7 @@
 #  sysBiolAlg_mtfClass.R
 #  FBA and friends with R.
 #
-#  Copyright (C) 2010-2013 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
+#  Copyright (C) 2010-2014 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
 #  Institute for Informatics, Heinrich-Heine-University, Duesseldorf, Germany.
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
@@ -47,6 +47,7 @@ setMethod(f = "initialize",
                                 react = NULL, lb = NULL, ub = NULL,
                                 costcoefbw = NULL,
                                 costcoeffw = NULL,
+                                absMAX = SYBIL_SETTINGS("MAXIMUM"),
                                 useNames = SYBIL_SETTINGS("USE_NAMES"),
                                 cnames = NULL,
                                 rnames = NULL,
@@ -61,7 +62,9 @@ setMethod(f = "initialize",
                       wtobj  <- tmp[["obj"]]
                   }
                   
-                  stopifnot(is(model, "modelorg"), is(wtobj, "numeric"))
+                  stopifnot(is(model, "modelorg"),
+                            is(wtobj, "numeric"),
+                            is(absMAX, "numeric"))
 
                   # If wtobj is longer than 1, mtf algorithm has to run several
                   # times. In that case, wtobj is not written in the problem
@@ -109,8 +112,6 @@ setMethod(f = "initialize",
 
                   nCols  <- 3*nc
                   nRows  <- nr + 2*nc + 1
-
-                  absMAX <- SYBIL_SETTINGS("MAXIMUM")
 
 
                   # ---------------------------------------------

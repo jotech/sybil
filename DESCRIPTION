@@ -1,14 +1,16 @@
 Package: sybil
 Type: Package
 Title: sybil - Efficient Constrained Based Modelling in R
-Version: 1.2.5
-Date: 2013-11-27
+Version: 1.2.6
+Date: 2014-06-04
 Authors@R: c(person("Gabriel", "Gelius-Dietrich", role = c("aut", "cre"), email = "geliudie@uni-duesseldorf.de"),
              person(c("C.", "Jonathan"), "Fritzemeier", role = "ctb"),
              person("Rajen", "Piernikarczyk", role = "ctb"),
              person(c("Marc", "Andre"), "Daxer", role = "ctb"),
              person("Benjamin", "Braasch", role = "ctb"),
-             person("Abdelmoneim", "Desouki", role = "ctb"))
+             person("Abdelmoneim", "Desouki", role = "ctb"),
+             person(c("Martin", "J."), "Lercher", role = "ctb"))
+Maintainer: Gabriel Gelius-Dietrich <geliudie@uni-duesseldorf.de>
 Depends: R (>= 2.14.2), Matrix, lattice
 Imports: methods
 Suggests: glpkAPI (>= 1.2.8), cplexAPI (>= 1.2.4), clpAPI (>= 1.2.4),
@@ -48,14 +50,14 @@ Collate: generics.R validmodelorg.R validoptsol.R validreactId.R
         sysBiolAlgClass.R sysBiolAlg_fbaClass.R sysBiolAlg_fvClass.R
         sysBiolAlg_lmomaClass.R sysBiolAlg_momaClass.R
         sysBiolAlg_mtfClass.R sysBiolAlg_roomClass.R sybilLogClass.R
-Packaged: 2013-11-27 21:31:50 UTC; gabriel
+Packaged: 2014-06-04 10:26:00 UTC; gabriel
 Author: Gabriel Gelius-Dietrich [aut, cre],
   C. Jonathan Fritzemeier [ctb],
   Rajen Piernikarczyk [ctb],
   Marc Andre Daxer [ctb],
   Benjamin Braasch [ctb],
-  Abdelmoneim Desouki [ctb]
-Maintainer: Gabriel Gelius-Dietrich <geliudie@uni-duesseldorf.de>
+  Abdelmoneim Desouki [ctb],
+  Martin J. Lercher [ctb]
 NeedsCompilation: no
 Repository: CRAN
-Date/Publication: 2013-11-28 08:19:27
+Date/Publication: 2014-06-04 14:51:16

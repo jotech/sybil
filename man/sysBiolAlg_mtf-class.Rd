@@ -111,6 +111,11 @@
       values given in \code{costcoeffw}.\cr
       Default: \code{NULL}.
     }
+    \item{absMAX}{
+      A single numerical value used as a maximum value for upper variable
+      and contraint bounds.\cr
+      Default: \code{SYBIL_SETTINGS("MAXIMUM")}.
+    }
     \item{useNames}{
       A single boolean value. If set to \code{TRUE}, variables and constraints
       will be named according to \code{cnames} and \code{rnames}. If set to

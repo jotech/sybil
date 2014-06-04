@@ -109,11 +109,15 @@
       program. See Details below.\cr
       Default: \code{FALSE}.
     }
-    \item{useNames}{
-      A single boolean value. If set to \code{TRUE}, variables and constraints
-      will be named according to \code{cnames} and \code{rnames}. If set to
-      \code{NULL}, no specific variable or constraint names are set.\cr
-      Default: \code{SYBIL_SETTINGS("USE_NAMES")}.
+    \item{LPvariant}{
+      Boolean. If \code{TRUE}, the problem object is formulated as linear
+      program. See Details below.\cr
+      Default: \code{FALSE}.
+    }
+    \item{absMAX}{
+      A single numerical value used as a maximum value for upper variable
+      and contraint bounds.\cr
+      Default: \code{SYBIL_SETTINGS("MAXIMUM")}.
     }
     \item{cnames}{
       A character vector giving the variable names. If set to \code{NULL},

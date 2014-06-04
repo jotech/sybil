@@ -1,7 +1,7 @@
 #  optsol_fluxdelClass.R
 #  FBA and friends with R.
 #
-#  Copyright (C) 2010-2013 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
+#  Copyright (C) 2010-2014 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
 #  Institute for Informatics, Heinrich-Heine-University, Duesseldorf, Germany.
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
@@ -160,8 +160,10 @@ setMethod("[", "optsol_fluxdel", function(x, i, j, ..., drop = FALSE) {
         
         newSol <- new(isO,
             mod_id      = x@mod_id,
+            mod_key     = x@mod_key,
             solver      = x@solver,
-            method      = x@mod_id,
+            method      = x@method,
+            algorithm   = x@algorithm,
             num_of_prob = length(i),
             lp_num_cols = x@lp_num_cols,
             lp_num_rows = x@lp_num_rows,
@@ -170,6 +172,7 @@ setMethod("[", "optsol_fluxdel", function(x, i, j, ..., drop = FALSE) {
             lp_stat     = x@lp_stat[i],
             lp_dir      = x@lp_dir,
             obj_coef    = x@obj_coef,
+            obj_func    = x@obj_func,
             fldind      = x@fldind,
             chlb        = x@chlb[i],
             chub        = x@chub[i],

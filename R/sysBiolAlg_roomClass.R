@@ -1,7 +1,7 @@
 #  sysBiolAlg_roomClass.R
 #  FBA and friends with R.
 #
-#  Copyright (C) 2010-2013 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
+#  Copyright (C) 2010-2014 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
 #  Institute for Informatics, Heinrich-Heine-University, Duesseldorf, Germany.
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
@@ -56,6 +56,7 @@ setMethod(f = "initialize",
                                 delta = 0.03,
                                 epsilon = 0.001,
                                 LPvariant = FALSE,
+                                absMAX = SYBIL_SETTINGS("MAXIMUM"),
                                 useNames = SYBIL_SETTINGS("USE_NAMES"),
                                 cnames = NULL,
                                 rnames = NULL,
@@ -74,7 +75,8 @@ setMethod(f = "initialize",
                             is(wtflux, "numeric"),
                             is(delta, "numeric"),
                             is(epsilon, "numeric"),
-                            is(LPvariant, "logical"))
+                            is(LPvariant, "logical"),
+                            is(absMAX, "numeric"))
                   
                   stopifnot(length(wtflux) == react_num(model))
 
@@ -108,8 +110,6 @@ setMethod(f = "initialize",
 
                   nCols <- (2 * nc)
                   nRows <- (nr + 2 * nc)
-
-                  absMAX <- SYBIL_SETTINGS("MAXIMUM")
 
 
                   # ---------------------------------------------

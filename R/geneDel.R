@@ -1,7 +1,7 @@
 #  geneDel.R
 #  FBA and friends with R.
 #
-#  Copyright (C) 2010-2013 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
+#  Copyright (C) 2010-2014 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
 #  Institute for Informatics, Heinrich-Heine-University, Duesseldorf, Germany.
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
@@ -111,11 +111,19 @@ geneDel <- function(model, genes, checkId = FALSE) {
   for(i in 1:length(reactInd)) {
       #print(reactInd[i])
       #print(ru[i])
-      #if (eval(parse(text = gprRules(model)[reactInd[i]])) == FALSE) {
-      if (eval(parse(text = ru[i])) == FALSE) {
-          #print(reactInd[i])
-          #print("cool")
-          constReact[i] <- TRUE
+      ev <- eval(parse(text = ru[i]))
+      if (any(is.na(ev))) {
+          warning("reference to non existing gene id in gpr no. ",
+                  reactInd, ", ignoring gpr ", sQuote(gprRules(model)[reactInd]))
+      }
+      else {
+          #if (eval(parse(text = gprRules(model)[reactInd[i]])) == FALSE) {
+		  #if (eval(parse(text = ru[i])) == FALSE) {
+		  if (ev == FALSE) {
+			  #print(reactInd[i])
+			  #print("cool")
+			  constReact[i] <- TRUE
+		  }
       }
   }
 

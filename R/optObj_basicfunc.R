@@ -1,7 +1,7 @@
 #  optObj_basicfunc.R
 #  FBA and friends with R.
 #
-#  Copyright (C) 2010-2013 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
+#  Copyright (C) 2010-2014 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
 #  Institute for Informatics, Heinrich-Heine-University, Duesseldorf, Germany.
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
@@ -61,7 +61,8 @@ checkSolStat <- function(stat, solver = SYBIL_SETTINGS("SOLVER")) {
         },
         "cplexAPI" = {
             # CPLEX: 101 optimal integer solution
-            out <- which(stat != 1 & stat != 101)
+            # CPLEX: 102 Optimal solution with the tolerance defined by epgap or epagap
+            out <- which(stat != 1 & stat != 101 & stat != 102)
         },
         {
             cmd <- paste(solver,"::checkSolutionStatus(stat)", sep = "")

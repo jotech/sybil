@@ -1,7 +1,7 @@
 #  addReact.R
 #  FBA and friends with R.
 #
-#  Copyright (C) 2010-2013 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
+#  Copyright (C) 2010-2014 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
 #  Institute for Informatics, Heinrich-Heine-University, Duesseldorf, Germany.
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
@@ -168,7 +168,7 @@ addReact <- function(model,
                                                 mod_compart(model)))
                 }
             }
-            
+
             # singleton and dead end metabolites (not checked!)
             newmet_single <- append(met_single(model), rep(NA, nNewRows))
             newmet_de     <- append(met_de(model),     rep(NA, nNewRows))
@@ -257,11 +257,13 @@ addReact <- function(model,
                 # gene name(s) to allGenes
                 if (length(new_gene) > 0) {
                     newallGenes <- append(allGenes(model),
-                                          gene_rule$gene[new_gene])
-                    newrxnGeneMat <- cBind(newrxnGeneMat,
-                                           rep(FALSE, nrow(newrxnGeneMat)))
+                                          gene_rule[["gene"]][new_gene])
+                    for (i in seq(along = gene_rule[["gene"]][new_gene])) {
+						newrxnGeneMat <- cBind(newrxnGeneMat,
+											   rep(FALSE, nrow(newrxnGeneMat)))
+					}
                     # update geneInd
-                    geneInd <- match(gene_rule$gene, newallGenes)
+                    geneInd <- match(gene_rule[["gene"]], newallGenes)
                 }
             
                 # rxnGeneMat

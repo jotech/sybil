@@ -69,7 +69,7 @@
   }
   \item{gprAssoc}{
     A single character string giving the gpr association for the reaction. If
-    \code{NA}, no gpr association is created.p\cr
+    \code{NA}, no gpr association is created.\cr
     Default: \code{NA}.
   }
   \item{reactName}{

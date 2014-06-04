@@ -1,7 +1,7 @@
 #  sysBiolAlg_lmomaClass.R
 #  FBA and friends with R.
 #
-#  Copyright (C) 2010-2013 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
+#  Copyright (C) 2010-2014 Gabriel Gelius-Dietrich, Dpt. for Bioinformatics,
 #  Institute for Informatics, Heinrich-Heine-University, Duesseldorf, Germany.
 #  All right reserved.
 #  Email: geliudie@uni-duesseldorf.de
@@ -45,6 +45,7 @@ setMethod(f = "initialize",
                                 wtobj = NULL,
                                 wtobjLB = TRUE,
                                 obj_coefD = NULL,
+                                absMAX = SYBIL_SETTINGS("MAXIMUM"),
                                 useNames = SYBIL_SETTINGS("USE_NAMES"),
                                 cnames = NULL,
                                 rnames = NULL,
@@ -63,7 +64,8 @@ setMethod(f = "initialize",
                   stopifnot(is(model, "modelorg"),
                             is(COBRAflag, "logical"),
                             is(wtobjLB, "logical"),
-                            is(wtflux, "numeric"))
+                            is(wtflux, "numeric"),
+                            is(absMAX, "numeric"))
                   
                   stopifnot(length(wtflux) == react_num(model))
 
@@ -102,9 +104,6 @@ setMethod(f = "initialize",
                   nRows  <- ifelse(isTRUE(COBRAflag),
                                    2*nr + 2*nc + 1,
                                    nr + 2*nc)
-
-                  absMAX <- SYBIL_SETTINGS("MAXIMUM")
-
 
                   if (is.null(obj_coefD)) {
                       deltaobj <- rep(1, 2*nc)
