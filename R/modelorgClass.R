@@ -71,13 +71,26 @@ setClass("modelorg",
 #                              user constructor                                #
 #------------------------------------------------------------------------------#
 
-modelorg <- function(id, name) {
+modelorg <- function(id, name, subSys = NULL, compartment = NULL) {
     if (missing(id) || missing(name)) {
         stop("Creating an object of class model needs name and id!")
     }
-    id   <- as.character(id)
-    name <- as.character(name)
-    obj <- new("modelorg", id = id, name = name)
+    idP   <- as.character(id)
+    nameP <- as.character(name)
+    if (is.null(subSys)) {
+        subSysP <- NULL
+    }
+    else {
+        subSysP <- as.character(subSys)
+    }
+    if (is.null(compartment)) {
+        compartmentP <- NULL
+    }
+    else {
+        compartmentP <- as.character(compartment)
+    }
+    obj <- new("modelorg", id = idP, name = nameP,
+               subSys = subSysP, compartment = compartmentP)
     return(obj)
 }
 
@@ -88,12 +101,24 @@ modelorg <- function(id, name) {
 
 setMethod(f = "initialize",
           signature = "modelorg",
-          definition = function(.Object, id, name) {
+          definition = function(.Object, id, name,
+                                subSys = NULL, compartment = NULL) {
 
               if ( (!missing(id)) || (!missing(name)) ) {
-                  .Object@mod_id   <- as.character(id)
-                  .Object@mod_name <- as.character(name)
-                  .Object@mod_key  <- as.character(.generateModKey())
+                  .Object@mod_id     <- as.character(id)
+                  .Object@mod_name   <- as.character(name)
+                  .Object@mod_key    <- as.character(.generateModKey())
+                  .Object@react_num  <- as.integer(0)
+                  .Object@met_num    <- as.integer(0)
+                  .Object@S          <- Matrix::Matrix(0, 0, 0)
+                  .Object@rxnGeneMat <- Matrix::Matrix(0, 0, 0)
+                  .Object@subSys     <- Matrix::Matrix(0, 0, length(subSys))
+                  if (!is.null(subSys)) {
+                      colnames(.Object@subSys) <- as.character(subSys)
+                  }
+                  if (!is.null(compartment)) {
+                      .Object@mod_compart <- as.character(compartment)
+                  }
               }
 
               return(.Object)
@@ -558,6 +583,7 @@ setMethod("optimizeProb", signature(object = "modelorg"),
              obj_coef = NULL,
              lpdir = NULL,
              mtfobj = NULL,
+             fldind = TRUE,
              prCmd = NA, poCmd = NA,
              prCil = NA, poCil = NA, ...) {
 
@@ -577,6 +603,15 @@ setMethod("optimizeProb", signature(object = "modelorg"),
             check <- checkReactId(object, react = react)
             if (is(check, "reactId")) {
                 react <- react_pos(check)
+                if (length(lb) == 1) {
+                    lb <- rep(lb[1], length(react))
+                }
+                if (length(ub) == 1) {
+                    ub <- rep(ub[1], length(react))
+                }
+                if (length(obj_coef) == 1) {
+                    obj_coef <- rep(obj_coef[1], length(react))
+                }
             }
             else {
                 stop("check argument react")
@@ -614,6 +649,7 @@ setMethod("optimizeProb", signature(object = "modelorg"),
                             ub = ub,
                             obj_coef = obj_coef,
                             lpdir = lpdir,
+                            fldind = fldind,
                             resetChanges = FALSE,
                             prCmd = prCmd, poCmd = poCmd,
                             prCil = prCil, poCil = poCil)

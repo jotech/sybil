@@ -111,10 +111,19 @@ geneDel <- function(model, genes, checkId = FALSE) {
   for(i in 1:length(reactInd)) {
       #print(reactInd[i])
       #print(ru[i])
-      ev <- eval(parse(text = ru[i]))
+      #ev <- eval(parse(text = ru[i]))
+      ev <- tryCatch(eval(parse(text = ru[i])), error = function(e) e)
+      if (is(ev, "simpleError")) {
+          stop("wrong gene association:",
+               "\nreaction no. ", reactInd[i],
+               "\nreaction id: ", react_id(model)[reactInd[i]],
+               "\ngpr: ", gpr(model)[reactInd[i]])
+      }
       if (any(is.na(ev))) {
-          warning("reference to non existing gene id in gpr no. ",
-                  reactInd, ", ignoring gpr ", sQuote(gprRules(model)[reactInd]))
+          warning("reference to non existing gene id in gene association:",
+                  "\nreaction no. ", reactInd[i],
+                  "\nreaction id: ", react_id(model)[reactInd[i]],
+                  "\nignoring gpr ", sQuote(gpr(model)[reactInd[i]]))
       }
       else {
           #if (eval(parse(text = gprRules(model)[reactInd[i]])) == FALSE) {

@@ -29,6 +29,8 @@
 # The function .parseBoolean() is inspired by the function
 # parseBoolean() contained in the COBRA Toolbox.
 # The algorithm is the same.
+#
+# 2015-06-17 CJF: added handling for emtpy gprRule like "( )"
 
 
 .parseBoolean <- function(gprRule, tokens = "()&|~") {
@@ -40,6 +42,11 @@
   # quit, if there is no gene association
   if ( is.na(gprRule) || (gprRule == "") ) {
       return(list(gene = "", rule = ""))
+  }
+  
+  if( grepl("\\s*\\(\\s*\\)\\s*", gprRule) ){
+  	warning("found empty expression rule: '( )'. check if this is intended.")
+  	return(list(gene = "", rule = ""))
   }
 
   # quit, if there is no gene association
@@ -163,18 +170,6 @@
 
 
 #  }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

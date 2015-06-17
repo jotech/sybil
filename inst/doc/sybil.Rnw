@@ -359,6 +359,10 @@ corresponding metabolite:
 Setting the stoichiometric coefficient in brackets makes it possible for the
 metabolite id to start with a number.
 
+\paragraph{Metabolite Id's}
+The abbreviation of a metabolite name (a metabolite id) must be unique for the model and
+must not contain \Comp{+}, \Comp{(} or \Comp{)} characters.
+
 \paragraph{Examples}
 
 A minimal reaction list without compartment flags for figure~\ref{netex}B

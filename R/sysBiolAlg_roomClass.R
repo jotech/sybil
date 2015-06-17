@@ -335,26 +335,36 @@ setMethod("applyChanges", signature(object = "sysBiolAlg_room"),
              lb       = NULL,
              ub       = NULL,
              obj_coef = NULL,
+             fldind   = TRUE,
              lpdir    = NULL) {
 
-        tmp_val <- list("react" = react, "lb" = NULL, "ub" = NULL)
+        if (!isTRUE(fldind)) {
+            warning("argument ", sQuote("fldind"), " is currently not used for ROOM")
+        }
 
-        fi    <- fldind(object)
+        fi <- fldind(object)[react]
+
+        if (any(is.na(fi))) {
+            stop("argument ", sQuote("react"), " must contain reactions only")
+        }
+
+        tmp_val <- list("fi" = react, "lb" = NULL, "ub" = NULL)
+
         wu    <- object@wu
         wl    <- object@wl
         lpmod <- problem(object)
 
         if (isTRUE(del)) {
             # store default lower and upper bounds
-            tmp_val[["lb"]] <- getColsLowBnds(lpmod, fi[react])
-            tmp_val[["ub"]] <- getColsUppBnds(lpmod, fi[react])
+            tmp_val[["lb"]] <- getColsLowBnds(lpmod, fi)
+            tmp_val[["ub"]] <- getColsUppBnds(lpmod, fi)
     
             # change bounds of fluxes in react
-            check <- changeColsBnds(lpmod, fi[react], lb, ub)
+            check <- changeColsBnds(lpmod, fi, lb, ub)
 
             # change constraint matrix and objective coefficients
-            vwu <- (ub - wu[fi[react]]) * -1
-            vwl <- (lb - wl[fi[react]]) * -1
+            vwu <- (ub - wu[fi]) * -1
+            vwl <- (lb - wl[fi]) * -1
 
             ri <- react + object@fnr
             ci <- react + object@fnc
@@ -389,20 +399,20 @@ setMethod("resetChanges", signature(object = "sysBiolAlg_room"),
 
         if ( (!is.null(old_val[["lb"]])) || (!is.null(old_val[["ub"]])) ) {
             check <- changeColsBnds(lpmod,
-                                    fi[old_val[["react"]]],
+                                    fi[old_val[["fi"]]],
                                     old_val[["lb"]], old_val[["ub"]])
 
             vwu <- (old_val[["ub"]] - wu[fi[old_val[["react"]]]]) * -1
             vwl <- (old_val[["lb"]] - wl[fi[old_val[["react"]]]]) * -1
 
-            for (i in seq(along = old_val[["react"]])) {
+            for (i in seq(along = old_val[["fi"]])) {
                 changeMatrixRow(lpmod,
                                 old_val[["ri"]][i],
-                                c(old_val[["react"]][i], old_val[["ci"]][i]),
+                                c(old_val[["fi"]][i], old_val[["ci"]][i]),
                                 c(1, vwl[i]))
                 changeMatrixRow(lpmod,
                                 old_val[["ri"]][i]+object@fnc,
-                                c(old_val[["react"]][i], old_val[["ci"]][i]),
+                                c(old_val[["fi"]][i], old_val[["ci"]][i]),
                                 c(1, vwu[i]))
             }
             

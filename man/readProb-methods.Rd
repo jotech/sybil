@@ -70,12 +70,42 @@
 }
 
 \author{
-  Gabriel Gelius-Dietrich
+  Gabriel Gelius-Dietrich <geliudie@uni-duesseldorf.de>
+
+  Maintainer: Claus Jonathan Fritzemeier <clausjonathan.fritzemeier@uni-duesseldorf.de>
 }
+
 
 \seealso{
   Superclass \code{\linkS4class{optObj}} and constructor function
   \code{\link{optObj}}.
+  Method to write problem objects: \code{\link{writeProb}}
+}
+
+\examples{
+	\dontrun{
+		# In very rare cases it is handy to save a sysBiolAlg-object:
+
+		library(sybil)
+		data(Ec_core)
+		
+		# create a sysBiolAlg object (we use here GLPK (!))
+		prob <- sysBiolAlg(Ec_core, algorithm = "fba", solver="glpkAPI")
+		
+		# write the R-object to disc
+		save(file="prob.RData",prob)
+		
+		# now write the linear program part (managed by the solver) to disc
+		writeProb(prob@problem, fname="prob.lp", ff="lp")
+
+		# start new R session
+
+		library(sybil)
+		library(glpkAPI)
+		load("prob.RData") # restore the R-object
+		prob@problem@oobj <- initProbGLPK() # initialize a new linear program
+		readProb(problem(prob), fname="prob.lp") # load the previously saved linear program
+	}
 }
 
 \keyword{methods}

@@ -72,7 +72,7 @@ setGeneric(name = "allGenes<-",
 )
 
 setGeneric(name = "applyChanges",
-           def  = function(object, del, obj, ld, react, lb, ub, obj_coef, lpdir) { standardGeneric("applyChanges") }
+           def  = function(object, del, obj, ld, react, lb, ub, obj_coef, fldind, lpdir) { standardGeneric("applyChanges") }
 )
 
 setGeneric(name = "backupProb",

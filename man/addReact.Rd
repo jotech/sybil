@@ -114,6 +114,18 @@
   \code{\linkS4class{modelorg_irrev}}. 
 }
 
+\examples{
+data(Ec_core)
+
+# add reaction A + 2 B <-> C to the model
+modelNew <- addReact(Ec_core, id="newReact", met=c("A", "B", "C"),
+						Scoef=c(-1, -2, 1), reversible=TRUE,
+						lb=-1000, ub=1000, obj=0)
+
+# view the new reaction
+shrinkMatrix(modelNew, j="newReact")
+}
+
 \references{
   Becker, S. A., Feist, A. M., Mo, M. L., Hannum, G., Palsson, B. Ø.  and
   Herrgard, M. J. (2007) Quantitative prediction of cellular metabolism with
@@ -127,7 +139,12 @@
   \emph{Nat Protoc} \bold{6}, 1290--1307.
 }
 
-\author{Gabriel Gelius-Dietrich}
+\author{
+  Gabriel Gelius-Dietrich <geliudie@uni-duesseldorf.de>
+
+  Maintainer: Claus Jonathan Fritzemeier <clausjonathan.fritzemeier@uni-duesseldorf.de>
+}
+
 
 \seealso{
   \code{\linkS4class{modelorg}} and \code{\link{rmReact}}

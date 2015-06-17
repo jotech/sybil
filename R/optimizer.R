@@ -244,6 +244,8 @@ optimizer <- function(model, react,
 
 
     fi <- fldind(lpmod)
+    objcTMP <- integer(react_num(model))
+
 
     for (i in 1:nObj) {
 
@@ -312,7 +314,6 @@ optimizer <- function(model, react,
                                 prCil = runPrPcn, poCil = runPoPcn)
         }
 
-
         #obj[i]  <- sum(obj_coef(model) * sol$fluxes[fi])
         #mobj[i] <- crossprod(obj_coef(model), sol$fluxes[fi])
         #obj[i]  <- sol$obj
@@ -320,7 +321,14 @@ optimizer <- function(model, react,
         stat[i] <- sol$stat
         if (fdist == "none") {
             if (isTRUE(pert)) {
-                obj[i] <- crossprod(obj_coef(model), sol$fluxes[fi])
+                #obj[i] <- crossprod(obj_coef(model), sol$fluxes[fi])
+                if (is.null(obj_coef)) {
+                    obj[i] <- crossprod(obj_coef(model), sol$fluxes[fi])
+                }
+                else {
+                    objcTMP[react[[i]]] <- gEl(obj_coef, length(react[[i]]), i)
+                    obj[i] <- crossprod(objcTMP, sol$fluxes[fi])
+                }
             }
             else {
                 obj[i] <- sol$obj

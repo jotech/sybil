@@ -277,6 +277,7 @@ setMethod("optimizeProb", signature(object = "sysBiolAlg"),
              ub = NULL,
              obj_coef = NULL,
              lpdir = NULL,
+             fldind = TRUE,
              resetChanges = TRUE,
              #prCmd = NULL, poCmd = NULL,
              prCmd = NA, poCmd = NA,
@@ -337,14 +338,14 @@ setMethod("optimizeProb", signature(object = "sysBiolAlg"),
         # modifications to problem object
         tmp_val <- applyChanges(object, del = del, obj = obj, ld = ld,
                                 react = react, lb = lb, ub = ub,
-                                obj_coef = obj_coef, lpdir = lpdir)
+                                obj_coef = obj_coef, fldind = fldind, lpdir = lpdir)
 
         lpmod <- problem(object)
 
         # do some kind of preprocessing
         preP <- .ppProcessing(lpprob  = lpmod,
-                                      ppCmd   = prCmd,
-                                      loopvar = prCil)
+                              ppCmd   = prCmd,
+                              loopvar = prCil)
 
         lp_ok     <- solveLp(lpmod)
         lp_stat   <- getSolStat(lpmod)
@@ -356,9 +357,9 @@ setMethod("optimizeProb", signature(object = "sysBiolAlg"),
         lp_fluxes <- getFluxDist(lpmod)
 
         # do some kind of postprocessing
-        postP <- .ppProcessing(lpprob = lpmod,
-                                       ppCmd = poCmd,
-                                       loopvar = poCil)
+        postP <- .ppProcessing(lpprob  = lpmod,
+                               ppCmd   = poCmd,
+                               loopvar = poCil)
     
         # reset modifications
         if (isTRUE(resetChanges)) {
@@ -389,17 +390,24 @@ setMethod("applyChanges", signature(object = "sysBiolAlg"),
              lb       = NULL,
              ub       = NULL,
              obj_coef = NULL,
+             fldind   = TRUE,
              lpdir    = NULL) {
 
-        tmp_val <- list("react" = react, "lb" = NULL, "ub" = NULL,
-                        "obj_coef" = NULL, "lpdir" = NULL)
-
-        fi    <- fldind(object)[react]
-        lpmod <- problem(object)
+        if (isTRUE(fldind)) {
+            fi <- fldind(object)[react]
+        }
+        else {
+            fi <- react
+        }
 
         if (any(is.na(fi))) {
             stop("argument ", sQuote("react"), " must contain reactions only")
         }
+
+        tmp_val <- list("fi" = fi, "lb" = NULL, "ub" = NULL,
+                        "obj_coef" = NULL, "lpdir" = NULL)
+
+        lpmod <- problem(object)
 
         if (isTRUE(del)) {
             # store default lower and upper bounds
@@ -436,19 +444,18 @@ setMethod("applyChanges", signature(object = "sysBiolAlg"),
 setMethod("resetChanges", signature(object = "sysBiolAlg"),
     function(object, old_val) {
 
-        fi    <- fldind(object)
         lpmod <- problem(object)
 
         if ( (!is.null(old_val[["lb"]])) || (!is.null(old_val[["ub"]])) ) {
             check <- changeColsBnds(lpmod,
-                                    fi[old_val[["react"]]],
+                                    old_val[["fi"]],
                                     old_val[["lb"]], old_val[["ub"]])
         }
     
         # reset the default objective function
         if (!is.null(old_val[["obj_coef"]])) {
             check <- changeObjCoefs(lpmod,
-                                    fi[old_val[["react"]]],
+                                    old_val[["fi"]],
                                     old_val[["obj_coef"]])
         }
 

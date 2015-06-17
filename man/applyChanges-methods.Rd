@@ -22,6 +22,7 @@
              lb       = NULL,
              ub       = NULL,
              obj_coef = NULL,
+             fldind   = TRUE,
              lpdir    = NULL)
 
 \S4method{applyChanges}{sysBiolAlg_room}(object, del, obj, ld,
@@ -29,6 +30,7 @@
              lb       = NULL,
              ub       = NULL,
              obj_coef = NULL,
+             fldind   = TRUE,
              lpdir    = NULL)
 }
 
@@ -78,6 +80,14 @@
     objective coefficients.\cr
     Default: \code{NULL}.
   }
+  \item{fldind}{
+    Boolean value. If set to \code{TRUE}, (default) indices in \code{"react"} are used
+    only for reactions. If set to \code{FALSE}, indices in \code{"react"} are used for
+    all variables during optimization, e.g. also for additional variables introduced by
+    the \code{\link{mtf}} algorithm. Currently unused by class
+    \code{\linkS4class{sysBiolAlg_room}}.\cr
+    Default: \code{TRUE}.
+  }
   \item{lpdir}{
     A single character value indicating the new direction of optimization.\cr
     Default: \code{NULL}.
@@ -87,7 +97,7 @@
 \value{
   Returns a list containing the original values in order to undo the changes
   with \code{\link{resetChanges}}:
-  \item{react}{
+  \item{fi}{
     A numeric vector containing variable id's to apply changes to.
   }
   \item{lb}{
@@ -120,8 +130,11 @@
 }
 
 \author{
-  Gabriel Gelius-Dietrich
+  Gabriel Gelius-Dietrich <geliudie@uni-duesseldorf.de>
+
+  Maintainer: Claus Jonathan Fritzemeier <clausjonathan.fritzemeier@uni-duesseldorf.de>
 }
+
 
 \seealso{
   Class \code{\linkS4class{sysBiolAlg}} and \code{\link{resetChanges}}

@@ -47,12 +47,17 @@ model <- readTSVmod(prefix = "Ec_core",
 }
 
 \author{
-  Gabriel Gelius-Dietrich
+  Gabriel Gelius-Dietrich <geliudie@uni-duesseldorf.de>
 
-  Maintainer: geliudie@uni-duesseldorf.de
+  Maintainer: Claus Jonathan Fritzemeier <clausjonathan.fritzemeier@uni-duesseldorf.de>
 }
 
+
 \references{
+  Gelius-Dietrich, G., Desouki, A. A., Fritzemeier, C. J., 
+  and Lercher, M. J. (2013). sybil -- Efficient constraint-based modelling 
+  in R. \emph{BMC Systems Biology} \bold{7}, 125.
+
   The BiGG database \url{http://bigg.ucsd.edu/}.
 
   Schellenberger, J., Park, J. O., Conrad, T. C., and Palsson, B. Ø., (2010)

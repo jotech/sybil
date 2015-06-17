@@ -74,10 +74,10 @@ getsybilenv <- function(part) {
     printpurpose <- function() {
         cat("\n# --------------------------------------------------------- #\n")
         cat("algorithms for this purpose:\n")
-        fkt <- names(.SYBILenv[["purpose"]])
+        fkt <- names(.SYBILenv[["algorithm"]])
         for(i in seq(along = fkt)) {
             cat(fkt[i], ":\n", sep = "")
-            cat(paste(.SYBILenv[["purpose"]][[fkt[i]]]), sep = ", ")
+            cat(paste(.SYBILenv[["algorithm"]][[fkt[i]]]), sep = ", ")
             cat("\n\n")
         }
         cat("\n")

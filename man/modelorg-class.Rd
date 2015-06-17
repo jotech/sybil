@@ -131,13 +131,22 @@
 \section{Objects from the Class}{
   Objects can be created by calls of the function \code{modelorg}:
 
-  \code{test <- modelorg(id = "foo", name = "bar")}.
+  \code{test <- modelorg(id = "foo", name = "bar",
+                         subSys = NULL, compartment = NULL)}.
   \describe{
     \item{\code{id}:}{
       a single character string giving the model id.
     }
     \item{\code{name}:}{
       a single character string giving the model name.
+    }
+    \item{\code{subSys}:}{
+      an optional single character string giving the metabolic subsystems
+      of the model. Default: \code{NULL}
+    }
+    \item{\code{compartment}:}{
+      an optional single character string giving the compartments of the
+      model. Default: \code{NULL}
     }
   }
   This constructor also generates the model key used in slot \code{mod_key}.
@@ -424,7 +433,12 @@
   }
 }
 
-\author{Gabriel Gelius-Dietrich}
+\author{
+  Gabriel Gelius-Dietrich <geliudie@uni-duesseldorf.de>
+
+  Maintainer: Claus Jonathan Fritzemeier <clausjonathan.fritzemeier@uni-duesseldorf.de>
+}
+
 
 \seealso{
   \code{\linkS4class{modelorg_irrev}} for models in irreversible format.

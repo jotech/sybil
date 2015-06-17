@@ -6,6 +6,55 @@
 
 \newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 
+\section{Changes in version 1.3.0 2015-06-17}{
+  \itemize{
+    \item changed maintainer
+    \item \code{.parseBoolean} now gives a warning, but handles empty gpr in a intuitive way.
+  }
+}
+
+% ---------------------------------------------------------------------------- %
+\section{Changes in version 1.2.10 2015-03-30}{
+  \itemize{
+    \item \code{findExchangeReact} can now deal with real big matrices (>30.000 columns).
+    \item additional example for readProb and writeProb.
+    \item modified \code{multiDel} to not use \code{require}
+    \item \code{doubleFluxDel} had a bug if \code{react1} or \code{react2} contained duplicated entries.
+    \item documentation of \code{hasEffect} in \code{optsol_genedel} is now clearer.
+  }
+}
+
+% ---------------------------------------------------------------------------- %
+\section{Changes in version 1.2.9 2014-11-19}{
+  \itemize{
+    \item fixed a bug in class \code{modelorg} and function \code{addReact} when
+          the modelorg object is initially empty
+  }
+}
+
+
+% ---------------------------------------------------------------------------- %
+\section{Changes in version 1.2.8 2014-08-29}{
+  \itemize{
+    \item for method \code{optimizeProb} of class \code{modelorg}: if arguments
+          \code{lb}, \code{ub} or \code{obj_coef} are of length one, they are used
+          for all elements given in \code{react}
+    \item function \code{geneDel} returns a more illustrative error message if a gene
+          association is malformed
+    \item fixed a bug in optimizer which returns the wrong objective value in rare cases
+  }
+}
+
+
+% ---------------------------------------------------------------------------- %
+\section{Changes in version 1.2.7 2014-06-05}{
+  \itemize{
+    \item added boolean parameter \code{fldind} to methods \code{optimizeProb}
+          and \code{applyChanges} which controls the usage of parameter \code{react}
+  }
+}
+
+
 % ---------------------------------------------------------------------------- %
 \section{Changes in version 1.2.6 2014-06-04}{
   \itemize{

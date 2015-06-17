@@ -26,6 +26,7 @@
              obj_coef = NULL,
              lpdir = NULL,
              mtfobj = NULL,
+             fldind = TRUE,
              prCmd = NA,
              poCmd = NA,
              prCil = NA,
@@ -38,6 +39,7 @@
              ub = NULL,
              obj_coef = NULL,
              lpdir = NULL,
+             fldind = TRUE,
              resetChanges = TRUE,
              prCmd = NA,
              poCmd = NA,
@@ -92,7 +94,8 @@
     Numeric vector, must have the same length as \code{react}.  Contains the new
     values for the lower bounds of fluxes (variables) mentioned in \code{react}.
     If set to \code{NULL}, lower bounds for variables in \code{react} will be
-    left unchanged.\cr
+    left unchanged. For class \code{\linkS4class{modelorg}}: if \code{lb} is of length
+    one, \code{lb} is used for all elements in \code{react}.\cr
     Default: \code{NULL}.
   }
   \item{ub}{
@@ -104,7 +107,8 @@
     values for the objective coefficients of fluxes (variables) mentioned in
     \code{react}. All other objective coefficients stay untouched. If set to
     \code{NULL}, objective coefficients for variables in \code{react} will be
-    left unchanged.\cr
+    left unchanged. For class \code{\linkS4class{modelorg}}: if \code{obj_coef} is of
+    length one, \code{obj_coef} is used for all elements in \code{react}.\cr
     Default: \code{NULL}.
   }
   \item{lpdir}{
@@ -122,6 +126,14 @@
     arguments \code{solver} and \code{method} are set, they will be used here
     too.\cr
     Default: \code{NULL}.
+  }
+  \item{fldind}{
+    Boolean value. If set to \code{TRUE}, (default) indices in \code{"react"} are used
+    only for reactions. If set to \code{FALSE}, indices in \code{"react"} are used for
+    all variables during optimization, e.g. also for additional variables introduced by
+    the \code{\link{mtf}} algorithm. Currently unused by class
+    \code{\linkS4class{sysBiolAlg_room}}.\cr
+    Default: \code{TRUE}.
   }
   \item{resetChanges}{
     Boolean value. If set to \code{TRUE}, (default) modifications of the
@@ -274,11 +286,14 @@
 }
 
 \author{
-  Gabriel Gelius-Dietrich
+  Gabriel Gelius-Dietrich <geliudie@uni-duesseldorf.de>
+
+  Maintainer: Claus Jonathan Fritzemeier <clausjonathan.fritzemeier@uni-duesseldorf.de>
 }
 
+
 \seealso{
-  \code{\link{modelorg}} and \code{\linkS4class{sysBiolAlg}}.
+  \code{\link{modelorg}}, \code{\link{applyChanges}} and \code{\linkS4class{sysBiolAlg}}.
 }
 
 \examples{

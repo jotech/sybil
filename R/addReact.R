@@ -95,6 +95,7 @@ addReact <- function(model,
     nRows    <- met_num(model)          # number of rows in the model
     nNewRows <- length(newM)            # number of new rows
     addRow   <- FALSE
+    
     for (i in seq(along = newM)) {
         addRow   <- TRUE
         nRows    <- nRows + 1
@@ -210,8 +211,14 @@ addReact <- function(model,
             
             # subsystems
             if (any(is.na(subSystem))) {
-                newsubSys <- rBind(subSys(model),
-                                   rep(FALSE, ncol(subSys(model))))
+            	ss <- subSys(model)
+            	if(ncol(ss)==0){ # if no subSys defined, rbind (see else) failed
+            		dim(ss) <- c(nrow(ss)+1, ncol(ss))
+            		newsubSys <- ss
+            	}
+            	else {
+            		newsubSys <- rBind(ss, rep(FALSE, ncol(subSys(model))))
+            	}
             }
             else {
                 if (is(subSystem, "logical")) {
@@ -229,14 +236,12 @@ addReact <- function(model,
                 newrxnGeneMat   <- rBind(rxnGeneMat(model),
                                          rep(FALSE, ncol(rxnGeneMat(model))))
             }
-            else if (nrow(rxnGeneMat(model)) > 0) {
+            else { #if (nrow(rxnGeneMat(model)) > 0) {
                 newrxnGeneMat <- rxnGeneMat(model)
                 dim(newrxnGeneMat) <- c(nrow(newrxnGeneMat)+1,
                                         ncol(newrxnGeneMat))
             }
-            else {
-                newrxnGeneMat <- rxnGeneMat(model)
-            }
+            # do above else always.
 
             if ( (is.na(gprAssoc)) || (gprAssoc == "") ) {
                 if ((length(gprRules(model)) > 0)) {
@@ -252,20 +257,30 @@ addReact <- function(model,
             
                 # indices of new genes
                 new_gene <- which(is.na(geneInd))
-                
+
                 # if we have new gene(s), add a column in rxnGeneMat and
                 # gene name(s) to allGenes
                 if (length(new_gene) > 0) {
                     newallGenes <- append(allGenes(model),
                                           gene_rule[["gene"]][new_gene])
-                    for (i in seq(along = gene_rule[["gene"]][new_gene])) {
-						newrxnGeneMat <- cBind(newrxnGeneMat,
-											   rep(FALSE, nrow(newrxnGeneMat)))
-					}
+
                     # update geneInd
                     geneInd <- match(gene_rule[["gene"]], newallGenes)
+
+                    # if we have an empty modelorg object, we need to
+                    # initialize rxnGeneMat
+                    if (ncol(newrxnGeneMat) == 0) {
+                        newrxnGeneMat <- Matrix::Matrix(FALSE,
+                                                        nCols, max(geneInd))
+                    }
+                    else {
+                        for (i in seq(along = gene_rule[["gene"]][new_gene])) {
+	    					newrxnGeneMat <- cBind(newrxnGeneMat,
+		    								   rep(FALSE, nrow(newrxnGeneMat)))
+			    		}
+					}
                 }
-            
+
                 # rxnGeneMat
                 newrxnGeneMat[nCols, geneInd] <- TRUE
  
