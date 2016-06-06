@@ -6,6 +6,31 @@
 
 \newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 
+\section{Changes in version 2.0.0 2016-05-17}{
+  \itemize{
+  	\item \code{modelorg}-class has changed and thus a slot \code{version} was introduced.
+  	the method \code{upgradeModelorg} can convert from earlier instances of this
+  	 class. This method is only needed if \code{modelorg}-Objects were loaded 
+  	 with \code{load} from disk. 
+    \item \code{gprRules} were stored in an impractical format. This lead to bugs
+    in \code{rmReact} and further \code{geneDel}.
+    \item updated the manual of various files.
+  }
+}
+% ---------------------------------------------------------------------------- %
+\section{Changes in version 1.3.4 2016-04-18}{
+  \itemize{
+    \item \code{doubleGeneDel} messed up the order of deletions when using exlicit gene lists.
+    \item corrected url of openCOBRA in the manual.
+  }
+}
+% ---------------------------------------------------------------------------- %
+\section{Changes in version 1.3.3 2015-11-25}{
+  \itemize{
+    \item \code{addReact} crashed for irreversible models.
+  }
+}
+% ---------------------------------------------------------------------------- %
 \section{Changes in version 1.3.2 2015-10-21}{
   \itemize{
   	\item New Algorithm \code{fbaEasyConstraint} and \code{mtfEasyConstraint} 
@@ -14,6 +39,7 @@
     \item \code{switch} needs the first parameter explicitly named.
   }
 }
+% ---------------------------------------------------------------------------- %
 
 \section{Changes in version 1.3.1 2015-10-02}{
   \itemize{
@@ -21,6 +47,7 @@
     \item \code{deadEndMetabolite()} could miss deadEndMetabolites if reactions differ in stoichiometry e.g. 1 and 2.
   }
 }
+% ---------------------------------------------------------------------------- %
 
 \section{Changes in version 1.3.1 2015-08-06}{
   \itemize{
