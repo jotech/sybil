@@ -2,25 +2,78 @@
 #
 # extension for sybil to allow to add several reaction from one model to another
 # 
+# TODO: add handling of gprAssoc and subSystem
 
-addMultiReact <- function(model, source, ids){
+addMultiReact <- function(model, 
+                          ids,
+                          src = NA, # if defined then all other parameters will be taken from this model
+                          mets = NA,   # vector needed
+                          Scoefs = NA, # vector needed
+                          reversible = FALSE,
+                          lb = 0,
+                          ub = SYBIL_SETTINGS("MAXIMUM"),
+                          obj = 0,
+                          subSystem = NA,
+                          gprAssoc = NA,
+                          reactName = NA,
+                          metName = NA,
+                          metComp = NA) {
+
   
-  pos_dupl <- intersect(ids, model@react_id) 
-  if(length(pos_dupl>0)){
-    warning("Reactions with same IDs already exist")
-    print(pos_dupl)
+  # ------------------------------------------------------------------------ #
+  # check arguments
+  # ------------------------------------------------------------------------ #
+  
+  if (!is(model, "modelorg")) {
+    stop("needs an object of class modelorg!")
   }
   
-  reactInd  <- match(ids, react_id(source))
-  reactName <- react_name(source)[reactInd]
-  Crev      <- react_rev(source)[reactInd]
-  lb        <- lowbnd(source)[reactInd]
-  ub        <- uppbnd(source)[reactInd]
-  obj       <- obj_coef(source)[reactInd]
-  subSystem <- NA #subSys(source)[reactInd,] # subsystems not implemented yet
-  gprAssoc  <- NA # gene association not implemented yet
-  met_list  <- sapply(reactInd, function(r){met_id(source)[which(S(source)[,r]!=0)]})
-  Scoef_list<- sapply(reactInd, function(r){S(source)[,r][which(S(source)[,r]!=0)]})
+  stopifnot(checkVersion(model))
+  
+  if (!is(src, "modelorg")){
+    Nids <- length(ids)
+    if (length(mets) != Nids | length(Scoefs) != Nids){
+      stop("all arguments have to be provided for each reaction")
+    }
+  }
+  
+  check_mets <- sapply(1:length(ids), function(i){length(mets[i]) == length(Scoefs[i])})
+  if (any(is.na(check_mets) | !all(check_mets))) {
+    stop("in each reaction arguments 'met' and 'Scoef' must have the same length")
+  }
+
+  
+  # ------------------------------------------------------------------------ #
+  # get main parameters from source model
+  # ------------------------------------------------------------------------ #
+  
+  if(is(src, "modelorg")){
+    reactInd  <- match(ids, react_id(src))
+    reactName <- react_name(src)[reactInd]
+    Crev      <- react_rev(src)[reactInd]
+    lb        <- lowbnd(src)[reactInd]
+    ub        <- uppbnd(src)[reactInd]
+    obj       <- obj_coef(src)[reactInd]
+    subSystem <- NA #subSys(src)[reactInd,] # subsystems not implemented yet
+    gprAssoc  <- NA # gene association not implemented yet
+    mets      <- sapply(reactInd, function(r){met_id(src)[which(S(src)[,r]!=0)]})
+    Scoefs    <- sapply(reactInd, function(r){S(src)[,r][which(S(src)[,r]!=0)]})
+    met       <- unique(unlist(mets))
+    metInd    <- match(met, met_id(src))
+    metName   <- met_name(src)[metInd]
+    metComp   <- met_comp(src)[metInd]
+  }else{
+    met       <- unique(unlist(mets))
+    nMets     <- length(mets)
+    if(length(obj)==1 & nMets>1) obj <- rep(obj, nMets)
+    if(length(lb)==1 & nMets>1)  lb  <- rep(lb,  nMets)
+    if(length(ub)==1 & nMets>1)  ub  <- rep(ub,  nMets)
+  }
+  
+  
+  # ------------------------------------------------------------------------ #
+  # check, if we need to add columns and/or rows
+  # ------------------------------------------------------------------------ #
   
   # reactions
   colInd    <- match(ids, react_id(model))
@@ -37,13 +90,6 @@ addMultiReact <- function(model, source, ids){
   
   
   # metabolites
-  met     <- unique(unlist(met_list))
-  metInd  <- match(met, met_id(source))
-  #metInd  <- which(S(source)[,reactInd]!=0)
-  #metInd  <- which(rowSums(source@S[,match(ids, react_id(source))])>0)
-  #met     <- met_id(source)[metInd]
-  metName <- met_name(source)[metInd]
-  metComp <- met_comp(source)[metInd]
   
   rowInd  <- match(met, met_id(model))
   
@@ -279,11 +325,12 @@ addMultiReact <- function(model, source, ids){
     }
     
     # values for stoichiometric matrix
-    newS[ , colInd] <- sapply(1:nNewCols, function(i){
+    newS[ , colInd] <- sapply(1:length(colInd), function(i){
       newCol <- rep(0, length = nrow(newS))
       curRInd <- colInd[i]
-      curMInd <- metInd[match(met_list[[i]], met)]
-      newCol[curMInd] <- Scoef_list[[i]]
+      #curMInd <- metInd[match(mets[[i]], met)]
+      curMInd <- rowInd[match(mets[[i]], met)]
+      newCol[curMInd] <- Scoefs[[i]]
       newCol
     })
     
@@ -341,7 +388,7 @@ addMultiReact <- function(model, source, ids){
     
     
   } else{
-    Stop("Nothing to change")
+    stop("Nothing to change")
   }
   
   check <- validObject(mod_out, test = TRUE)
