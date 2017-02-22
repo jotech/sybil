@@ -64,10 +64,12 @@ addMultiReact <- function(model,
     metComp   <- met_comp(src)[metInd]
   }else{
     met       <- unique(unlist(mets))
-    nMets     <- length(mets)
-    if(length(obj)==1 & nMets>1) obj <- rep(obj, nMets)
-    if(length(lb)==1 & nMets>1)  lb  <- rep(lb,  nMets)
-    if(length(ub)==1 & nMets>1)  ub  <- rep(ub,  nMets)
+    nR        <- length(ids)
+    if(length(obj)==1 & nR>1) obj <- rep(obj, nR)
+    if(length(lb)==1 & nR>1)  lb  <- rep(lb,  nR)
+    if(length(ub)==1 & nR>1)  ub  <- rep(ub,  nR)
+    if(length(reversible)==1 & nR>1) reversible <- rep(reversible, nR)
+    Crev      <- ifelse( ( (ub > 0) && (lb < 0) ) && (!isTRUE(reversible)), TRUE, reversible)
   }
   
   
