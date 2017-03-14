@@ -31,7 +31,7 @@
 # The algorithm is (more or less) the same.
 
 
-addExchReact <- function(model, met, lb, ub) {
+addExchReact <- function(model, met, lb, ub, tag="Ex_") {
 
   
     # ------------------------------------------------------------------------ #
@@ -67,7 +67,7 @@ addExchReact <- function(model, met, lb, ub) {
     Crev <- rep(FALSE, length(met))
     Crev[Clb < 0] <- TRUE
     
-    exRid <- paste("Ex_", met, sep = "")
+    exRid <- paste(tag, met, sep = "")
     
     mod_out <- model
     
