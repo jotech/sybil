@@ -135,7 +135,7 @@ rmReact <- function(model, react, rm_met = TRUE) {
   react_de(mod_out)     <- react_de(model)[keepReact]
   
   if(ncol(react_attr(model))>0){
-      	react_attr(mod_out)   <- react_attr(model)[keepReact, ]
+      	react_attr(mod_out)   <- as.data.frame(react_attr(model)[keepReact,])
   }
 
   react_num(mod_out)    <- length(react_id(mod_out))
@@ -216,7 +216,7 @@ rmReact <- function(model, react, rm_met = TRUE) {
       met_de(mod_out)     <- met_de(model)[keepMet]
       
       if(ncol(met_attr(model))>0){
-      	met_attr(mod_out)   <- met_attr(model)[keepMet, ]
+      	met_attr(mod_out)   <- as.data.frame(met_attr(model)[keepMet, ])
       }
   }
   else {
