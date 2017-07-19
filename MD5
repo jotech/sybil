@@ -1,4 +1,4 @@
-08b20af0cec6c8cdb4a4f817c495bc3f *DESCRIPTION
+6988ca1ebc1d30344db15dadf362248a *DESCRIPTION
 784d7dc7357bd924e8d5642892bf1b6b *LICENSE
 2a3c7dc7e16ed2f66b21dc22b7f2504c *NAMESPACE
 90ecac75949618855d37c9257cd3f6ba *R/addAlgorithm.R
@@ -32,11 +32,11 @@ b6dfb672da86a3dd67e3d9883ba10b2f *R/fluxDistributionClass.R
 54155cafbd020f506529f1d3b09712db *R/geneDeletion.R
 0991ea1d270faf4fb8c17a95b3f9d696 *R/generateFluxdels.R
 6a9ec13e76ac04adcee61d137c8e04c4 *R/generateModKey.R
-07a4f4bebbd1994115902a48654e71be *R/generateWT.R
+eeff891a92637e0388e98296bc7e52a0 *R/generateWT.R
 1fa7e28e3ce7ae3e88b1a49dcec83585 *R/generics.R
 161f081b5e0e4ab9c6760b6c10f68d68 *R/getsybilenv.R
 c9871521aa40b4ff5ef0366e25b99d14 *R/makeLPcompatible.R
-b24905241f5563f655ed8f4e42a271d8 *R/mod2irrev.R
+cd80dbd650f7cb83681bc0648a0feda4 *R/mod2irrev.R
 48057c793465f42492bfa86e38eca2de *R/modelorg2ExPA.R
 ff95c8bba67c0872032c138e21917198 *R/modelorg2text.R
 0008835ef92bd9dfc6cdfcb1c1e37a8d *R/modelorg2tsv.R
@@ -80,7 +80,7 @@ b51a65aacf11c0753e81f47402e484d6 *R/reactId_ExchClass.R
 828fb55b036b026ba1cfaa2b7d5f7e46 *R/readTSVmod.R
 2333f0e4415c6d759231f47091dbbf93 *R/reassignFwBwMatch.R
 7be0d1c8f0aeb3ee77d934c87dfdb16e *R/recodeMatrix.R
-040411cb943d3181998bc8ba0b4060a0 *R/rmReact.R
+96529cf6505d1848a608789d654d0872 *R/rmReact.R
 85ee480ef1164d83e4321ff56bac3aff *R/robAna.R
 a7b8feac6869afc4f4fd0332cfb0ec90 *R/settings.R
 7021a4fdac1e26a687f3132087efc747 *R/singletonMetabolite.R
@@ -97,7 +97,7 @@ f910f8cc337b8cd369fe68588bed17fa *R/sysBiolAlg_lmomaClass.R
 086ed8679d6df46ea294beb9c4e88359 *R/sysBiolAlg_mtfClass.R
 688b11570c03c34811fe58668a778857 *R/sysBiolAlg_mtfEasyConstraintClass.R
 7486b073ca76fbb5b4d1eecf92d844c4 *R/sysBiolAlg_roomClass.R
-1235594500d404982a1a9e5225573a84 *R/upgradeModelorg.R
+1f5a28241ac469bf3318c58921536c32 *R/upgradeModelorg.R
 95404327ccf1220466bf8660239ed82e *R/validmodelorg.R
 581b6740b46f3230ea6b70225adb5baf *R/validoptsol.R
 4bf1eb49479dde86718fc4257b3049d0 *R/validreactId.R
@@ -105,14 +105,14 @@ f9253acaee4e2dae34d57291e0471248 *R/validreactId_Exch.R
 723c6b1fa7a331c280ca8b049396b6c8 *R/validsysBiolAlg.R
 94eef6e16843a2cd6cf543132f24f8cd *R/ypd.R
 42dab78122a95222825a810ee795ca0f *R/zzz.R
-a1cdc11fea5e3f6aa43c660756951fa8 *README.md
-f63d84e8df007d9c1f0daca3c3482b87 *build/vignette.rds
+a1be0de810c178a965239cfc11751974 *README.md
+d04a23ff144551ca3127f4b235fd0c53 *build/vignette.rds
 c3a4955df966f86bd01b43aef1f93ad8 *data/Ec_core.RData
 dcb1bdb0b852efeed6c4633f10aa2fd0 *inst/CITATION
-730a95cd47fda1e47ed5abfb77fdf3c5 *inst/NEWS.Rd
+9de8f2a05da5fe361c9f0baf9591b4c7 *inst/NEWS.Rd
 23d1433e302a9eba8ef18916b190c9d2 *inst/doc/sybil.R
 24e6cf8fb9f47f6aa6c8b7bdf3957ca5 *inst/doc/sybil.Rnw
-2390cc66f7dead157defa2f1e6683f42 *inst/doc/sybil.pdf
+a3d72a5d0ddd1126ae4096d617f921a0 *inst/doc/sybil.pdf
 57349ddd1c5292698b4f40828fb0a4c8 *inst/extdata/Ec_core_desc.tsv
 a087d5c12df926906688674ba133e6a9 *inst/extdata/Ec_core_met.tsv
 5e592ee880a444834fca2de9f320367a *inst/extdata/Ec_core_react.tsv
@@ -141,7 +141,7 @@ c6958244524e3df2437c9172011c253c *man/changeRowsBnds-methods.Rd
 38186ec69234adb184e6cd9e8c3589a8 *man/changeUptake-methods.Rd
 be90e2b926190713bb9c386dbf3b3498 *man/checkAkgorithm.Rd
 95ab37fb8517a99f4f3078e1f8098aa8 *man/checkDefaultMethod.Rd
-c9b1a83ea04b88c8d6d27d2219e0bc84 *man/checkOptSol-methods.Rd
+875d823be078a73755e420610485e6d7 *man/checkOptSol-methods.Rd
 bdda31a71dab49e5870d3de829f8c3fb *man/checkReactId.Rd
 9b0befab257c18b90d203e1a3ce21462 *man/checkVersion-methods.Rd
 5154a7d4e5f8ef19839dd3d5d65cd50e *man/checksol-class.Rd
