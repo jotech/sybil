@@ -233,8 +233,8 @@ optimizer <- function(model, react,
 #                             optimizations                                    #
 #------------------------------------------------------------------------------#
 
-    message("calculating ", nObj, " optimizations ... ", appendLF = FALSE)
-    if (verboseMode > 1) { cat("\n") }
+    if (verboseMode > -1) { message("calculating ", nObj, " optimizations ... ", appendLF = FALSE) }
+    if (verboseMode >  1)  { cat("\n") }
     if (verboseMode == 2) {
         progr <- .progressBar()
         #progr <- txtProgressBar(min = 2, max = nObj, initial = 2, style = 3)
@@ -368,7 +368,7 @@ optimizer <- function(model, react,
         #close(progr)
     }
 
-    message("OK")
+    if (verboseMode > -1) { message("OK") }
 
 
 #------------------------------------------------------------------------------#
