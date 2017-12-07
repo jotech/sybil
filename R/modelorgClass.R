@@ -865,12 +865,12 @@ setMethod("printReaction", signature(object = "modelorg"),
             
             arrow   <- ifelse(react_rev(object)[cind[j]], " <==> ", " --> ")
             
-            reaction[j] <- paste(react_id(check)[j],
+            reaction[j] <- paste(react_id(check)[j], react_name(object)[check@react_pos],
                                  paste(educt, product, sep = arrow), sep = "\t")
         }
 
         if (isTRUE(printOut)) {
-           cat("abbreviation\tequation", reaction, sep = "\n", ...)
+           cat("abbreviation\tname\tequation", reaction, sep = "\n", ...)
         }
         
         return(invisible(reaction))
