@@ -2,7 +2,7 @@
 #
 # extension for sybil to allow to add several reaction from one model to another
 # 
-# TODO: add handling of gprAssoc and subSystem
+# TODO: add handling of gprAssoc and subSystem !!
 # TODO: bug in Crev handling (NA inserted for new reactions)
 
 addMultiReact <- function(model, 
@@ -64,7 +64,10 @@ addMultiReact <- function(model,
     metName   <- met_name(src)[metInd]
     metComp   <- met_comp(src)[metInd]
   }else{
-    met       <- unique(unlist(mets))
+    uidx       <- !duplicated(unlist(mets))
+    met       <- unlist(mets)[uidx]
+    metComp   <- unlist(metComp)[uidx]
+    metName   <- unlist(metName)[uidx]
     nR        <- length(ids)
     if(length(obj)==1 & nR>1) obj <- rep(obj, nR)
     if(length(lb)==1 & nR>1)  lb  <- rep(lb,  nR)
