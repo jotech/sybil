@@ -1,3 +1,6 @@
+# TODO: needed stoichiometric numbers to be given as '(1)' (with round brackets)
+# TODO: needed compartment to be given as '[x]' (square brackets)
+
 library(stringr)
 
 
@@ -31,12 +34,12 @@ addReactByString <- function(model,
   mets  <- list()
   Scoef <- list()
   rev   <- vector(mode="logical", length=Nids)
-  for( i in 1:Nids){
+  for(i in 1:Nids){
     str    <- str_strip(react_str[i])
     dirtmp <- list("<==>"="BOTH", "<-->"="BOTH", "<=>"="BOTH", "<->"="BOTH",
                    "==>"="FORW", "-->"="FORW", "=>"="FORW", "->"="FORW",
                    "<=="="BACK", "<--"="BACK", "<="="BACK", "<-"="BACK") # TODO detection may cause problem, order of list is important (e.g. <== before <=)
-    dir    <- str_extract(str, paste(names(dirtmp), collapse="|"))
+    dir    <- stringr::str_extract(str, paste(names(dirtmp), collapse="|"))
     rev[i] <- unname(dirtmp[dir]=="BOTH")
     
     split   <- unlist(str_split(str, dir))
@@ -49,10 +52,10 @@ addReactByString <- function(model,
     Scoef    <- c(Scoef, list(rm.na(c(-1 * as.numeric(edu[2,]), as.numeric(pro[2,])))) )
     mets     <- c(mets,  list(rm.na(unname(c(edu[1,], pro[1,])))) )
   }
-  
-  lb <- ifelse(rev==TRUE, -1000, 0) # always the case?
+  lb    <- ifelse(rev==TRUE, -1000, 0) # always the case?
+  comp  <- lapply(mets, function(m){str_extract(m, "(?<=\\[).*?(?=\\])")})
   model <- addMultiReact(model=model, ids=ids, mets=mets, Scoefs=Scoef, reversible=rev, lb=lb, ub=ub, obj=obj, 
-                subSystem=subSystem, gprAssoc=gprAssoc, reactName=reactName, metName=metName, metComp=metComp)
+                subSystem=subSystem, gprAssoc=gprAssoc, reactName=reactName, metName=metName, metComp=comp)
   
   return(model)
 }
@@ -67,8 +70,8 @@ get_reactants <- function(str){
       scoef    <- 1.0
       met      <- str_strip(s)
     } else {
-      met <- str_strip(gsub(scoef,"",s))
-      met <- str_strip(gsub("\\(\\)","",met)) # TODO: needed numbers are given as '(1)' and not as '1'
+      met <- str_strip(sub(paste0("\\b",scoef,"\\b"),"",s))
+      met <- str_strip(sub("\\(\\)","",met))
     }
     c(met, scoef)
   })
