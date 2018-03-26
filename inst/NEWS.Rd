@@ -4,8 +4,38 @@
 \title{sybil News}
 \encoding{UTF-8}
 
-\newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
+\newcommand{\CRANpkg}{\href{https://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 
+\section{Changes in version 2.0.4 2017-07-18}{
+  \itemize{
+  	\item Minor changes for CRAN submission.
+  }
+}
+% ---------------------------------------------------------------------------- %
+
+\section{Changes in version 2.0.3 2017-07-12}{
+  \itemize{
+  	\item The function \code{genrateWT} caused a problem when setting only \code{solverParm} and no solver.
+  	\item \code{rmReact} handles now \code{react_attr} and \code{met_attr} corretly, if there is just one column.
+  }
+}
+% ---------------------------------------------------------------------------- %
+
+\section{Changes in version 2.0.2 2017-03-24}{
+  \itemize{
+  	\item The function \code{mod2irrev} crashed when using models with just one gene.
+  }
+}
+% ---------------------------------------------------------------------------- %
+\section{Changes in version 2.0.1 2016-07-05}{
+  \itemize{
+  	\item After \code{rmReact} the columns of \code{rxnGeneMat} and 
+  		\code{allGenes}-slot did not match.
+  	\item \code{upgradeModelorg} was not working correctly, when all gprRules
+  	are empty.
+  }
+}
+% ---------------------------------------------------------------------------- %
 \section{Changes in version 2.0.0 2016-05-17}{
   \itemize{
   	\item \code{modelorg}-class has changed and thus a slot \code{version} was introduced.

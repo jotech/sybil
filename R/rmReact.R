@@ -135,7 +135,7 @@ rmReact <- function(model, react, rm_met = TRUE) {
   react_de(mod_out)     <- react_de(model)[keepReact]
   
   if(ncol(react_attr(model))>0){
-      	react_attr(mod_out)   <- as.data.frame(react_attr(model)[keepReact,])
+      	react_attr(mod_out)   <- react_attr(model)[keepReact, , drop=F]
   }
 
   react_num(mod_out)    <- length(react_id(mod_out))
@@ -162,21 +162,9 @@ rmReact <- function(model, react, rm_met = TRUE) {
      	ag					<- ag[which(ncag != 0)]
       	allGenes(mod_out)   <- ag
       }
-      #TODO: update indices in the GPR rules accoording to the updated allGenes slot!
       
-
-      # reaction to gene mapping
-      #SrGMbin     <- rxnGeneMat(mod_out) != 0
-
-      #SrGMbindiag <- diag(crossprod(SrGMbin))
-
-      #keepGenes   <- ifelse(SrGMbindiag == 0, FALSE, TRUE)
-      keepGenes <- sapply(allGenes(model), function(x) match(x, allGenes(mod_out)))
-      keepGenes <- ifelse(is.na(keepGenes), FALSE, TRUE)
-      #print(keepGenes)
-
-      rxnGeneMat(mod_out)   <- rxnGeneMat(mod_out)[, keepGenes, drop = FALSE]
-      #print(dim(rxnGeneMat))
+      newGeneOrder <- match(allGenes(mod_out), allGenes(model))
+      rxnGeneMat(mod_out)   <- rxnGeneMat(mod_out)[, newGeneOrder, drop = FALSE]
   }
   
 
@@ -216,7 +204,7 @@ rmReact <- function(model, react, rm_met = TRUE) {
       met_de(mod_out)     <- met_de(model)[keepMet]
       
       if(ncol(met_attr(model))>0){
-      	met_attr(mod_out)   <- as.data.frame(met_attr(model)[keepMet, ])
+      	met_attr(mod_out)   <- met_attr(model)[keepMet, , drop=F]
       }
   }
   else {
